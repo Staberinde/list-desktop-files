@@ -22,6 +22,10 @@ if [ ! -a "$LocalArray" ];then
 FilePath="$GlobalArray"
 else
 	echo 'No config file found!!!'
+	echo 'To create new use options 
+	--update-local : scan system and save path into $HOME/.ListDF/custom-path/file.test
+	--update-global: scan system and save  into /opt/share/list-desktop-files/sorted.test
+	--create-local-list | --cll'
 	exit 1
 	fi
 else
@@ -32,7 +36,7 @@ fi
 IFS="
 "
 
-ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' $FilePath;
+ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 while read FromFile;do echo "$FromFile"  ; done < "$FilePath" | awk '{system("file "$0)}' |sort|uniq|  grep -v \)$ | grep ^\/ | awk -F': ' '{print $1}'))
 
 	BDskPath+=("$HOME/.local/share/applications")
@@ -404,11 +408,13 @@ Opts="scan-root"
 	ReCreateDskPath
 	ListDefault
 	;;
-
+--create-local-list | --cll)
+mkdir -p "$HOME/.ListDF/custom-path"
+	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$HOME/.ListDF/custom-path/file.test"
+	;;
 * ) 
 	ReCreateDskPath
 	ListDefault
 	;;
 
 esac
-
