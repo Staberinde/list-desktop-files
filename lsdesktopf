@@ -102,59 +102,6 @@ do
 		ADskPath+="$AddWithVariables";
 	fi
 done
-#ADskPath[0]="/usr/share/applications/"
-#ADskPath[8]="~/.local/share/applications/"
-
-#ADskPath[2]="/usr/local/share/applications"
-
-#ADskPath[3]="/etc/xdg/autostart/"
-#ADskPath[4]="~/.config/autostart/"
-
-#ADskPath[5]="$XDG_CONFIG_DIRS/autostart/"
-#ADskPath[6]="$XDG_CONFIG_HOME/autostart/"
-
-#ADskPath[7]="/usr/share/gnome/autostart/"
-
-#### Search with no subdirs # This is an example
-## !!!!  some of the desktop environments can create the
-## "Desktop" destination with another name, you must modify the script to fit your needs !!!!!
-#MaxDepth[1]="-maxdepth 1"
-#ADskPath[1]="~/Desktop"
-####
-
-#ADskPath[9]="/usr/etc/xdg/autostart/"
-#ADskPath[10]="/usr/share/mimelnk/application/"
-#ADskPath[11]="/usr/share/mimelnk/chemical/"
-#ADskPath[12]="/usr/lib/libreoffice/share/xdg/"
-#ADskPath[13]="/usr/share/xsessions/"
-#ADskPath[14]="/usr/share/apps/kdm/sessions/"
-#ADskPath[15]="/usr/share/gdm/greeter/autostart/"
-#ADskPath[16]="/usr/share/wayland-sessions/"
-#ADskPath[17]="/usr/share/apps/kdm/programs/"
-#ADskPath[18]="/usr/share/mate/wm-properties/"
-
-#ADskPath[19]="/usr/share/wayland-sessions/"
-
-#ADskPath[20]="/usr/share/apps/solid/actions/"
-
-#ADskPath[21]="/usr/share/xfce4/helpers/"
-
-#ADskPath[22]="/usr/share/kde*"
-#ADskPath[23]="/lib/libreoffice/share/xdg/"
-#ADskPath[24]="/etc/dynamic/launchers/scanner/"
-#ADskPath[25]="/lib/gnome-settings-daemon*"
-
-
-#ADskPath[26]="/usr/share/xgreeters/"
-
-#ADskPath[27]="/usr/share/dist/desktop-files/default/"
-#ADskPath[28]="/usr/share/parole/"
-#ADskPath[29]="/usr/share/mimelnk/application/"
-#ADskPath[30]="/usr/share/gnome/autostart/"
-
-#ADskPath[31]="/usr/share/Thunar/sendto/"
-#ADskPath[32]="/usr/share/gdm/autostart/"
-#ADskPath[33]="/usr/share/mga/"
 
 One=$1
 Two=$2
@@ -349,7 +296,7 @@ case "$1" in
 --var variable : search for variable in the *.desktop
 --all-sys-path | --asc : scanning only in /etc /usr /opt , supports default options
  
- Show RAW content of files
+ Dump RAW content of files to stdout
 --dump-all | --da : search in  / (may need root rights)
 --dump-default-path | --ddp : search and dump content from default path
 --dump-sys-path | --dsp : search and dump content from /usr /etc /opt
@@ -359,15 +306,19 @@ case "$1" in
 --show-sys-uniq | --ssu : show uniq variable names found in sys path (/usr /etc /opt)
 --find-uniq-path | --fup : find path that contain *.desktop files, default path is /
 #disabled option, buggy --scan-root | --sr : scanning in / (may need root rights)
+
+ Configuration
 --create-global-list | --cgl : scan system and save into /opt/share/list-desktop-files/sorted.test
 --create-local-list  | --cll : scan system and save into ~/.list-desktop-path/custom-path/sorted.test
+--show-local-defaults | --sld : show content of ~/.list-desktop-path/custom-path/sorted.test
+--show-global-defaults | --sgd : show content of /opt/share/list-desktop-files/sorted.test
 
  Usage:
 List content with default options:
- lsdsk
+ lsdesktopf
 Search only for specific text in default output:
- lsdsk gtk
- lsdsk game
+ lsdesktopf gtk
+ lsdesktopf game
 Use --var option (supporting grep syntax):
 --var Name=
 --var 'Name\[zn_CN\]'
@@ -480,14 +431,27 @@ Opts="scan-root"
 	;;
 --create-global-list | --cgl)
 	if [[ "$UID" != 0 ]];then  
-		echo 'You must run it as user root'
+		echo 'You must start it as user root'
 		exit 1
 	else
 	mkdir -p "$(dirname $LocalArray)"
 	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
 	fi
 	;;
-
+--show-local-defaults | --sld)
+	if [[ -f "~/.list-desktop-path/custom-path/sorted.test" ]];then
+		cat "~/.list-desktop-path/custom-path/sorted.test"
+	else
+	echo 'Does not exist ~/.list-desktop-path/custom-path/sorted.test'
+	fi
+	;;
+--show-global-defaults | --sgd)
+	if [[ -f "/opt/share/list-desktop-files/sorted.test" ]];then
+		cat "/opt/share/list-desktop-files/sorted.test"
+	else
+	echo 'Does not exist /opt/share/list-desktop-files/sorted.test'
+	fi
+	;;
 * ) 
 	ReCreateDskPath
 	ListDefault
