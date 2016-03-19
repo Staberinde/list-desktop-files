@@ -1,7 +1,7 @@
 #!/bin/bash
-##Version 3.0.0-0
+##Version 1.0.0-0
 #
-#License: GPL
+#License: GPL2
 #
 #Author: Andy Crowd
 #Tested in Arch Linux
@@ -291,29 +291,36 @@ esac
 case "$1" in
 
 --help ) 
+#disabled option, buggy --scan-root | --sr : scanning in / (may need root rights)
 	echo "OPTIONS
 --help : show this help message
---var variable : search for variable in the *.desktop
+
+ Search for content in Name,Comment,Exec,Category.
 --all-sys-path | --asc : scanning only in /etc /usr /opt , supports default options
+Without supported extended options (begins with --) will use defaults
  
  Dump RAW content of files to stdout
 --dump-all | --da : search in  / (may need root rights)
 --dump-default-path | --ddp : search and dump content from default path
 --dump-sys-path | --dsp : search and dump content from /usr /etc /opt
+--show-me | --sm : show content of this script
 
  Search content of variables
+--var variable : search for variable in the *.desktop
 --show-uniq-def | --sud : show all uniq base variable names found in default path
 --show-sys-uniq | --ssu : show uniq variable names found in sys path (/usr /etc /opt)
---find-uniq-path | --fup : find path that contain *.desktop files, default path is /
-#disabled option, buggy --scan-root | --sr : scanning in / (may need root rights)
+
 
  Configuration
---create-global-list | --cgl : scan system and save into /opt/share/list-desktop-files/sorted.test
---create-local-list  | --cll : scan system and save into ~/.list-desktop-path/custom-path/sorted.test
+--create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
+--create-local-list  | --cll : scan system and save dirs into ~/.list-desktop-path/custom-path/sorted.test
 --show-local-defaults | --sld : show content of ~/.list-desktop-path/custom-path/sorted.test
 --show-global-defaults | --sgd : show content of /opt/share/list-desktop-files/sorted.test
+--show-default-directories | --sdd : if config files doesn\'t exist then it show internal dirs
 
- Usage:
+--find-uniq-path | --fup : find path that contain *.desktop files, default path is /
+
+ Usage examples
 List content with default options:
  lsdesktopf
 Search only for specific text in default output:
@@ -321,7 +328,7 @@ Search only for specific text in default output:
  lsdesktopf game
 Use --var option (supporting grep syntax):
 --var Name=
---var 'Name\[zn_CN\]'
+--var 'Name\[zn_CN\]' -e "Exec="
 Scan for all *.desktop files in sys path (/usr /etc /opt)
 --asc 
 --asc gtk
@@ -434,23 +441,32 @@ Opts="scan-root"
 		echo 'You must start it as user root'
 		exit 1
 	else
-	mkdir -p "$(dirname $LocalArray)"
-	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
+		mkdir -p "$(dirname $LocalArray)"
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
 	fi
 	;;
 --show-local-defaults | --sld)
 	if [[ -f "~/.list-desktop-path/custom-path/sorted.test" ]];then
 		cat "~/.list-desktop-path/custom-path/sorted.test"
 	else
-	echo 'Does not exist ~/.list-desktop-path/custom-path/sorted.test'
+		echo 'Does not exist ~/.list-desktop-path/custom-path/sorted.test'
 	fi
 	;;
 --show-global-defaults | --sgd)
 	if [[ -f "/opt/share/list-desktop-files/sorted.test" ]];then
 		cat "/opt/share/list-desktop-files/sorted.test"
 	else
-	echo 'Does not exist /opt/share/list-desktop-files/sorted.test'
+		echo 'Does not exist /opt/share/list-desktop-files/sorted.test'
 	fi
+	;;
+--show-default-directories | --sdd)
+	for SDD in ${DefDskPath[@]}; do
+		echo "$SDD"
+	done
+	;;
+--show-me | --sm)
+	cat $0
+	echo '# my path: '" $0"
 	;;
 * ) 
 	ReCreateDskPath
