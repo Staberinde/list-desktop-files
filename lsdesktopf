@@ -346,7 +346,7 @@ Use --find-uniq-path or --fup
 		if [[ -d "$StartCmdLine" ]]; then
   		InPath="$StartCmdLine"
  		fi
-	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
+	find $InPath -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
  #| awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
