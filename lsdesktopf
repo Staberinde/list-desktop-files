@@ -197,7 +197,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
                 grep ^ -H -R --include \*.desktop "${fdPath}"
 		;;
 	sud )
-		grep = -R -h --include \*.desktop "${fdPath}" | cut -d= -f 1 | grep -v "\[" | sort | uniq
+		grep = -R -h --include \*.desktop "${fdPath}" | cut -d= -f 1 | grep -v -e "\[" -e ^\# | sort | uniq
 		;;
 	esac
     fi;
