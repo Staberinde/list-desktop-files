@@ -15,24 +15,6 @@
 ## Check if exist config file
 GlobalArray="/opt/share/list-desktop-files/sorted.test"
 LocalArray="~/.list-desktop-path/custom-path/file.test"
-
-if [[  ! -f "$LocalArray" ]];then
-
-	if [[  -f "$GlobalArray" ]];then
-FilePath="$GlobalArray"
-
-else
-
-	#	echo 'No config file found!!!'
-#	echo 'To create new use options 
-#--create-global-list | --cgl : scan system and save into /opt/share/list-desktop-files/sorted.test
-#--create-local-list  | --cll : scan system and save into ~/.list-desktop-path/custom-path/sorted.test
-#or save example file 
-#/opt/share/list-desktop-files/folder_list.example.txt
-#as sorted.test'
-# exit 1
-####################
-####################
 DefDskPath+=("/etc/dynamic/launchers/scanner")
 DefDskPath+=("/etc/xdg/autostart")
 DefDskPath+=("/etc/xdg/xfce*/panel/launcher-*")
@@ -68,6 +50,27 @@ DefDskPath+=("/usr/share/xfce*/panel/plugins")
 DefDskPath+=("/usr/share/xgreeters")
 DefDskPath+=("/usr/share/xsessions")
 DefDskPath+=("~/.local/share/")
+
+##########################################
+##########################################
+
+if [[  ! -f "$LocalArray" ]];then
+
+	if [[  -f "$GlobalArray" ]];then
+FilePath="$GlobalArray"
+
+else
+
+	#	echo 'No config file found!!!'
+#	echo 'To create new use options 
+#--create-global-list | --cgl : scan system and save into /opt/share/list-desktop-files/sorted.test
+#--create-local-list  | --cll : scan system and save into ~/.list-desktop-path/custom-path/sorted.test
+#or save example file 
+#/opt/share/list-desktop-files/folder_list.example.txt
+#as sorted.test'
+# exit 1
+####################
+####################
 
 ADskPath=($(for FromDDP in ${DefDskPath[@]};do
 	file "$FromDDP";
@@ -114,36 +117,34 @@ NoEmpty=($(for InDskPath in ${ADskPath[@]};do echo $InDskPath|sort|uniq;done));
 #IFS=OldIFS
 #DskPath=(${NoEmpty[@]})
 
+########################################
 ReCreateDskPath(){
-
 
 case "$Opts" in
  
 	OnlyNew1 )
 DskPath=($(if [[ ! -z $2 ]]; then  
 	 for StartCmdLine in $@;
- 	 do
+	 	do
 
- if [[ -d "$StartCmdLine" ]]; then
-  InPath="$StartCmdLine"
- fi
+ 		if [[ -d "$StartCmdLine" ]]; then
+		  InPath="$StartCmdLine"
+ 		fi
 
- find "$InPath" -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+find "$InPath" -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 
- if [[ "$InPath" == "/" ]];then 
-  exit
- fi
+ 		if [[ "$InPath" == "/" ]];then 
+  		exit 0
+ 		fi
 
-done
+	done
 else
- find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 fi))
-
 ;;
 	scan-sys-path )
 		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq))
-	
-	;;
+		;;
 #	scan-root )
 #		echo "   "Please wait...
 #		DskPath=($(find "/"  -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq))
@@ -152,12 +153,11 @@ fi))
 
 	*)
 	DskPath=(${NoEmpty[@]})
-;;
+	;;
 esac
-
 }
 
-
+########################################
 ListDefault(){
 
 for fdPath in "${DskPath[@]}";do
@@ -218,7 +218,6 @@ done
 }
 ###################  Search specific ####
 OffPrint="no";
-
 SearchContentOfVariable(){
 for fdPath in "${DskPath[@]}";do
 
@@ -254,10 +253,8 @@ var-sys)
 	grep -e ^"$Var" $Additional -H -R --include \*.desktop /usr/ /etc /opt
 	;;
 esac
-
-
 }
-####################
+########################################
 RawView(){
 for fdPath in "${DskPath[@]}";do
 
@@ -276,15 +273,10 @@ done | case $Opts in
 	suo )
 		grep = | cut -d= -f 1 | grep -v -e "\[" -e ^\# | sort | uniq
 		;;
-
 esac
-
 }
 
 ###################
-
-
-
 ###################
 ###################
 
@@ -308,6 +300,7 @@ Without supported extended options (begins with --) will use defaults
  Search content of variables
 --var variable : search for variable in the *.desktop
 --show-uniq-def | --sud : show all uniq base variable names found in default path
+--var-sys | --vs : show all uniq base variable names found in /usr /etc /opt
 --show-sys-uniq | --ssu : show uniq variable names found in sys path (/usr /etc /opt)
 
 
@@ -316,7 +309,7 @@ Without supported extended options (begins with --) will use defaults
 --create-local-list  | --cll : scan system and save dirs into ~/.list-desktop-path/custom-path/sorted.test
 --show-local-defaults | --sld : show content of ~/.list-desktop-path/custom-path/sorted.test
 --show-global-defaults | --sgd : show content of /opt/share/list-desktop-files/sorted.test
---show-default-directories | --sdd : if config files doesn\'t exist then it show internal dirs
+--show-default-directories | --sdd : show internal dirs (that use if no )
 
 --find-uniq-path | --fup : find path that contain *.desktop files, default path is /
 
@@ -339,96 +332,89 @@ Use --find-uniq-path or --fup
 	;;
 --var )
 	ReCreateDskPath
-
-if [[  ! -z "$2"    ]];then  
-	Var="$2"
- if [[ "$#" -gt 2  ]];then 
-OptionsToGrep=($@);
-Additional="${OptionsToGrep[@]:2}"  ;
- fi;
-	Opts="var"
-	SearchContentOfVariable
-else
-	echo "Error, parameter to --var is missing
-example: --var MimeType"
- fi	
- ;;
+	if [[  ! -z "$2"    ]];then  
+		Var="$2"
+ 	if [[ "$#" -gt 2  ]];then 
+	OptionsToGrep=($@);
+	Additional="${OptionsToGrep[@]:2}"  ;
+ 	fi;
+		Opts="var"
+		SearchContentOfVariable
+	else
+		echo "Error, parameter to --var is missing
+	example: --var MimeType"
+ 	fi	 	;;
  --var-sys | --vs)
 #	ReCreateDskPath
-
-if [[  ! -z "$2"    ]];then  
+	if [[  ! -z "$2"    ]];then  
 	Var="$2"
- if [[ "$#" -gt 2  ]];then 
-OptionsToGrep=($@);
-Additional="${OptionsToGrep[@]:2}"  ;
- fi;
+ 	if [[ "$#" -gt 2  ]];then 
+	OptionsToGrep=($@);
+	Additional="${OptionsToGrep[@]:2}"  ;
+	 fi;
 	Opts="var-sys"
 	SearchContentOfVariable
-else
-	echo "Error, parameter to --var-sys is missing
-example: --var MimeType"
- fi	
-;;
+	else
+		echo "Error, parameter to --var-sys is missing
+	example: --var MimeType"
+ 	fi	
+	;;
 --dump-all | --da ) 
 	grep -i ^ -H -R --include \*.desktop "/"
 	;;
 --dump-sys-path | --dsp )
 	grep -i ^ -H -R --include \*.desktop "/usr /etc /opt"
-
 	;;
 --dump-default-path | --ddp )
 	Opts="ddp"
-  ReCreateDskPath
+  	ReCreateDskPath
      	SearchContentOfVariable
-
 	;;
 --show-uniq-def | --sud )
 	Opts="sud"
- ReCreateDskPath
+ 	ReCreateDskPath
       	SearchContentOfVariable
 	;;
---show-uniq-only | --suo )
-OffPrint="yes"
-Opts=suo
-ReCreateDskPath
+	--show-uniq-only | --suo )
+	OffPrint="yes"
+	Opts=suo
+	ReCreateDskPath
 
-RawView
+	RawView
 	;;	
 --show-sys-uniq | --ssu )
-Opts="sys-uniq"
+	Opts="sys-uniq"
 	SearchContentOfVariable
 
 	;;
 --find-uniq-path | --fup )
 
-if [[ ! -z $Two ]]; then  
+	if [[ ! -z $Two ]]; then  
 	 for StartCmdLine in $@;
  	 do
 
- if [[ -d "$StartCmdLine" ]]; then
-  InPath="$StartCmdLine"
- fi
+ 	if [[ -d "$StartCmdLine" ]]; then
+  	InPath="$StartCmdLine"
+ 	fi
 
- find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
+ 	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
  #| awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+	 if [[ "$InPath" == "/" ]];then 
+  	exit
+ 	fi
 
- if [[ "$InPath" == "/" ]];then 
-  exit
- fi
-
-done
-else
- find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
-fi
-
-;;
+	done
+	else
+ 	find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+	fi
+	;;
 --all-sys-path | --asc)
-Opts="scan-sys-path"
+	Opts="scan-sys-path"
 	ReCreateDskPath
 	ListDefault
 	;;
 --scan-root | --sr)
-Opts="scan-root"
+	Opts="scan-root"
 	ReCreateDskPath
 	ListDefault
 	;;
@@ -472,5 +458,4 @@ Opts="scan-root"
 	ReCreateDskPath
 	ListDefault
 	;;
-
 esac
