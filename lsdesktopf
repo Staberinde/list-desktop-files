@@ -408,6 +408,7 @@ Use --find-uniq-path or --fup
 	else
 		echo You must be root!
 	fi
+	;;
 --show-me | --sm)
 	cat $0
 	echo '# my path: '" $0"
