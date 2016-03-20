@@ -427,8 +427,8 @@ Use --find-uniq-path or --fup
 		echo 'You must start it as user root'
 		exit 1
 	else
-		mkdir -p "$(dirname $LocalArray)"
-		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
+		mkdir -p "$(dirname $GlobalArray)"
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$GlobalArray"
 	fi
 	;;
 --show-local-defaults | --sld)
