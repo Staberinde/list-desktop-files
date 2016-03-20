@@ -341,19 +341,20 @@ Use --find-uniq-path or --fup
 	;;
 --find-uniq-path | --fup )
 	if [[ ! -z $Two ]]; then  
-	 for StartCmdLine in $@;
- 	 do
- 	if [[ -d "$StartCmdLine" ]]; then
-  	InPath="$StartCmdLine"
- 	fi
- 	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
+	for StartCmdLine in $@; 
+		do
+		if [[ -d "$StartCmdLine" ]]; then
+  		InPath="$StartCmdLine"
+ 		fi
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
  #| awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 	 if [[ "$InPath" == "/" ]];then 
-  	exit
- 	fi
+	  	exit 0
+ 		fi
 	done
 	else
- 	find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+		find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName);
+		print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 	fi
 	;;
 --all-sys-path | --asc)
