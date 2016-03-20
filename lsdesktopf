@@ -7,14 +7,15 @@
 #Tested in Arch Linux
 #Search in *.desktop for "Categories" and "Exec"
 #
-
 # sudo find /etc/ /usr/ /opt/ /lib/ /var/ -type f  -name "*\.desktop"  -exec dirname "{}" \; | sed 's/[0-9]/*/g' | sed 's/\*[\.]\*/*/g' |  uniq
 # Decode variables: file /etc/xdg/xfce*/panel*/launcher-* | awk -F': ' '{print $1}' | grep -v \)$
-
-
 ## Check if exist config file
+OldIFS=IFS
+unset IFS
+IFS="
+"
 GlobalArray="/opt/share/list-desktop-files/sorted.test"
-LocalArray="~/.list-desktop-path/custom-path/file.test"
+LocalArray="~/.list-desktop-path/custom-path/sorted.test"
 DefDskPath+=("/etc/dynamic/launchers/scanner")
 DefDskPath+=("/etc/xdg/autostart")
 DefDskPath+=("/etc/xdg/xfce*/panel/launcher-*")
@@ -50,18 +51,14 @@ DefDskPath+=("/usr/share/xfce*/panel/plugins")
 DefDskPath+=("/usr/share/xgreeters")
 DefDskPath+=("/usr/share/xsessions")
 DefDskPath+=("~/.local/share/")
-
 ##########################################
 ##########################################
-
 if [[  ! -f "$LocalArray" ]];then
-
 	if [[  -f "$GlobalArray" ]];then
-FilePath="$GlobalArray"
+	FilePath="$GlobalArray"
 
-else
-
-	#	echo 'No config file found!!!'
+	else
+#	echo 'No config file found!!!'
 #	echo 'To create new use options 
 #--create-global-list | --cgl : scan system and save into /opt/share/list-desktop-files/sorted.test
 #--create-local-list  | --cll : scan system and save into ~/.list-desktop-path/custom-path/sorted.test
@@ -69,74 +66,53 @@ else
 #/opt/share/list-desktop-files/folder_list.example.txt
 #as sorted.test'
 # exit 1
-####################
-####################
 
+####################
 ADskPath=($(for FromDDP in ${DefDskPath[@]};do
 	file "$FromDDP";
 done |sort|uniq|  grep -v \)$ | grep ^\/ | awk -F': ' '{print $1}'))
-
-####################
 ####################
 	fi
 else
 	FilePath="$LocalArray"
 fi
-
-
-IFS="
-"
-#echo ${#ADskPath[@]}
-#exit 0
 if [[ "${#ADskPath}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
-	while read FromFile;do echo "$FromFile"  ; done < "$FilePath" | awk '{system("file "$0)}' |sort|uniq|  grep -v \)$ | grep ^\/ | awk -F': ' '{print $1}'))
-
+	while read FromFile;do echo "$FromFile"  ; 
+	done < "$FilePath" | awk '{system("file "$0)}' |sort|uniq|  grep -v \)$ | grep ^\/ | awk -F': ' '{print $1}'))
 		BDskPath+=("~/.local/share/applications")
 		BDskPath+=("~/.config/autostart")
 		BDskPath+=("$XDG_CONFIG_DIRS/autostart")
 		BDskPath+=("$XDG_CONFIG_HOME/autostart")
-
 fi
-
 for AddWithVariables in ${BDskPath[@]};
 do
 	if [ -d "$BDskPath" ];then
 		ADskPath+="$AddWithVariables";
 	fi
 done
-
 One=$1
 Two=$2
 Three=$3
-OldIFS=IFS
-IFS="
-"
 NoEmpty=($(for InDskPath in ${ADskPath[@]};do echo $InDskPath|sort|uniq;done));
 #unset IFS
 #IFS=OldIFS
 #DskPath=(${NoEmpty[@]})
-
 ########################################
 ReCreateDskPath(){
-
 case "$Opts" in
- 
 	OnlyNew1 )
 DskPath=($(if [[ ! -z $2 ]]; then  
 	 for StartCmdLine in $@;
 	 	do
-
  		if [[ -d "$StartCmdLine" ]]; then
 		  InPath="$StartCmdLine"
  		fi
-
 find "$InPath" -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 
  		if [[ "$InPath" == "/" ]];then 
   		exit 0
  		fi
-
 	done
 else
 find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
@@ -150,31 +126,25 @@ fi))
 #		DskPath=($(find "/"  -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq))
 #	
 #	;;
-
 	*)
 	DskPath=(${NoEmpty[@]})
 	;;
 esac
 }
-
 ########################################
 ListDefault(){
-
 for fdPath in "${DskPath[@]}";do
-
-	## Replace One with Two
+## Replace One with Two
 if [[ ! -z "$One"   ]];then
  if [[ "$One" ==  "--all-sys-path" || "$One" == --asc ]];then
 	 One=$Two
  fi
 fi
-
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
   printf "\e[1;36m ${fdPath} \e[0m \n";
   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then
-
      find "${fdPath}" ${MaxDepth[Count]}  -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
 if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"Name=")       == 1) inNm=substr($0,index($0,"=")+1);
@@ -182,11 +152,8 @@ if(index($0,"Comment=")    == 1) inComment=substr($0,index($0,"=")+1);
 if(index($0,"Command")     == 1) inCmd=substr($0,index($0,"=")+1) ;
 if(index($0,"Module=")     == 1) inExc=substr($0,index($0,"=")+1);
 if(index($0,"Exec=")       == 1) inExc=substr($0,index($0,"=")+1);
-
-
 if(index($0,"Category=") >= 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"X-XFCE-Binaries=") >= 1) inExc=substr($0,index($0,"=")+1);
-
      }END{
 if(! Ctgr ){E=inNm}else{E=Ctgr};
 if(! inExc){CmdLine=inCmd}else{CmdLine=inExc};
@@ -201,10 +168,8 @@ if(index($0,"Name=")      == 1) inNm=substr($0,index($0,"=")+1);
 if(index($0,"Exec=")      == 1) inExc=substr($0,index($0,"=")+1);
 if(index($0,"Comment=")   == 1) inComment=substr($0,index($0,"=")+1);
 if(index($0,"Command=")   == 1) inCmd=substr($0,index($0,"=")+1) ;
-
 if(index($0,"Category=") >= 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"X-XFCE-Binaries=") >= 1) inExc=substr($0,index($0,"=")+1);
-
 }END{
 if(! Ctgr ){E=inNm}else{E=Ctgr};
 if(! inExc){CmdLine=inCmd}else{CmdLine=inExc};
@@ -213,21 +178,18 @@ if(! E)E=inComment;
 if(CmdLine)print Z;}' "{}" \;
  fi;
 fi
-
 done
 }
 ###################  Search specific ####
 OffPrint="no";
 SearchContentOfVariable(){
 for fdPath in "${DskPath[@]}";do
-
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
 [[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m ${fdPath} \e[0m \n";
-
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
-case $Opts in
+	case $Opts in
 	var )
 		grep -e ^"$Var" $Additional -H -R --include \*.desktop "${fdPath}" 
 		;;
@@ -237,13 +199,11 @@ case $Opts in
 	sud )
 		grep = -R -h --include \*.desktop "${fdPath}" | cut -d= -f 1 | grep -v "\[" | sort | uniq
 		;;
-
-esac
+	esac
     fi;
 fi
-
-
 done
+
 case  "$Opts" in
 	sys-uniq)
 #DskPath=($(find "/usr/" "/etc/" "/opt"  -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq))
@@ -257,31 +217,24 @@ esac
 ########################################
 RawView(){
 for fdPath in "${DskPath[@]}";do
-
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
  [[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m ${fdPath} \e[0m \n";
-
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
 [[ "$Opts" == "suo"  ]] && find "${fdPath}" -type f -name "*\.desktop" -exec grep ^ "{}" \;
-
     fi;
 fi
-
 done | case $Opts in
 	suo )
 		grep = | cut -d= -f 1 | grep -v -e "\[" -e ^\# | sort | uniq
 		;;
 esac
 }
-
 ###################
 ###################
 ###################
-
 case "$1" in
-
 --help ) 
 #disabled option, buggy --scan-root | --sr : scanning in / (may need root rights)
 	echo "OPTIONS
@@ -289,7 +242,7 @@ case "$1" in
 
  Search for content in Name,Comment,Exec,Category.
 --all-sys-path | --asc : scanning only in /etc /usr /opt , supports default options
-Without supported extended options (begins with --) will use defaults
+Without supported extended options (begins with --) will list or search in default
  
  Dump RAW content of files to stdout
 --dump-all | --da : search in  / (may need root rights)
@@ -303,13 +256,14 @@ Without supported extended options (begins with --) will use defaults
 --var-sys | --vs : show all uniq base variable names found in /usr /etc /opt
 --show-sys-uniq | --ssu : show uniq variable names found in sys path (/usr /etc /opt)
 
-
  Configuration
 --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
 --create-local-list  | --cll : scan system and save dirs into ~/.list-desktop-path/custom-path/sorted.test
 --show-local-defaults | --sld : show content of ~/.list-desktop-path/custom-path/sorted.test
 --show-global-defaults | --sgd : show content of /opt/share/list-desktop-files/sorted.test
 --show-default-directories | --sdd : show internal dirs (that use if no )
+--remove-local-config : removing ~/.list-desktop-path/custom-path/sorted.test
+--remove-global-config : removing /opt/share/list-desktop-files/sorted.test
 
 --find-uniq-path | --fup : find path that contain *.desktop files, default path is /
 
@@ -322,7 +276,7 @@ Search only for specific text in default output:
 Use --var option (supporting grep syntax):
 --var Name=
 --var 'Name\[zn_CN\]' -e "Exec="
-Scan for all *.desktop files in sys path (/usr /etc /opt)
+Scan for all *.desktop files in /usr /etc /opt
 --asc 
 --asc gtk
 Use --find-uniq-path or --fup 
@@ -379,30 +333,24 @@ Use --find-uniq-path or --fup
 	OffPrint="yes"
 	Opts=suo
 	ReCreateDskPath
-
 	RawView
 	;;	
 --show-sys-uniq | --ssu )
 	Opts="sys-uniq"
 	SearchContentOfVariable
-
 	;;
 --find-uniq-path | --fup )
-
 	if [[ ! -z $Two ]]; then  
 	 for StartCmdLine in $@;
  	 do
-
  	if [[ -d "$StartCmdLine" ]]; then
   	InPath="$StartCmdLine"
  	fi
-
  	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
  #| awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 	 if [[ "$InPath" == "/" ]];then 
   	exit
  	fi
-
 	done
 	else
  	find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
@@ -450,6 +398,15 @@ Use --find-uniq-path or --fup
 		echo "$SDD"
 	done
 	;;
+--remove-local-config) 
+	rm -i "~/.list-desktop-path/custom-path/sorted.test"
+	;;
+--remove-global-config) 
+	if [[ "$UID" -eq "0" ]];then
+		rm -i "/opt/share/list-desktop-files/sorted.test"
+	else
+		echo You must be root!
+	fi
 --show-me | --sm)
 	cat $0
 	echo '# my path: '" $0"
