@@ -276,7 +276,7 @@ Search only for specific text in default output:
  lsdesktopf game
 Use --var option (supporting grep syntax):
 --var Name=
---var 'Name\[zn_CN\]' -e "Exec="
+--var "Name\[zn_CN\]" -e "Exec="
 Scan for all *.desktop files in /usr /etc /opt
 --asc 
 --asc gtk
