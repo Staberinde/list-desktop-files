@@ -238,7 +238,7 @@ esac
 case "$1" in
 --help ) 
 #disabled option, buggy --scan-root | --sr : scanning in / (may need root rights)
-	echo "OPTIONS
+	echo 'OPTIONS
 --help : show this help message
 
  Search for content in Name,Comment,Exec,Category.
@@ -283,7 +283,7 @@ Scan for all *.desktop files in /usr /etc /opt
 Use --find-uniq-path or --fup 
 --fup 
 --fup /usr /etc
-"
+'
 	;;
 --var )
 	ReCreateDskPath
@@ -396,7 +396,7 @@ Use --find-uniq-path or --fup
 	fi
 	;;
 --show-default-directories | --sdd)
-	for SDD in ${DefDskPath[@]}; do
+	for SDD in "${DefDskPath[@]}"; do
 		echo "$SDD"
 	done
 	;;
