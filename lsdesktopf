@@ -91,9 +91,9 @@ do
 		ADskPath+="$AddWithVariables";
 	fi
 done
-One=$1
-Two=$2
-Three=$3
+One="$1"
+Two="$2"
+#Three="$3"
 NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort|uniq;));
 #unset IFS
 #IFS=OldIFS
