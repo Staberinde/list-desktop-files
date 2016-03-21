@@ -68,7 +68,7 @@ if [[  ! -f "$LocalArray" ]];then
 # exit 1
 
 ####################
-ADskPath=($(for FromDDP in ${DefDskPath[@]};do
+ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
 	file "$FromDDP";
 done |sort|uniq|  grep -v \)$ | grep ^/ | awk -F': ' '{print $1}'))
 ####################
@@ -342,7 +342,7 @@ Use --find-uniq-path or --fup
 	;;
 --find-uniq-path | --fup )
 	if [[ ! -z $Two ]]; then  
-	for StartCmdLine in $@; 
+	for StartCmdLine in "$@"; 
 		do
 		if [[ -d "$StartCmdLine" ]]; then
   		InPath="$StartCmdLine"
