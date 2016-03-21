@@ -70,7 +70,7 @@ if [[  ! -f "$LocalArray" ]];then
 ####################
 ADskPath=($(for FromDDP in ${DefDskPath[@]};do
 	file "$FromDDP";
-done |sort|uniq|  grep -v \)$ | grep ^\/ | awk -F': ' '{print $1}'))
+done |sort|uniq|  grep -v \)$ | grep ^/ | awk -F': ' '{print $1}'))
 ####################
 	fi
 else
@@ -79,22 +79,22 @@ fi
 if [[ "${#ADskPath[@]}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
-	done < "$FilePath" | awk '{system("file "$0)}' |sort|uniq|  grep -v \)$ | grep ^\/ | awk -F': ' '{print $1}'))
+	done < "$FilePath" | awk '{system("file "$0)}' |sort|uniq|  grep -v \)$ | grep ^/ | awk -F': ' '{print $1}'))
 		BDskPath+=("$HOME/.local/share/applications")
 		BDskPath+=("$HOME/.config/autostart")
 		BDskPath+=("$XDG_CONFIG_DIRS/autostart")
 		BDskPath+=("$XDG_CONFIG_HOME/autostart")
 fi
-for AddWithVariables in ${BDskPath[@]};
+for AddWithVariables in "${BDskPath[@]}";
 do
-	if [ -d "$BDskPath" ];then
+	if [ -d "$AddWithVariables" ];then
 		ADskPath+="$AddWithVariables";
 	fi
 done
 One=$1
 Two=$2
 Three=$3
-NoEmpty=($(for InDskPath in ${ADskPath[@]};do echo $InDskPath|sort|uniq;done));
+NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort|uniq;));
 #unset IFS
 #IFS=OldIFS
 #DskPath=(${NoEmpty[@]})
