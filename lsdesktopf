@@ -10,7 +10,7 @@
 # sudo find /etc/ /usr/ /opt/ /lib/ /var/ -type f  -name "*\.desktop"  -exec dirname "{}" \; | sed 's/[0-9]/*/g' | sed 's/\*[\.]\*/*/g' |  uniq
 # Decode variables: file /etc/xdg/xfce*/panel*/launcher-* | awk -F': ' '{print $1}' | grep -v \)$
 ## Check if exist config file
-OldIFS=IFS
+OldIFS="$IFS"
 unset IFS
 IFS="
 "
