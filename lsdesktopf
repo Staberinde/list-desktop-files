@@ -10,7 +10,7 @@
 # sudo find /etc/ /usr/ /opt/ /lib/ /var/ -type f  -name "*\.desktop"  -exec dirname "{}" \; | sed 's/[0-9]/*/g' | sed 's/\*[\.]\*/*/g' |  uniq
 # Decode variables: file /etc/xdg/xfce*/panel*/launcher-* | awk -F': ' '{print $1}' | grep -v \)$
 ## Check if exist config file
-OldIFS="$IFS"
+#OldIFS="$IFS"
 unset IFS
 IFS="
 "
@@ -103,7 +103,7 @@ ReCreateDskPath(){
 case "$Opts" in
 	OnlyNew1 )
 DskPath=($(if [[ ! -z $2 ]]; then  
-	 for StartCmdLine in $@;
+	 for StartCmdLine in "$@";
 	 	do
  		if [[ -d "$StartCmdLine" ]]; then
 		  InPath="$StartCmdLine"
@@ -145,7 +145,8 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
   printf "\e[1;36m ${fdPath} \e[0m \n";
   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then
-     find "${fdPath}" ${MaxDepth[Count]}  -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
+    # ${MaxDepth[Count]}
+     find "${fdPath}" -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
 if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"Name=")       == 1) inNm=substr($0,index($0,"=")+1);
 if(index($0,"Comment=")    == 1) inComment=substr($0,index($0,"=")+1);
@@ -197,7 +198,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
                 grep ^ -H -R --include \*.desktop "${fdPath}"
 		;;
 	sud )
-		grep = -R -h --include \*.desktop "${fdPath}" | cut -d= -f 1 | grep -v -e "\[" -e ^\# | sort | uniq
+		grep \= -R -h --include \*.desktop "${fdPath}" | cut -d= -f 1 | grep -v -e "\[" -e ^\# | sort | uniq
 		;;
 	esac
     fi;
