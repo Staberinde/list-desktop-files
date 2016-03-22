@@ -300,7 +300,8 @@ Use --find-uniq-path or --fup
 	else
 		echo "Error, parameter to --var is missing
 	example: --var MimeType"
- 	fi	 	;;
+ 	fi	 	
+ 	;;
  --var-sys | --vs)
 #	ReCreateDskPath
 	if [[  ! -z "$2"    ]];then  
