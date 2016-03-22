@@ -417,6 +417,19 @@ Use --find-uniq-path or --fup
 	cat $0
 	echo '# my path: '" $0"
 	;;
+--info)
+echo 'Information: https://specifications.freedesktop.org/desktop-entry-spec/latest/
+Exec specifications: https://specifications.freedesktop.org/desktop-entry-spec/latest/ar01s06.html
+Short overview:
+Single source file/url:
+%f 
+%u
+Multiple source file/url:
+%F
+%U
+'
+	
+	;;
 * ) 
 	ReCreateDskPath
 	ListDefault
