@@ -237,9 +237,9 @@ esac
 ###################
 ###################
 ###################
-case "$1" in
---help ) 
 #disabled option, buggy --scan-root | --sr : scanning in / (may need root rights)
+case "$1" in
+--help )
 	echo 'OPTIONS
 --help : show this help message
 
