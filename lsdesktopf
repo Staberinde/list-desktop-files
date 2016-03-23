@@ -14,6 +14,9 @@
 unset IFS
 IFS="
 "
+One="$1"
+Two="$2"
+
 GlobalArray="/opt/share/list-desktop-files/sorted.test"
 LocalArray="$HOME/.list-desktop-path/custom-path/sorted.test"
 DefDskPath+=("/etc/dynamic/launchers/scanner")
@@ -97,8 +100,7 @@ do
 		ADskPath+="$AddWithVariables";
 	fi
 done
-One="$1"
-Two="$2"
+
 #Three="$3"
 NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort|uniq;));
 #unset IFS
@@ -208,6 +210,9 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 	sud )
 		grep '=' -R -h --include \*.desktop "${fdPath}"|cut -d= -f 1|grep -v -e "\[" -e ^\# |sort|uniq
 		;;
+	no-var )
+		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" $Additional "{}" \;
+		;;
 	esac
     fi;
 fi
@@ -253,10 +258,11 @@ case "$1" in
 --all-sys-path | --asc : scanning only in /etc /usr /opt , supports default options
 Without supported extended options (begins with --) will list or search in default
  
- Dump RAW content of files to stdout
+ Dump RAW content of *.desktop files to stdout
 --dump-all | --da : search in  / (may need root rights)
 --dump-default-path | --ddp : search and dump content from default path
 --dump-sys-path | --dsp : search and dump content from /usr /etc /opt
+
 --show-me | --sm : show content of this script
 
  Search content of variables
@@ -264,6 +270,8 @@ Without supported extended options (begins with --) will list or search in defau
 --show-uniq-def | --sud : show all uniq base variable names found in default path
 --var-sys | --vs : show all uniq base variable names found in /usr /etc /opt
 --show-sys-uniq | --ssu : show uniq variable names found in sys path (/usr /etc /opt)
+--no-var-sys | --nvs : show file names that does not contain string
+--no-var | --nv : show file names that does not contain string
 
  Configuration
 --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
@@ -308,6 +316,21 @@ Use --find-uniq-path or --fup
 	example: --var MimeType"
  	fi	 	
  	;;
+--no-var | --nv )
+	ReCreateDskPath
+	if [[  ! -z "$2"    ]];then  
+		Var="$2"
+# 	if [[ "$#" -gt 2  ]];then 
+#	OptionsToGrep=($@);
+#	Additional="${OptionsToGrep[@]:2}"  ;
+# 	fi;
+		Opts="no-var"
+		SearchContentOfVariable
+	else
+		echo "Error, parameter to --var is missing
+	example: --no-var MimeType"
+ 	fi	 	
+ 	;;
  --var-sys | --vs)
 #	ReCreateDskPath
 	if [[  ! -z "$2"    ]];then  
@@ -322,6 +345,13 @@ Use --find-uniq-path or --fup
 		echo "Error, parameter to --var-sys is missing
 	example: --var MimeType"
  	fi	
+	;;
+--no-var-sys | --nvs )
+	if [[ ! -z "$2" ]];then
+		find /usr /etc /opt -type f -name "*\.desktop" -exec grep -i -H -L "$2" \;
+	else
+		echo 'No options are given.'
+	fi
 	;;
 --dump-all | --da ) 
 	grep -i ^ -H -R --include \*.desktop "/"
