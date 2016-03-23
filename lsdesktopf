@@ -101,9 +101,7 @@ DskPath=($(if [[ ! -z $2 ]]; then
  		if [[ -d "$StartCmdLine" ]]; then
 		  InPath="$StartCmdLine"
  		fi
-find "$InPath" -type f -name "*\.desktop" |\
-       	awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'  | \
-       	sort | uniq
+find "$InPath" -type f -name "*\.desktop"|awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'|sort|uniq
 
  		if [[ "$InPath" == "/" ]];then 
   		exit 0
