@@ -7,10 +7,7 @@
 #Tested in Arch Linux
 #Search in *.desktop for "Categories" and "Exec"
 #
-# sudo find /etc/ /usr/ /opt/ /lib/ /var/ -type f  -name "*\.desktop"  -exec dirname "{}" \; | sed 's/[0-9]/*/g' | sed 's/\*[\.]\*/*/g' |  uniq
-# Decode variables: file /etc/xdg/xfce*/panel*/launcher-* | awk -F': ' '{print $1}' | grep -v \)$
-## Check if exist config file
-#OldIFS="$IFS"
+
 unset IFS
 IFS="
 "
@@ -63,14 +60,6 @@ if [[  ! -f "$LocalArray" ]];then
 	FilePath="$GlobalArray"
 
 	else
-#	echo 'No config file found!!!'
-#	echo 'To create new use options 
-#--create-global-list | --cgl : scan system and save into /opt/share/list-desktop-files/sorted.test
-#--create-local-list  | --cll : scan system and save into $HOME/.list-desktop-path/custom-path/sorted.test
-#or save example file 
-#/opt/share/list-desktop-files/folder_list.example.txt
-#as sorted.test'
-# exit 1
 
 ####################
 ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
@@ -101,12 +90,8 @@ do
 	fi
 done
 
-#Three="$3"
 NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort|uniq;));
-#unset IFS
-#IFS=OldIFS
-#DskPath=(${NoEmpty[@]})
-########################################
+
 ReCreateDskPath(){
 case "$Opts" in
 	OnlyNew1 )
@@ -131,11 +116,6 @@ fi))
 	scan-sys-path )
 		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop"|awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'|sort|uniq))
 		;;
-#	scan-root )
-#		echo "   "Please wait...
-#		DskPath=($(find "/"  -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq))
-#	
-#	;;
 	*)
 	DskPath=(${NoEmpty[@]})
 	;;
@@ -246,9 +226,6 @@ done | case $Opts in
 esac
 }
 ###################
-###################
-###################
-#disabled option, buggy --scan-root | --sr : scanning in / (may need root rights)
 case "$1" in
 --help )
 	echo 'OPTIONS
@@ -323,10 +300,6 @@ Use --find-uniq-path or --fup
 	ReCreateDskPath
 	if [[  ! -z "$2"    ]];then  
 		Var="$2"
-# 	if [[ "$#" -gt 2  ]];then 
-#	OptionsToGrep=($@);
-#	Additional="${OptionsToGrep[@]:2}"  ;
-# 	fi;
 		Opts="no-var"
 		SearchContentOfVariable
 	else
@@ -390,17 +363,13 @@ Use --find-uniq-path or --fup
   		InPath="$StartCmdLine"
  		fi
 	find $InPath -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
-#| awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop" | \
-		awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | \
-		sort | uniq
-	fi
-	;;
+		find / -type f -name "*\.desktop" -exec dirname "{}" \;| sort | uniq
+	fi	;;
 --all-sys-path | --asc)
 	Opts="scan-sys-path"
 	ReCreateDskPath
