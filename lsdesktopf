@@ -265,13 +265,16 @@ Without supported extended options (begins with --) will list or search in defau
 
 --show-me | --sm : show content of this script
 
- Search content of variables
+ Search value of variables
 --var variable : search for variable in the *.desktop
 --show-uniq-def | --sud : show all uniq base variable names found in default path
 --var-sys | --vs : show all uniq base variable names found in /usr /etc /opt
 --show-sys-uniq | --ssu : show uniq variable names found in sys path (/usr /etc /opt)
---no-var-sys | --nvs : show file names that does not contain string
---no-var | --nv : show file names that does not contain string
+--no-var-sys | --nvs : show file names that does not contain string /usr /etc /opt
+--no-var | --nv : show file names that does not contain string in default path
+
+ Search section names
+ --show-uniq-section-name | --susn : search for section names in /usr /etc /opt
 
  Configuration
 --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
@@ -470,6 +473,9 @@ Multiple source file/url:
 %U
 '
 	
+	;;
+--show-uniq-section-name | --susn)
+	grep -e ^"\[" -h -R --include *\.desktop  /usr /etc /opt | sort | uniq
 	;;
 * ) 
 	ReCreateDskPath
