@@ -458,7 +458,7 @@ Use --find-uniq-path or --fup
 		cat $0	
 		echo '# my path: '" $0"
 	else
-		grep $2 $0 | grep -v -e "IGNORE" -e ^"#" -e \-\-
+		grep -n $2 $0 | grep -v -e "IGNORE" -e ^"#" -e \-\-
 	fi
 	;;
 --info)
