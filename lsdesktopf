@@ -64,9 +64,7 @@ if [[  ! -f "$LocalArray" ]];then
 ####################
 ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
 	file "$FromDDP";
-done |sort|uniq|\
-      	grep -v \)$ | grep ^/ |\
-       	awk -F': ' '{print $1}'))
+done |sort|uniq|grep -v \)$ | grep ^/ |awk -F': ' '{print $1}'))
 ####################
 	fi
 else
@@ -131,7 +129,6 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
   printf "\e[1;36m %s  ${fdPath} \e[0m \n";
   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then
-# ${MaxDepth[Count]}
      find "${fdPath}" -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
 if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"Name=")       == 1) inNm=substr($0,index($0,"=")+1);
@@ -147,7 +144,6 @@ if(! inExc){CmdLine=inCmd}else{CmdLine=inExc};
 if(! E)E=inComment;
  Z=CmdLine" # "E" #  "Fil;
 if( index(tolower(Z),tolower(Seek)) && CmdLine  )  print Z;}' "{}" \;
-    
     else
 [[ -d "${fdPath}"  || -f "${fdPath}" ]] && find "${fdPath}" -iname "*.desktop" -exec awk -v Fil="{}"  -F"=" '//{
 if(index($0,"Categories") == 1) Ctgr=substr($0,index($0,"=")+1);
@@ -196,7 +192,6 @@ done
 
 case  "$Opts" in
 	sys-uniq)
-#DskPath=($(find "/usr/" "/etc/" "/opt"  -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq))
 find "/usr/" "/etc/" "/opt"  -type f -name "*\.desktop" -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort | uniq
 ;;
 var-sys)
