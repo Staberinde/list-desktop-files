@@ -72,7 +72,9 @@ if [[  ! -f "$LocalArray" ]];then
 ####################
 ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
 	file "$FromDDP";
-done |sort|uniq|  grep -v \)$ | grep ^/ | awk -F': ' '{print $1}'))
+done |sort|uniq|\
+      	grep -v \)$ | grep ^/ |\
+       	awk -F': ' '{print $1}'))
 ####################
 	fi
 else
@@ -81,7 +83,9 @@ fi
 if [[ "${#ADskPath[@]}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
-	done < "$FilePath" | awk '{system("file "$0)}' |sort|uniq|  grep -v \)$ | grep ^/ | awk -F': ' '{print $1}'))
+	done < "$FilePath"|awk '{system("file "$0)}'|sort|uniq|grep -v \)$ | \
+		grep ^/ | \
+		awk -F': ' '{print $1}'))
 		BDskPath+=("$HOME/.local/share/applications")
 		BDskPath+=("$HOME/.config/autostart")
 		BDskPath+=("$XDG_CONFIG_DIRS/autostart")
@@ -110,18 +114,20 @@ DskPath=($(if [[ ! -z $2 ]]; then
  		if [[ -d "$StartCmdLine" ]]; then
 		  InPath="$StartCmdLine"
  		fi
-find "$InPath" -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+find "$InPath" -type f -name "*\.desktop" |\
+       	awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'  | \
+       	sort | uniq
 
  		if [[ "$InPath" == "/" ]];then 
   		exit 0
  		fi
 	done
 else
-find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+	find / -type f -name "*\.desktop"|awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'|sort|uniq
 fi))
 ;;
 	scan-sys-path )
-		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq))
+		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop"|awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'|sort|uniq))
 		;;
 #	scan-root )
 #		echo "   "Please wait...
@@ -144,10 +150,10 @@ if [[ ! -z "$One"   ]];then
 fi
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
-  printf "\e[1;36m ${fdPath} \e[0m \n";
+  printf "\e[1;36m %s  ${fdPath} \e[0m \n";
   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then
-    # ${MaxDepth[Count]}
+# ${MaxDepth[Count]}
      find "${fdPath}" -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
 if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"Name=")       == 1) inNm=substr($0,index($0,"=")+1);
@@ -189,7 +195,7 @@ SearchContentOfVariable(){
 for fdPath in "${DskPath[@]}";do
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
-[[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m ${fdPath} \e[0m \n";
+[[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m %s ${fdPath} \e[0m \n";
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
 	case $Opts in
@@ -200,7 +206,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
                 grep ^ -H -R --include \*.desktop "${fdPath}"
 		;;
 	sud )
-		grep \= -R -h --include \*.desktop "${fdPath}" | cut -d= -f 1 | grep -v -e "\[" -e ^\# | sort | uniq
+		grep '=' -R -h --include \*.desktop "${fdPath}"|cut -d= -f 1|grep -v -e "\[" -e ^\# |sort|uniq
 		;;
 	esac
     fi;
@@ -222,7 +228,7 @@ RawView(){
 for fdPath in "${DskPath[@]}";do
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
- [[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m ${fdPath} \e[0m \n";
+ [[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m %s ${fdPath} \e[0m \n";
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
 [[ "$Opts" == "suo"  ]] && find "${fdPath}" -type f -name "*\.desktop" -exec grep ^ "{}" \;
@@ -230,7 +236,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 fi
 done | case $Opts in
 	suo )
-		grep = | cut -d= -f 1 | grep -v -e "\[" -e ^\# | sort | uniq
+		grep = |cut -d= -f 1|grep -v -e "\[" -e ^\#|sort | uniq
 		;;
 esac
 }
@@ -333,15 +339,15 @@ Use --find-uniq-path or --fup
  	ReCreateDskPath
       	SearchContentOfVariable
 	;;
-	--show-uniq-only | --suo )
+--show-uniq-only | --suo )
 	OffPrint="yes"
 	Opts=suo
 	ReCreateDskPath
 	RawView
 	;;	
 --show-sys-uniq | --ssu )
-	Opts="sys-uniq"
-	SearchContentOfVariable
+		Opts="sys-uniq"
+		SearchContentOfVariable
 	;;
 --find-uniq-path | --fup )
 	if [[ ! -z $Two ]]; then  
@@ -351,14 +357,15 @@ Use --find-uniq-path or --fup
   		InPath="$StartCmdLine"
  		fi
 	find $InPath -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
- #| awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+#| awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop" | awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName);
-		print substr($0,0,index($0,BaseName)-1)}' | sort | uniq
+		find / -type f -name "*\.desktop" | \
+		awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}' | \
+		sort | uniq
 	fi
 	;;
 --all-sys-path | --asc)
@@ -414,8 +421,12 @@ Use --find-uniq-path or --fup
 	fi
 	;;
 --show-me | --sm)
-	cat $0
-	echo '# my path: '" $0"
+	if [[  -z $2 ]];then
+		cat $0	
+		echo '# my path: '" $0"
+	else
+		grep $2 $0 | grep -v -e "IGNORE" -e ^"#" -e \-\-
+	fi
 	;;
 --info)
 echo 'Information: https://specifications.freedesktop.org/desktop-entry-spec/latest/
