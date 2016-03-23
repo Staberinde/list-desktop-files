@@ -75,9 +75,7 @@ fi
 if [[ "${#ADskPath[@]}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
-	done < "$FilePath"|awk '{system("file "$0)}'|sort|uniq|grep -v \)$ | \
-		grep ^/ | \
-		awk -F': ' '{print $1}'))
+	done < "$FilePath"|awk '{system("file "$0)}'|sort|uniq|grep -v \)$ |grep ^/ |awk -F': ' '{print $1}'))
 		BDskPath+=("$HOME/.local/share/applications")
 		BDskPath+=("$HOME/.config/autostart")
 		BDskPath+=("$XDG_CONFIG_DIRS/autostart")
