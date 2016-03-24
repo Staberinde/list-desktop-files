@@ -219,7 +219,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" $Additional "{}" \;
 		;;
 	sdsn )
-		grep '\[*\]' -R -h --include \*.desktop "${fdPath}"|grep -v -e ^'#' -e '\]=' |sort|uniq		
+		grep '\[*\]'$ -R -h --include \*.desktop "${fdPath}" | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort|uniq		
 		;;
 	esac
     fi;
