@@ -1,7 +1,6 @@
 /etc/dynamic/launchers/scanner
 /etc/xdg/autostart
 /etc/xdg/xfce*/panel/launcher-*
-/lib/gnome-settings-daemon*
 /lib/gnome-settings-daemon-*/gtk-modules
 /lib/libreoffice/share/xdg
 /usr/etc/xdg/autostart
@@ -20,7 +19,6 @@
 /usr/share/gnome/autostart
 /usr/share/kde*
 /usr/share/mate/wm-properties
-/usr/share/mga
 /usr/share/mga/dm
 /usr/share/mimelnk/application
 /usr/share/mimelnk/chemical
@@ -28,7 +26,6 @@
 /usr/share/parole/parole-plugins-*
 /usr/share/Thunar/sendto
 /usr/share/wayland-sessions
-/usr/share/xfce*/helpers
 /usr/share/xfce*/helpers
 /usr/share/xfce*/panel-plugins
 /usr/share/xfce*/panel/plugins
