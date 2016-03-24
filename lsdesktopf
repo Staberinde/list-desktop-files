@@ -284,11 +284,16 @@ Without supported extended options (begins with --) will list or search in defau
  Configuration
 --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
 --create-local-list  | --cll : scan system and save dirs into $HOME/.list-desktop-path/custom-path/sorted.test
+
+--update-path-file | --upf : scan / , modify, sort leave only-uniq
+
 --show-local-defaults | --sld : show content of $HOME/.list-desktop-path/custom-path/sorted.test
 --show-global-defaults | --sgd : show content of /opt/share/list-desktop-files/sorted.test
 --show-default-directories | --sdd : show internal dirs (that use if no )
 --remove-local-config : removing $HOME/.list-desktop-path/custom-path/sorted.test
 --remove-global-config : removing /opt/share/list-desktop-files/sorted.test
+
+
 
 --find-uniq-path | --fup : find path that contain *.desktop files, default path is /
 
@@ -412,6 +417,26 @@ Use --find-uniq-path or --fup
 	mkdir -p "$(dirname $LocalArray)"
 	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
 	;;
+--update-path-file | --upf)
+	if [[ "$UID" != 0 ]];then  
+		echo 'You must start it as user root'
+		exit 1
+	else
+		if [[ -z "$2"  ]];then
+			echo 'path to file is missing'
+		else
+			if [[ -f "$2" ]];then
+				mkdir -p "$(dirname $GlobalArray)"
+				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq >> "$2";
+				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$2";
+				uniq -u "$2" /tmp/uniq-tmp.txt
+				cp "/tmp/uniq-tmp.txt" "$2"
+			else
+				echo "Destion is not a file"
+			fi
+		fi
+	fi
+	;;
 --create-global-list | --cgl)
 	if [[ "$UID" != 0 ]];then  
 		echo 'You must start it as user root'
@@ -421,6 +446,7 @@ Use --find-uniq-path or --fup
 		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$GlobalArray"
 	fi
 	;;
+
 --show-local-defaults | --sld)
 	if [[ -f "$HOME/.list-desktop-path/custom-path/sorted.test" ]];then
 		cat "$HOME/.list-desktop-path/custom-path/sorted.test"
