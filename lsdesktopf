@@ -97,18 +97,18 @@ DskPath=($(if [[ ! -z $2 ]]; then
  		if [[ -d "$StartCmdLine" ]]; then
 		  InPath="$StartCmdLine"
  		fi
-find "$InPath" -type f -name "*\.desktop"|awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'|sort|uniq
+find "$InPath" -type f -name "*\.desktop" -exec dirname "{}" \;|sort|uniq
 
  		if [[ "$InPath" == "/" ]];then 
   		exit 0
  		fi
 	done
 else
-	find / -type f -name "*\.desktop"|awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'|sort|uniq
+	find / -type f -name "*\.desktop" -exec dirname "{}" \; |sort|uniq
 fi))
 ;;
 	scan-sys-path )
-		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop"|awk '{BaseName=$0; gsub(/[^.*]*\//,"",BaseName); print substr($0,0,index($0,BaseName)-1)}'|sort|uniq))
+		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop" -exec dirname "{}" \;|sort|uniq))
 		;;
 	*)
 	DskPath=(${NoEmpty[@]})
@@ -185,6 +185,9 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 	no-var )
 		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" $Additional "{}" \;
 		;;
+	sdsn )
+		grep '\[*\]' -R -h --include \*.desktop "${fdPath}"|grep -v -e ^'#' -e '\]=' |sort|uniq		
+		;;
 	esac
     fi;
 fi
@@ -207,12 +210,12 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  [[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m %s ${fdPath} \e[0m \n";
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
-[[ "$Opts" == "suo"  ]] && find "${fdPath}" -type f -name "*\.desktop" -exec grep ^ "{}" \;
+[[ "$Opts" == "suo"  ]] &&  grep ^ -R -h --include "*\.desktop" "${fdPath}";
     fi;
 fi
 done | case $Opts in
 	suo )
-		grep = |cut -d= -f 1|grep -v -e "\[" -e ^\#|sort | uniq
+		grep = |cut -d= -f1 |grep -v -e "\[" -e ^\#|sort | uniq
 		;;
 esac
 }
@@ -422,7 +425,7 @@ Use --find-uniq-path or --fup
 	fi
 	;;
 --info)
-echo 'Information: https://specifications.freedesktop.org/desktop-entry-spec/latest/
+	echo 'Information: https://specifications.freedesktop.org/desktop-entry-spec/latest/
 Exec specifications: https://specifications.freedesktop.org/desktop-entry-spec/latest/ar01s06.html
 Short overview:
 Single source file/url:
@@ -430,13 +433,17 @@ Single source file/url:
 %u
 Multiple source file/url:
 %F
-%U
-'
-	
+%U'	
 	;;
 --show-uniq-section-name | --susn)
 	grep -e ^"\[" -h -R --include *\.desktop  /usr /etc /opt | sort | uniq
 	;;
+--show-default-section-name | --sdsn )
+	OffPrint="no"
+	Opts='sdsn'
+	ReCreateDskPath
+	SearchContentOfVariable
+	;;	
 * ) 
 	ReCreateDskPath
 	ListDefault
