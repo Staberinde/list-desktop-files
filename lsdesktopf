@@ -244,8 +244,9 @@ Without supported extended options (begins with --) will list or search in defau
 --no-var-sys | --nvs : show file names that does not contain string /usr /etc /opt
 --no-var | --nv : show file names that does not contain string in default path
 
- Search section names
- --show-uniq-section-name | --susn : search for section names in /usr /etc /opt
+ Search section names in *.desktop files
+--sys-section-name | --ssn | --susn : search for section names in /usr /etc /opt
+--default-section-name | --dsn : search for section names in default path
 
  Configuration
 --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
@@ -435,10 +436,10 @@ Multiple source file/url:
 %F
 %U'	
 	;;
---show-uniq-section-name | --susn)
+--sys-section-name | --ssn)
 	grep -e ^"\[" -h -R --include *\.desktop  /usr /etc /opt | sort | uniq
 	;;
---show-default-section-name | --sdsn )
+--default-section-name | --dsn)
 	OffPrint="no"
 	Opts='sdsn'
 	ReCreateDskPath
