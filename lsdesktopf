@@ -84,7 +84,7 @@ DefDskPath+=("/usr/share/xfce*/panel-plugins")
 DefDskPath+=("/usr/share/xfce*/panel/plugins")
 DefDskPath+=("/usr/share/xsessions")
 DefDskPath+=("$HOME/.local/share/applications")
-DefDskPath+=("$HOME/.local/share/xfce4/helpers")
+DefDskPath+=("$HOME/.local/share/xfce*/helpers")
 
 ##########################################
 ##########################################
