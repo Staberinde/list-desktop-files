@@ -360,7 +360,8 @@ Without supported options (begins with --) will list or search in default output
 	fi
 		;;
 --var )
-	ReCreateDskPath
+	ReCreateDskPath "$@"
+
 	if [[  ! -z "$2"    ]];then  
 		Var="$2"
  	if [[ "$#" -gt 2  ]];then 
@@ -375,7 +376,8 @@ Without supported options (begins with --) will list or search in default output
  	fi	 	
  	;;
 --no-var | --nv )
-	ReCreateDskPath
+	ReCreateDskPath "$@"
+
 	if [[  ! -z "$2"    ]];then  
 		Var="$2"
 		Opts="no-var"
@@ -450,7 +452,7 @@ Without supported options (begins with --) will list or search in default output
 	fi	;;
 --all-sys-path | --asc)
 	Opts="scan-sys-path"
-	ReCreateDskPath
+	ReCreateDskPath "$@"
 	ListDefault
 	;;
 --create-local-list | --cll)
@@ -530,11 +532,13 @@ Without supported options (begins with --) will list or search in default output
 --default-section-name | --dsn)
 	OffPrint="no"
 	Opts='sdsn'
-	ReCreateDskPath
+	ReCreateDskPath "$@"
+
 	SearchContentOfVariable
 	;;	
 * ) 
-	ReCreateDskPath
+	ReCreateDskPath "$@"
+
 	ListDefault
 	;;
 esac
