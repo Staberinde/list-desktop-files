@@ -12,7 +12,7 @@ unset IFS
 IFS="
 "
 One="$1"
-Two="$2"
+#Two="$2"
 
 GlobalArray="/opt/share/list-desktop-files/sorted.test"
 LocalArray="$HOME/.list-desktop-path/custom-path/sorted.test"
@@ -151,16 +151,15 @@ esac
 ########################################
 ListDefault(){
 for fdPath in "${DskPath[@]}";do
-## Replace One with Two
-if [[ ! -z "$One"   ]];then
- if [[ "$One" ==  "--all-sys-path" || "$One" == --asc ]];then
-	 One=$Two
+if [[ ! -z "$1"   ]];then
+ if [[ "$One" ==  "--all-sys-path" || "$1" == --asc ]];then
+	 One="$2"
  fi
 fi
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
   printf "\e[1;36m %s  ${fdPath} \e[0m \n";
-  if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+  if [ ! -z "$2" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then
      find "${fdPath}" -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
 if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
@@ -232,7 +231,7 @@ case  "$Opts" in
 find "/usr/" "/etc/" "/opt"  -type f -name "*\.desktop" -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort | uniq
 ;;
 var-sys)
-	grep -e ^"$Var" $Additional -H -E -R --include \*.desktop /usr/ /etc /opt
+	grep -e ^"$Var" "$Additional" -H -E -R --include \*.desktop /usr/ /etc /opt
 	;;
 esac
 }
@@ -257,7 +256,8 @@ esac
 case "$1" in
 --help )
 	if [[ -z "$2" ]];then 
-	echo 'use additional options with --help'
+	echo '
+	use additional options with --help'
 	echo '
 usage	-	show usage of commands	
 config	-	configuration
@@ -274,49 +274,53 @@ info	-	show short info about *.desktop specified Exec'
 		;;
 	def )
 		echo '
-Search for content in 
-Deafult output to search in: Name/Comment,Exec,Category, path to the file
---all-sys-path | --asc (options): search only in /etc /usr /opt
-Without supported options (begins with --) will list or search in default output'
+	 Search for content in 
+	 Deafult output to search in: Name/Comment,Exec,Category, path to the file
+ --all-sys-path | --asc (options): search only in /etc /usr /opt
+ Without supported options (begins with --) will list or search in default output'
 		;; 
 	dump ) 
-		echo 'Dump RAW content of *.desktop files to stdout
---dump-all | --da : search in  / (may need root rights)
---dump-default-path | --ddp : from default path
---dump-sys-path | --dsp : dump content from /usr /etc /opt'
+		echo '
+	Dump RAW content of *.desktop files to stdout
+ --dump-all | --da : search in  / (may need root rights)
+ --dump-default-path | --ddp : from default path
+ --dump-sys-path | --dsp : dump content from /usr /etc /opt'
 		;;
 	debug ) 
 		echo '--show-me | --sm (options): show content of this script'
 		;;
 	var )
-		echo 'Search value of variables
---var [variable] : search for variable in the *.desktop
---show-uniq-def | --sud : show all uniq base variable names found in default path
---var-sys | --vs : show all uniq base variable names found in /usr /etc /opt
---show-sys-uniq | --ssu : show uniq variable names found in sys path /usr /etc /opt
---no-var-sys | --nvs [text] : show file names that does not contain string /usr /etc /opt
---no-var | --nv [text] : show file names that does not contain string in default path'
+		echo '
+	 Search value of variables
+ --var [variable]	: search for variable in the *.desktop
+ --show-uniq-def |--sud : show all uniq base variable names found in default path
+ --var-sys | --vs 	: show all uniq base variable names found in /usr /etc /opt
+ --show-sys-uniq |--ssu : show uniq variable names found in sys path /usr /etc /opt
+ --no-var-sys|--nvs [xx]: show file names that does not contain string /usr /etc /opt
+ --no-var | --nv [text] : show file names that does not contain string in default path'
 		;;
 	sec ) 
-		echo 'Search section names in *.desktop files
---sys-section-name | --ssn : search for uniq section names in /usr /etc /opt
---default-section-name | --dsn : search for uniq section names in default path'
+		echo '
+	Search section names in *.desktop files
+ --sys-section-name 	| --ssn  : search for uniq section names in /usr /etc /opt
+ --default-section-name | --dsn  : search for uniq section names in default path'
 		;;
 	config ) 
-		echo 'Configuration
---create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
---create-local-list  | --cll : scan system and save dirs into $HOME/.list-desktop-path/custom-path/sorted.test
+		echo '
+	Configuration
+ --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
+ --create-local-list  | --cll : scan system and save dirs into $HOME/.list-desktop-path/custom-path/sorted.test
 
---show-local-defaults | --sld : show content of $HOME/.list-desktop-path/custom-path/sorted.test
---show-global-defaults | --sgd : show content of /opt/share/list-desktop-files/sorted.test
+ --show-local-defaults	| --sld : show content of $HOME/.list-desktop-path/custom-path/sorted.test
+ --show-global-defaults	| --sgd : show content of /opt/share/list-desktop-files/sorted.test
 
---show-default-directories | --sdd : show internal dirs defined in array DefDskPath 
+ --show-default-directories | --sdd : show internal dirs defined in array DefDskPath 
 
---remove-local-config : removing $HOME/.list-desktop-path/custom-path/sorted.test
---remove-global-config : removing /opt/share/list-desktop-files/sorted.test
+ --remove-local-config	: removing $HOME/.list-desktop-path/custom-path/sorted.test
+ --remove-global-config	: removing /opt/share/list-desktop-files/sorted.test
 
---find-uniq-path | --fup (path): find path that contain *.desktop files, default starting path is /
---update-path-file | --upf [file name] : replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
+ --find-uniq-path | --fup (path)	: find path that contain *.desktop files, default starting path is /
+ --update-path-file | --upf [file name]	: replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
 		;;
 	info ) 
 	echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
@@ -383,7 +387,7 @@ Without supported options (begins with --) will list or search in default output
 	if [[  ! -z "$2"    ]];then  
 		Var="$2"
 		Opts="no-var"
-		SearchContentOfVariable
+		SearchContentOfVariable "$@"
 	else
 		echo "Error, parameter to --var is missing
 	example: --no-var MimeType"
@@ -398,7 +402,7 @@ Without supported options (begins with --) will list or search in default output
 	Additional="${OptionsToGrep[@]:2}"  ;
 	 fi;
 	Opts="var-sys"
-	SearchContentOfVariable
+	SearchContentOfVariable "$@"
 	else
 		echo "Error, parameter to --var-sys is missing
 	example: --var MimeType"
@@ -425,7 +429,7 @@ Without supported options (begins with --) will list or search in default output
 --show-uniq-def | --sud )
 	Opts="sud"
  	ReCreateDskPath "$@"
-      	SearchContentOfVariable
+      	SearchContentOfVariable "$@"
 	;;
 --show-uniq-only | --suo )
 	OffPrint="yes"
@@ -435,16 +439,16 @@ Without supported options (begins with --) will list or search in default output
 	;;	
 --show-sys-uniq | --ssu )
 		Opts="sys-uniq"
-		SearchContentOfVariable
+		SearchContentOfVariable "$@"
 	;;
 --find-uniq-path | --fup )
-	if [[ ! -z $Two ]]; then  
+	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
 		if [[ -d "$StartCmdLine" ]]; then
   		InPath="$StartCmdLine"
  		fi
-	find $InPath -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
@@ -455,7 +459,7 @@ Without supported options (begins with --) will list or search in default output
 --all-sys-path | --asc)
 	Opts="scan-sys-path"
 	ReCreateDskPath "$@"
-	ListDefault
+	ListDefault "$@"
 	;;
 --create-local-list | --cll)
 	mkdir -p "$(dirname $LocalArray)"
@@ -522,10 +526,10 @@ Without supported options (begins with --) will list or search in default output
 	;;
 --show-me | --sm)
 	if [[  -z $2 ]];then
-		cat $0	
+		cat "$0"
 		echo '# my path: '" $0"
 	else
-		grep -n $2 $0 | grep -v -e "IGNORE" -e ^"#" -e \-\-
+		grep -n $2 "$0" | grep -v -e "IGNORE" -e ^"#" -e \-\-
 	fi
 	;;
 --sys-section-name | --ssn)
@@ -541,6 +545,6 @@ Without supported options (begins with --) will list or search in default output
 * ) 
 	ReCreateDskPath "$@"
 
-	ListDefault
+	ListDefault "$@"
 	;;
 esac
