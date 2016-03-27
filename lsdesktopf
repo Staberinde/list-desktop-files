@@ -417,18 +417,18 @@ Without supported options (begins with --) will list or search in default output
 	;;
 --dump-default-path | --ddp )
 	Opts="ddp"
-  	ReCreateDskPath
+  	ReCreateDskPath "$@"
      	SearchContentOfVariable
 	;;
 --show-uniq-def | --sud )
 	Opts="sud"
- 	ReCreateDskPath
+ 	ReCreateDskPath "$@"
       	SearchContentOfVariable
 	;;
 --show-uniq-only | --suo )
 	OffPrint="yes"
 	Opts=suo
-	ReCreateDskPath
+	ReCreateDskPath "$@"
 	RawView
 	;;	
 --show-sys-uniq | --ssu )
