@@ -255,65 +255,110 @@ esac
 ###################
 case "$1" in
 --help )
-	echo 'OPTIONS
---help : show this help message
-
- Search for content in Name,Comment,Exec,Category.
---all-sys-path | --asc : scanning only in /etc /usr /opt , supports default options
-Without supported extended options (begins with --) will list or search in default
- 
- Dump RAW content of *.desktop files to stdout
+	if [[ -z "$2" ]];then 
+	echo 'use additional options with --help'
+	echo '
+usage	-	show usage of commands	
+config	-	configuration
+dump	-	dump content of *.desktop files
+var	-	list available variables or search a value
+sec	-	list available sections
+def	-	options that are using default output
+debug	-	view or search in content of this script
+info	-	show short info about *.desktop specified Exec'
+	else
+		case "$2" in
+	default )
+		echo '--help : show this help message'
+		;;
+	def )
+		echo '
+Search for content in 
+Deafult output to search in: Name/Comment,Exec,Category, path to the file
+--all-sys-path | --asc (options): search only in /etc /usr /opt
+Without supported options (begins with --) will list or search in default output'
+		;; 
+	dump ) 
+		echo 'Dump RAW content of *.desktop files to stdout
 --dump-all | --da : search in  / (may need root rights)
---dump-default-path | --ddp : search and dump content from default path
---dump-sys-path | --dsp : search and dump content from /usr /etc /opt
-
---show-me | --sm : show content of this script
-
- Search value of variables
---var variable : search for variable in the *.desktop
+--dump-default-path | --ddp : from default path
+--dump-sys-path | --dsp : dump content from /usr /etc /opt'
+		;;
+	debug ) 
+		echo '--show-me | --sm (options): show content of this script'
+		;;
+	var )
+		echo 'Search value of variables
+--var [variable] : search for variable in the *.desktop
 --show-uniq-def | --sud : show all uniq base variable names found in default path
 --var-sys | --vs : show all uniq base variable names found in /usr /etc /opt
---show-sys-uniq | --ssu : show uniq variable names found in sys path (/usr /etc /opt)
---no-var-sys | --nvs : show file names that does not contain string /usr /etc /opt
---no-var | --nv : show file names that does not contain string in default path
-
- Search section names in *.desktop files
---sys-section-name | --ssn | --susn : search for section names in /usr /etc /opt
---default-section-name | --dsn : search for section names in default path
-
- Configuration
+--show-sys-uniq | --ssu : show uniq variable names found in sys path /usr /etc /opt
+--no-var-sys | --nvs [text] : show file names that does not contain string /usr /etc /opt
+--no-var | --nv [text] : show file names that does not contain string in default path'
+		;;
+	sec ) 
+		echo 'Search section names in *.desktop files
+--sys-section-name | --ssn : search for uniq section names in /usr /etc /opt
+--default-section-name | --dsn : search for uniq section names in default path'
+		;;
+	config ) 
+		echo 'Configuration
 --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
 --create-local-list  | --cll : scan system and save dirs into $HOME/.list-desktop-path/custom-path/sorted.test
 
---update-path-file | --upf : scan / , modify, sort leave only-uniq
-
 --show-local-defaults | --sld : show content of $HOME/.list-desktop-path/custom-path/sorted.test
 --show-global-defaults | --sgd : show content of /opt/share/list-desktop-files/sorted.test
---show-default-directories | --sdd : show internal dirs (that use if no )
+
+--show-default-directories | --sdd : show internal dirs defined in array DefDskPath 
+
 --remove-local-config : removing $HOME/.list-desktop-path/custom-path/sorted.test
 --remove-global-config : removing /opt/share/list-desktop-files/sorted.test
 
-
-
---find-uniq-path | --fup : find path that contain *.desktop files, default path is /
-
- Usage examples
-List content with default options:
- lsdesktopf
-Search only for specific text in default output:
- lsdesktopf gtk
- lsdesktopf game
-Use --var option (supporting grep syntax):
---var Name=
---var "Name\[zn_CN\]" -e "Exec="
-Scan for all *.desktop files in /usr /etc /opt
---asc 
---asc gtk
-Use --find-uniq-path or --fup 
---fup 
---fup /usr /etc
-'
-	;;
+--find-uniq-path | --fup (path): find path that contain *.desktop files, default starting path is /
+--update-path-file | --upf [file name] : replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
+		;;
+	info ) 
+	echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
+	Short overview:
+"f" - File name with full path
+"u" - URL to website
+"d" - Directory
+"n" - Name of the file without path
+	Single source:
+%f %u %d %n
+	Multiple sources:
+%F %U %D %N
+	Other:
+%k URI/location of desktop file 
+%v name of the device'	
+		;;
+	usage ) 
+	echo 'Usage examples
+ List content with default options:
+	 lsdesktopf
+ Search only for specific text in default output:
+	 lsdesktopf gtk
+	 lsdesktopf game
+ Use --var option (supporting grep syntax):
+	--var-sys has same syntax as --var
+	--var Name=
+	--var "Name\[zn_CN\]" -e "Exec="
+ Reverse search 
+	--no-var Execute
+	--no-var-sys "Name\[en_GB\]"
+ Scan for all *.desktop files in /usr /etc /opt
+ has same syntax as without supported options
+	--asc 
+	--asc gtk
+	Use --find-uniq-path or --fup 
+	--fup 
+	--fup /usr /etc
+ Update a file that contains list of path
+	--upf filename'
+		;;
+		esac
+	fi
+		;;
 --var )
 	ReCreateDskPath
 	if [[  ! -z "$2"    ]];then  
@@ -408,11 +453,6 @@ Use --find-uniq-path or --fup
 	ReCreateDskPath
 	ListDefault
 	;;
---scan-root | --sr)
-	Opts="scan-root"
-	ReCreateDskPath
-	ListDefault
-	;;
 --create-local-list | --cll)
 	mkdir -p "$(dirname $LocalArray)"
 	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
@@ -428,7 +468,7 @@ Use --find-uniq-path or --fup
 			if [[ -f "$2" ]];then
 				mkdir -p "$(dirname $GlobalArray)"
 				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq >> "$2";
-				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$2";
+				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' "$2";
 				uniq -u "$2" /tmp/uniq-tmp.txt
 				cp "/tmp/uniq-tmp.txt" "$2"
 			else
@@ -483,17 +523,6 @@ Use --find-uniq-path or --fup
 	else
 		grep -n $2 $0 | grep -v -e "IGNORE" -e ^"#" -e \-\-
 	fi
-	;;
---info)
-	echo 'Information: https://specifications.freedesktop.org/desktop-entry-spec/latest/
-Exec specifications: https://specifications.freedesktop.org/desktop-entry-spec/latest/ar01s06.html
-Short overview:
-Single source file/url:
-%f 
-%u
-Multiple source file/url:
-%F
-%U'	
 	;;
 --sys-section-name | --ssn)
 	grep -e ^"\[" -h -R --include *\.desktop  /usr /etc /opt | sort | uniq
