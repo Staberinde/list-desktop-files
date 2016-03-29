@@ -101,7 +101,7 @@ if [[  ! -f "$LocalArray" ]];then
 ### command "awk" is used only to show name of the path without any additional description
 ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
 	file "$FromDDP";
-done |sort|uniq|grep -v \)$ | grep ^/ |rev|cut -d: -f2- |rev
+done |sort|uniq|grep -v \)$ | grep ^/ |rev|cut -d: -f2- |rev))
 ####################
 	fi
 else
@@ -110,7 +110,7 @@ fi
 if [[ "${#ADskPath[@]}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
-	done < "$FilePath"|xargs file|sort|uniq|grep -v \)$ |grep ^/ |rev|cut -d: -f2-|rev
+	done < "$FilePath"|xargs file|sort|uniq|grep -v \)$ |grep ^/ |rev|cut -d: -f2-|rev))
 ### $BDskPath is used to add path that depends on such variables as $HOME and $XDG related
 		BDskPath+=("$HOME/.local/share/applications")
 		BDskPath+=("$HOME/.config/autostart")
