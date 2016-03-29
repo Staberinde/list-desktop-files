@@ -1,145 +1,634 @@
 #!/bin/bash
-#LocList="$(localectl list-locales | cut -d_ -f2 | cut -d\. -f1 | cut -d@ -f 1 |cut -c1-2 | tr [:upper:]  [:lower:] | sort | uniq | sed 's/^/-e \//g' | sed 's/$/\$/g')i"
-#find /usr/ /etc/opt/ -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq | grep -v $LocList
+# Version 1.0.0-4
+#
+# License: GPL3
+#
+# Author: Andy Crowd
+# Tested in Arch Linux
+# Search in *.desktop for "Categories" and "Exec"
+#
 
-/usr/lib64/gnome-settings-daemon-*/gtk-modules
-/usr/lib64/kde*/akonadi
-/usr/lib64/libreoffice/share/xdg
-/usr/share/akonadi/agents
-/usr/share/anaconda/gnome
-/usr/share/applications
-/usr/share/applications/kde*
-/usr/share/autostart
-/usr/share/carddecks
-/usr/share/doc
-/usr/share/gcompris
-/usr/share/gdm/autostart/LoginWindow
-/usr/share/gnome/autostart
-/usr/share/kcm_componentchooser
-/usr/share/kcmsolidactions
-/usr/share/kde*/apps
-/usr/share/kde*/services
-/usr/share/kde4/servicetypes
-/usr/share/kf*/kmoretools/presets-kmoretools
-/usr/share/kf*/locale/countries
-/usr/share/kf*/locale/currency
-/usr/share/khelpcenter/plugins
-/usr/share/khelpcenter/searchhandlers
-/usr/share/kio_desktop
-/usr/share/kmines/themes
-/usr/share/konqsidebartng/virtual_folders/remote
-/usr/share/konqsidebartng/virtual_folders/services
-/usr/share/konqueror/dirtree/remote
-/usr/share/konversation/themes
-/usr/share/kpackage/kcms/kcm_energyinfo
-/usr/share/kpackage/kcms/kcm_fileindexermonitor
-/usr/share/kpackage/kcms/kcm_lookandfeel
-/usr/share/kpackage/kcms/kcm_splashscreen
-/usr/share/kpat/themes
-/usr/share/kservices*
-/usr/share/kservicetypes*
-/usr/share/ksmserver/screenlocker/org.kde.passworddialog
-/usr/share/ksmserver/themes
-/usr/share/ksmserver/windowmanagers
-/usr/share/ksysguard/scripts/smaps
-/usr/share/kwin/decorations/kwin*_decoration_qml_plastik
-/usr/share/kwin/desktoptabbox/previews
-/usr/share/kwin/effects
-/usr/share/kwin/scripts
-/usr/share/kwin/tabbox
-/usr/share/kxmlgui*/parley/themes
-/usr/share/lirc/contrib
-/usr/share/locale/
-/usr/share/locale/l10n
-/usr/share/parley/plugins
-/usr/share/parley/themes
-/usr/share/plasma/desktoptheme
-/usr/share/plasma/kcms/screenlocker_kcm
-/usr/share/plasma/layout-templates
-/usr/share/plasma/look-and-feel
-/usr/share/plasma/packages
-/usr/share/plasma/plasmoids
-/usr/share/plasma/shareprovider
-/usr/share/plasma/shells
-/usr/share/plasma/wallpapers
-/usr/share/remoteview
-/usr/share/sddm/themes
-/usr/share/services
-/usr/share/solid/actions
-/usr/share/solid/devices
-/usr/share/soprano/plugins
-/usr/share/speech-dispatcher/conf/desktop
-/usr/share/templates
-/usr/share/wallpapers
-/usr/share/yumex-dnf
-##########################
-DefDskPath+=("/usr/lib64/gnome-settings-daemon-*/gtk-modules")
-DefDskPath+=("/usr/lib64/kde*/akonadi")
-DefDskPath+=("/usr/lib64/libreoffice/share/xdg")
-DefDskPath+=("/usr/share/akonadi/agents")
-DefDskPath+=("/usr/share/anaconda/gnome")
+unset IFS
+IFS="
+"
+One="$1"
+#Two="$2"
+
+GlobalArray="/opt/share/list-desktop-files/sorted.test"
+LocalArray="$HOME/.list-desktop-path/custom-path/sorted.test"
+
+### The DefDskPath variable contains list of default folders
+DefDskPath+=("/etc/dynamic/launchers/scanner")
+DefDskPath+=("/etc/xdg/autostart")
+DefDskPath+=("/etc/xdg/xfce*/panel/launcher-*")
+DefDskPath+=("/lib/gnome-settings-daemon-*/gtk-modules")
+DefDskPath+=("/lib/libreoffice/share/xdg")
+DefDskPath+=("/usr/etc/xdg/autostart")
+DefDskPath+=("/usr/lib/gnome-settings-daemon-*/gtk-modules")
+DefDskPath+=("/usr/lib/libreoffice/share/xdg")
+DefDskPath+=("/usr/local/share/applications")
 DefDskPath+=("/usr/share/applications")
-DefDskPath+=("/usr/share/applications/kde*")
+DefDskPath+=("/usr/share/apps/kdm/programs")
+DefDskPath+=("/usr/share/apps/kdm/sessions")
+DefDskPath+=("/usr/share/apps/solid/actions")
 DefDskPath+=("/usr/share/autostart")
-DefDskPath+=("/usr/share/carddecks")
-DefDskPath+=("/usr/share/doc")
-DefDskPath+=("/usr/share/gcompris")
+DefDskPath+=("/usr/share/dist/desktop-files/default")
+DefDskPath+=("/usr/share/gdm/autostart")
 DefDskPath+=("/usr/share/gdm/autostart/LoginWindow")
+DefDskPath+=("/usr/share/gdm/greeter/autostart")
 DefDskPath+=("/usr/share/gnome/autostart")
-DefDskPath+=("/usr/share/kcm_componentchooser")
-DefDskPath+=("/usr/share/kcmsolidactions")
-DefDskPath+=("/usr/share/kde*/apps")
+DefDskPath+=("/usr/share/kde*")
+DefDskPath+=("/usr/share/mate/wm-properties")
+DefDskPath+=("/usr/share/mga/dm")
+DefDskPath+=("/usr/share/mimelnk/application")
+DefDskPath+=("/usr/share/mimelnk/chemical")
+DefDskPath+=("/usr/share/parole/parole-plugins-*")
+DefDskPath+=("/usr/share/Thunar/sendto")
+DefDskPath+=("/usr/share/wayland-sessions")
+DefDskPath+=("/usr/share/xfce*/helpers")
+DefDskPath+=("/usr/share/xfce*/panel-plugins")
+DefDskPath+=("/usr/share/xfce*/panel/plugins")
+DefDskPath+=("/usr/share/xgreeters")
+DefDskPath+=("/usr/share/xsessions")
+DefDskPath+=("/etc/xdg/autostart")
+DefDskPath+=("/opt/teamviewer/tv_bin/desktop")
+DefDskPath+=("/opt/wine-staging/share/applications")
+DefDskPath+=("/usr/lib/gnome-settings-daemon-*.*/gtk-modules")
+DefDskPath+=("/usr/lib/libreoffice/share/xdg")
+DefDskPath+=("/usr/local/share/applications")
+DefDskPath+=("/usr/share/applications")
+DefDskPath+=("/usr/share/applications/inputmethods")
+DefDskPath+=("/usr/share/apps/solid/actions")
+DefDskPath+=("/usr/share/gdm/autostart/LoginWindow")
+DefDskPath+=("/usr/share/gdm/greeter/autostart")
+DefDskPath+=("/usr/share/gnome/autostart")
+DefDskPath+=("/usr/share/hedgewars/Data/misc")
+DefDskPath+=("/usr/share/J*Z/Desktop/KDE")
+DefDskPath+=("/usr/share/J*Z/Desktop/Menu")
 DefDskPath+=("/usr/share/kde*/services")
-DefDskPath+=("/usr/share/kde4/servicetypes")
-DefDskPath+=("/usr/share/kf*/kmoretools/presets-kmoretools")
-DefDskPath+=("/usr/share/kf*/locale/countries")
-DefDskPath+=("/usr/share/kf*/locale/currency")
-DefDskPath+=("/usr/share/khelpcenter/plugins")
-DefDskPath+=("/usr/share/khelpcenter/searchhandlers")
-DefDskPath+=("/usr/share/kio_desktop")
-DefDskPath+=("/usr/share/kmines/themes")
-DefDskPath+=("/usr/share/konqsidebartng/virtual_folders/remote")
-DefDskPath+=("/usr/share/konqsidebartng/virtual_folders/services")
-DefDskPath+=("/usr/share/konqueror/dirtree/remote")
-DefDskPath+=("/usr/share/konversation/themes")
-DefDskPath+=("/usr/share/kpackage/kcms/kcm_energyinfo")
-DefDskPath+=("/usr/share/kpackage/kcms/kcm_fileindexermonitor")
-DefDskPath+=("/usr/share/kpackage/kcms/kcm_lookandfeel")
-DefDskPath+=("/usr/share/kpackage/kcms/kcm_splashscreen")
-DefDskPath+=("/usr/share/kpat/themes")
+DefDskPath+=("/usr/share/kde*/services/phononbackends")
+DefDskPath+=("/usr/share/kde*/services/ServiceMenus")
 DefDskPath+=("/usr/share/kservices*")
+DefDskPath+=("/usr/share/kservices*/qimageioplugins")
 DefDskPath+=("/usr/share/kservicetypes*")
-DefDskPath+=("/usr/share/ksmserver/screenlocker/org.kde.passworddialog")
-DefDskPath+=("/usr/share/ksmserver/themes")
-DefDskPath+=("/usr/share/ksmserver/windowmanagers")
-DefDskPath+=("/usr/share/ksysguard/scripts/smaps")
-DefDskPath+=("/usr/share/kwin/decorations/kwin*_decoration_qml_plastik")
-DefDskPath+=("/usr/share/kwin/desktoptabbox/previews")
-DefDskPath+=("/usr/share/kwin/effects")
-DefDskPath+=("/usr/share/kwin/scripts")
-DefDskPath+=("/usr/share/kwin/tabbox")
-DefDskPath+=("/usr/share/kxmlgui*/parley/themes")
 DefDskPath+=("/usr/share/lirc/contrib")
-DefDskPath+=("/usr/share/locale/")
-DefDskPath+=("/usr/share/locale/l10n")
-DefDskPath+=("/usr/share/parley/plugins")
-DefDskPath+=("/usr/share/parley/themes")
-DefDskPath+=("/usr/share/plasma/desktoptheme")
-DefDskPath+=("/usr/share/plasma/kcms/screenlocker_kcm")
-DefDskPath+=("/usr/share/plasma/layout-templates")
-DefDskPath+=("/usr/share/plasma/look-and-feel")
-DefDskPath+=("/usr/share/plasma/packages")
-DefDskPath+=("/usr/share/plasma/plasmoids")
-DefDskPath+=("/usr/share/plasma/shareprovider")
-DefDskPath+=("/usr/share/plasma/shells")
-DefDskPath+=("/usr/share/plasma/wallpapers")
-DefDskPath+=("/usr/share/remoteview")
-DefDskPath+=("/usr/share/sddm/themes")
-DefDskPath+=("/usr/share/services")
-DefDskPath+=("/usr/share/solid/actions")
-DefDskPath+=("/usr/share/solid/devices")
-DefDskPath+=("/usr/share/soprano/plugins")
+DefDskPath+=("/usr/share/mimelnk/application")
+DefDskPath+=("/usr/share/phoronix-test-suite/pts-core/static")
+DefDskPath+=("/usr/share/Quamachi/Desktop/Menu")
 DefDskPath+=("/usr/share/speech-dispatcher/conf/desktop")
-DefDskPath+=("/usr/share/templates")
-DefDskPath+=("/usr/share/wallpapers")
-DefDskPath+=("/usr/share/yumex-dnf")
+DefDskPath+=("/usr/share/themes/blondie/matchbox")
+DefDskPath+=("/usr/share/themes/Default/matchbox")
+DefDskPath+=("/usr/share/themes/MBOpus/matchbox")
+DefDskPath+=("/usr/share/Thunar/sendto")
+DefDskPath+=("/usr/share/xfce*/helpers")
+DefDskPath+=("/usr/share/xfce*/panel-plugins")
+DefDskPath+=("/usr/share/xfce*/panel/plugins")
+DefDskPath+=("/usr/share/xsessions")
+DefDskPath+=("$HOME/.local/share/applications")
+DefDskPath+=("$HOME/.local/share/xfce*/helpers")
+
+
+AddKorora(){
+ DefDskPath+=("/usr/lib64/gnome-settings-daemon-*/gtk-modules")
+ DefDskPath+=("/usr/lib64/libreoffice/share/xdg")
+ DefDskPath+=("/usr/share/akonadi/agents")
+ DefDskPath+=("/usr/share/anaconda/gnome")
+ DefDskPath+=("/usr/share/applications")
+ DefDskPath+=("/usr/share/applications/kde*")
+ DefDskPath+=("/usr/share/carddecks")
+ DefDskPath+=("/usr/share/doc")
+ DefDskPath+=("/usr/share/gcompris")
+ DefDskPath+=("/usr/share/gdm/autostart/LoginWindow")
+ DefDskPath+=("/usr/share/kcm_componentchooser")
+ DefDskPath+=("/usr/share/kcmsolidactions")
+ DefDskPath+=("/usr/share/kf*/kmoretools/presets-kmoretools")
+ DefDskPath+=("/usr/share/kf*/locale/countries")
+ DefDskPath+=("/usr/share/kf*/locale/currency")
+ DefDskPath+=("/usr/share/khelpcenter/plugins")
+ DefDskPath+=("/usr/share/khelpcenter/searchhandlers")
+ DefDskPath+=("/usr/share/kio_desktop")
+ DefDskPath+=("/usr/share/kmines/themes")
+ DefDskPath+=("/usr/share/konqsidebartng/virtual_folders/remote")
+ DefDskPath+=("/usr/share/konqsidebartng/virtual_folders/services")
+ DefDskPath+=("/usr/share/konqueror/dirtree/remote")
+ DefDskPath+=("/usr/share/konversation/themes")
+ DefDskPath+=("/usr/share/kpackage/kcms/kcm_energyinfo")
+ DefDskPath+=("/usr/share/kpackage/kcms/kcm_fileindexermonitor")
+ DefDskPath+=("/usr/share/kpackage/kcms/kcm_lookandfeel")
+ DefDskPath+=("/usr/share/kpackage/kcms/kcm_splashscreen")
+ DefDskPath+=("/usr/share/kpat/themes")
+ DefDskPath+=("/usr/share/kservicetypes*")
+ DefDskPath+=("/usr/share/ksmserver/screenlocker/org.kde.passworddialog")
+ DefDskPath+=("/usr/share/ksmserver/themes")
+ DefDskPath+=("/usr/share/ksmserver/windowmanagers")
+ DefDskPath+=("/usr/share/ksysguard/scripts/smaps")
+ DefDskPath+=("/usr/share/kwin/decorations/kwin*_decoration_qml_plastik")
+ DefDskPath+=("/usr/share/kwin/desktoptabbox/previews")
+ DefDskPath+=("/usr/share/kwin/effects")
+ DefDskPath+=("/usr/share/kwin/scripts")
+ DefDskPath+=("/usr/share/kwin/tabbox")
+ DefDskPath+=("/usr/share/kxmlgui*/parley/themes")
+ DefDskPath+=("/usr/share/lirc/contrib")
+ DefDskPath+=("/usr/share/locale/")
+ #DefDskPath+=("/usr/share/locale/l10n")
+ DefDskPath+=("/usr/share/parley/plugins")
+ DefDskPath+=("/usr/share/parley/themes")
+ DefDskPath+=("/usr/share/plasma/desktoptheme")
+ DefDskPath+=("/usr/share/plasma/kcms/screenlocker_kcm")
+ DefDskPath+=("/usr/share/plasma/layout-templates")
+ DefDskPath+=("/usr/share/plasma/look-and-feel")
+ DefDskPath+=("/usr/share/plasma/packages")
+ DefDskPath+=("/usr/share/plasma/plasmoids")
+ DefDskPath+=("/usr/share/plasma/shareprovider")
+ DefDskPath+=("/usr/share/plasma/shells")
+ DefDskPath+=("/usr/share/plasma/wallpapers")
+ DefDskPath+=("/usr/share/remoteview")
+ DefDskPath+=("/usr/share/sddm/themes")
+ DefDskPath+=("/usr/share/services")
+ DefDskPath+=("/usr/share/solid/actions")
+ DefDskPath+=("/usr/share/solid/devices")
+ DefDskPath+=("/usr/share/soprano/plugins")
+ DefDskPath+=("/usr/share/templates")
+ DefDskPath+=("/usr/share/wallpapers")
+ DefDskPath+=("/usr/share/yumex-dnf")
+}
+
+## Uncomment below to add path found in  Korora ProjectLinux
+#AddKorora
+
+##########################################
+##########################################
+if [[  ! -f "$LocalArray" ]];then
+	if [[  -f "$GlobalArray" ]];then
+	FilePath="$GlobalArray"
+
+	else
+### ADskPath contains list of "decoded" path with command "file"
+### command "file" can handle wildcards such as * that is useful when it is multiple or new path with versions number is available
+### command "grep" is used to separate available from not existing path
+### command combination "| rev | cut -d: -f2- | rev" make sure that only the last field will be removed by reversing output string 
+ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
+	file "$FromDDP";
+done |sort|uniq|grep -v \)$ | grep ^/ |rev|cut -d: -f2- |rev))
+####################
+	fi
+else
+	FilePath="$LocalArray"
+fi
+if [[ "${#ADskPath[@]}" == 0 ]]; then
+	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
+	while read FromFile;do echo "$FromFile"  ; 
+	done < "$FilePath"|xargs file|sort|uniq|grep -v \)$ |grep ^/ |rev|cut -d: -f2-|rev))
+### $BDskPath is used to add path that depends on such variables as $HOME and $XDG related
+		BDskPath+=("$HOME/.local/share/applications")
+		BDskPath+=("$HOME/.config/autostart")
+		BDskPath+=("$XDG_CONFIG_DIRS/autostart")
+		BDskPath+=("$XDG_CONFIG_HOME/autostart")
+fi
+for AddWithVariables in "${BDskPath[@]}";
+do
+	if [ -d "$AddWithVariables" ];then
+		ADskPath+="$AddWithVariables";
+	fi
+done
+
+### soring out only uniq path in case if $XDG related and $HOME are pointing on a similar destination. || $InDskPath, $ADskPath, NoEmpty
+NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort|uniq;));
+
+### used to find out path that can be used || scan-sys-path, $DskPath, NoEmpty
+ReCreateDskPath(){
+case "$Opts" in
+	OnlyNew1 )
+DskPath=($(if [[ ! -z $2 ]]; then  
+	 for StartCmdLine in "$@";
+	 	do
+ 		if [[ -d "$StartCmdLine" ]]; then
+		  InPath="$StartCmdLine"
+ 		fi
+find "$InPath" -type f -name "*\.desktop" -exec dirname "{}" \;|sort|uniq
+
+ 		if [[ "$InPath" == "/" ]];then 
+  		exit 0
+ 		fi
+	done
+else
+	find / -type f -name "*\.desktop" -exec dirname "{}" \; |sort|uniq
+fi))
+;;
+	scan-sys-path )
+		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop" -exec dirname "{}" \;|sort|uniq))
+		;;
+	*)
+	DskPath=(${NoEmpty[@]})
+	;;
+esac
+}
+########################################
+### ListDefault listing or searching in default output for content of Name, Exec, Comment. || awk, DskPath, fdPath
+ListDefault(){
+for fdPath in "${DskPath[@]}";do
+if [[ ! -z "$1"   ]];then
+ if [[ "$One" ==  "--all-sys-path" || "$1" == --asc ]];then
+	 One="$2"
+ fi
+fi
+if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
+ then
+  printf "\e[1;36m %s  ${fdPath} \e[0m \n";
+  if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+    then
+     find "${fdPath}" -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
+if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
+if(index($0,"Name=")       == 1) inNm=substr($0,index($0,"=")+1);
+if(index($0,"Comment=")    == 1) inComment=substr($0,index($0,"=")+1);
+if(index($0,"Command")     == 1) inCmd=substr($0,index($0,"=")+1) ;
+if(index($0,"Module=")     == 1) inExc=substr($0,index($0,"=")+1);
+if(index($0,"Exec=")       == 1) inExc=substr($0,index($0,"=")+1);
+if(index($0,"Category=") >= 1) Ctgr=substr($0,index($0,"=")+1);
+if(index($0,"X-XFCE-Binaries=") >= 1) inExc=substr($0,index($0,"=")+1);
+     }END{
+if(! Ctgr ){E=inNm}else{E=Ctgr};
+if(! inExc){CmdLine=inCmd}else{CmdLine=inExc};
+if(! E)E=inComment;
+ Z=CmdLine" # "E" #  "Fil;
+if( index(tolower(Z),tolower(Seek)) && CmdLine  )  print Z;}' "{}" \;
+    else
+[[ -d "${fdPath}"  || -f "${fdPath}" ]] && find "${fdPath}" -iname "*.desktop" -exec awk -v Fil="{}"  -F"=" '//{
+if(index($0,"Categories") == 1) Ctgr=substr($0,index($0,"=")+1);
+if(index($0,"Name=")      == 1) inNm=substr($0,index($0,"=")+1);
+if(index($0,"Exec=")      == 1) inExc=substr($0,index($0,"=")+1);
+if(index($0,"Comment=")   == 1) inComment=substr($0,index($0,"=")+1);
+if(index($0,"Command=")   == 1) inCmd=substr($0,index($0,"=")+1) ;
+if(index($0,"Category=") >= 1) Ctgr=substr($0,index($0,"=")+1);
+if(index($0,"X-XFCE-Binaries=") >= 1) inExc=substr($0,index($0,"=")+1);
+}END{
+if(! Ctgr ){E=inNm}else{E=Ctgr};
+if(! inExc){CmdLine=inCmd}else{CmdLine=inExc};
+if(! E)E=inComment;
+ Z=CmdLine" # "E" # "Fil" # "XFCEb;
+if(CmdLine)print Z;}' "{}" \;
+ fi;
+fi
+done
+}
+###################  Search specific ####
+OffPrint="no";
+SearchContentOfVariable(){
+for fdPath in "${DskPath[@]}";do
+if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
+ then
+[[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m %s ${fdPath} \e[0m \n";
+   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+    then 
+	case $Opts in
+### "$var" is used to search for variable names with "grep" in *.desktop
+	var )
+		grep -e ^"$Var" "${OptionsToGrep[@]:2}" -H -E -R --include \*.desktop "${fdPath}" 
+		;;
+### "ddp" is used to raw dump cotent of all *.desktop found in default path. || grep
+	ddp ) 
+                grep ^ -H -R --include \*.desktop "${fdPath}"
+		;;
+### "sud" showing uniq variables found in default path. || grep, cut
+	sud )
+		grep '=' -R -h --include \*.desktop "${fdPath}"|cut -d= -f 1|grep -v -e "\[" -e ^\# |sort|uniq
+		;;
+### "no-var" showing all *.desktop except them that contains contains specified string. || grep, find
+	no-var )
+		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" "$Additional" "{}" \;
+		;;
+### "sdsn" showing only uniq section names found in default path. || grep, sed 
+	sdsn )
+		grep '\[*\]'$ -R -h --include \*.desktop "${fdPath}" | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort|uniq		
+		;;
+	esac
+
+    fi;
+fi
+done
+
+case  "$Opts" in
+### "sys-uniq" showing uniq variable names found in /usr /etc /opt path. || find, cut, grep
+	sys-uniq )
+		find "/usr" "/etc" "/opt"  -type f -name "*\.desktop" -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort | uniq
+		;;
+### "var-sys" searching for variable name in system path /usr /etc /opt
+	var-sys )
+		grep -e ^"$Var" "$Additional" -H -E -R --include \*.desktop /usr /etc /opt
+		;;
+esac
+}
+########################################
+
+RawView(){
+for fdPath in "${DskPath[@]}";do
+if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
+ then
+ [[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m %s ${fdPath} \e[0m \n";
+   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+    then 
+[[ "$Opts" == "suo"  ]] &&  grep ^ -R -h --include "*\.desktop" "${fdPath}";
+    fi;
+fi
+done | case $Opts in
+	suo )
+		grep = |cut -d= -f1 |grep -v -e "\[" -e ^\#|sort | uniq
+		;;
+esac
+}
+###################
+case "$1" in
+--help )
+	if [[ -z "$2" ]];then 
+	echo '
+	use additional options with --help'
+	echo '
+usage	-	show usage of commands	
+config	-	configuration
+dump	-	dump content of *.desktop files
+var	-	list available variables or search a value
+sec	-	list available sections
+def	-	options that are using default output
+debug	-	view or search in content of this script
+info	-	show short info about *.desktop specified Exec'
+	else
+		case "$2" in
+	default )
+		echo '--help : show this help message'
+		;;
+	def )
+		echo '
+	 Search for content in 
+	 Deafult output to search in: Name/Comment,Exec,Category, path to the file
+ --all-sys-path | --asc (options): search only in /etc /usr /opt
+ Without supported options (begins with --) will list or search in default output'
+		;; 
+	dump ) 
+		echo '
+	Dump RAW content of *.desktop files to stdout
+ --dump-all | --da : search in  / (may need root rights)
+ --dump-default-path | --ddp : from default path
+ --dump-sys-path | --dsp : dump content from /usr /etc /opt'
+		;;
+	debug ) 
+		echo '--show-me | --sm (options): show content of this script'
+		;;
+	var )
+		echo '
+	 Search value of variables
+ --var [variable]	: search for variable in the *.desktop
+ --show-uniq-def |--sud : show all uniq base variable names found in default path
+ --var-sys | --vs 	: show all uniq base variable names found in /usr /etc /opt
+ --show-sys-uniq |--ssu : show uniq variable names found in sys path /usr /etc /opt
+ --no-var-sys|--nvs [xx]: show file names that does not contain string /usr /etc /opt
+ --no-var | --nv [text] : show file names that does not contain string in default path'
+		;;
+	sec ) 
+		echo '
+	Search section names in *.desktop files
+ --sys-section-name 	| --ssn  : search for uniq section names in /usr /etc /opt
+ --default-section-name | --dsn  : search for uniq section names in default path'
+		;;
+	config ) 
+		echo '
+	Configuration
+ --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
+ --create-local-list  | --cll : scan system and save dirs into $HOME/.list-desktop-path/custom-path/sorted.test
+
+ --show-local-defaults	| --sld : show content of $HOME/.list-desktop-path/custom-path/sorted.test
+ --show-global-defaults	| --sgd : show content of /opt/share/list-desktop-files/sorted.test
+
+ --show-default-directories | --sdd : show internal dirs defined in array DefDskPath 
+
+ --remove-local-config	: removing $HOME/.list-desktop-path/custom-path/sorted.test
+ --remove-global-config	: removing /opt/share/list-desktop-files/sorted.test
+
+ --find-uniq-path | --fup (path)	: find path that contain *.desktop files, default starting path is /
+ --update-path-file | --upf [file name]	: replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
+		;;
+	info ) 
+	echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
+	Short overview:
+"f" - File name with full path
+"u" - URL to website
+"d" - Directory
+"n" - Name of the file without path
+	Single source:
+%f %u %d %n
+	Multiple sources:
+%F %U %D %N
+	Other:
+%k URI/location of desktop file 
+%v name of the device'	
+		;;
+	usage ) 
+	echo 'Usage examples
+ List content with default options:
+	 lsdesktopf
+ Search only for specific text in default output:
+	 lsdesktopf gtk
+	 lsdesktopf game
+ Use --var option (supporting grep syntax):
+	--var-sys has same syntax as --var
+	--var Name=
+	--var "Name\[zn_CN\]" -e "Exec="
+ Reverse search 
+	--no-var Execute
+	--no-var-sys "Name\[en_GB\]"
+ Scan for all *.desktop files in /usr /etc /opt
+ has same syntax as without supported options
+	--asc 
+	--asc gtk
+	Use --find-uniq-path or --fup 
+	--fup 
+	--fup /usr /etc
+ Update a file that contains list of path
+	--upf filename'
+		;;
+		esac
+	fi
+		;;
+--var )
+	ReCreateDskPath "$@"
+
+	if [[  ! -z "$2"    ]];then  
+		Var="$2"
+ 	if [[ "$#" -gt 2  ]];then 
+	OptionsToGrep=($@);
+#	Additional="${OptionsToGrep[@]:2}"  ;
+ 	fi;
+		Opts="var"
+	echo "${OptionsToGrep[@]:2}"	
+		SearchContentOfVariable "$@"
+	else
+		echo "Error, parameter to --var is missing
+	example: --var MimeType"
+ 	fi	 	
+ 	;;
+--no-var | --nv )
+	ReCreateDskPath "$@"
+
+	if [[  ! -z "$2"    ]];then  
+		Var="$2"
+		Opts="no-var"
+		SearchContentOfVariable "$@"
+	else
+		echo "Error, parameter to --var is missing
+	example: --no-var MimeType"
+ 	fi	 	
+ 	;;
+ --var-sys | --vs)
+#	ReCreateDskPath
+	if [[  ! -z "$2"    ]];then  
+	Var="$2"
+ 	if [[ "$#" -gt 2  ]];then 
+	OptionsToGrep=($@);
+	Additional="${OptionsToGrep[@]:2}"  ;
+	 fi;
+	Opts="var-sys"
+	SearchContentOfVariable "$@"
+	else
+		echo "Error, parameter to --var-sys is missing
+	example: --var MimeType"
+ 	fi	
+	;;
+--no-var-sys | --nvs )
+	if [[ ! -z "$2" ]];then
+		find /usr /etc /opt -type f -name "*\.desktop" -exec grep -i -H -L "$2" \;
+	else
+		echo 'No options are given.'
+	fi
+	;;
+--dump-all | --da ) 
+	grep -i ^ -H -R --include \*.desktop "/"
+	;;
+--dump-sys-path | --dsp )
+	grep -i ^ -H -R --include \*.desktop "/usr /etc /opt"
+	;;
+--dump-default-path | --ddp )
+	Opts="ddp"
+  	ReCreateDskPath "$@"
+     	SearchContentOfVariable
+	;;
+--show-uniq-def | --sud )
+	Opts="sud"
+ 	ReCreateDskPath "$@"
+      	SearchContentOfVariable "$@"
+	;;
+--show-uniq-only | --suo )
+	OffPrint="yes"
+	Opts=suo
+	ReCreateDskPath "$@"
+	RawView
+	;;	
+--show-sys-uniq | --ssu )
+		Opts="sys-uniq"
+		SearchContentOfVariable "$@"
+	;;
+--find-uniq-path | --fup )
+	if [[ ! -z "$2" ]]; then  
+	for StartCmdLine in "$@"; 
+		do
+		if [[ -d "$StartCmdLine" ]]; then
+  		InPath="$StartCmdLine"
+ 		fi
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
+	 if [[ "$InPath" == "/" ]];then 
+	  	exit 0
+ 		fi
+	done
+	else
+		find / -type f -name "*\.desktop" -exec dirname "{}" \;| sort | uniq
+	fi	;;
+--all-sys-path | --asc)
+	Opts="scan-sys-path"
+	ReCreateDskPath "$@"
+	ListDefault "$@"
+	;;
+--create-local-list | --cll)
+	mkdir -p "$(dirname $LocalArray)"
+	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
+	;;
+--update-path-file | --upf)
+	if [[ "$UID" != 0 ]];then  
+		echo 'You must start it as user root'
+		exit 1
+	else
+		if [[ -z "$2"  ]];then
+			echo 'path to file is missing'
+		else
+			if [[ -f "$2" ]];then
+				mkdir -p "$(dirname $GlobalArray)"
+				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq >> "$2";
+				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' "$2";
+				uniq -u "$2" /tmp/uniq-tmp.txt
+				cp "/tmp/uniq-tmp.txt" "$2"
+			else
+				echo "Destion is not a file"
+			fi
+		fi
+	fi
+	;;
+--create-global-list | --cgl)
+	if [[ "$UID" != 0 ]];then  
+		echo 'You must start it as user root'
+		exit 1
+	else
+		mkdir -p "$(dirname $GlobalArray)"
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$GlobalArray"
+	fi
+	;;
+
+--show-local-defaults | --sld)
+	if [[ -f "$HOME/.list-desktop-path/custom-path/sorted.test" ]];then
+		cat "$HOME/.list-desktop-path/custom-path/sorted.test"
+	else
+		echo 'Does not exist $HOME/.list-desktop-path/custom-path/sorted.test'
+	fi
+	;;
+--show-global-defaults | --sgd)
+	if [[ -f "/opt/share/list-desktop-files/sorted.test" ]];then
+		cat "/opt/share/list-desktop-files/sorted.test"
+	else
+		echo 'Does not exist /opt/share/list-desktop-files/sorted.test'
+	fi
+	;;
+--show-default-directories | --sdd)
+	for SDD in "${DefDskPath[@]}"; do
+		echo "$SDD"
+	done
+	;;
+--remove-local-config) 
+	rm -i "$HOME/.list-desktop-path/custom-path/sorted.test"
+	;;
+--remove-global-config) 
+	if [[ "$UID" -eq "0" ]];then
+		rm -i "/opt/share/list-desktop-files/sorted.test"
+	else
+		echo You must be root!
+	fi
+	;;
+--show-me | --sm)
+	if [[  -z $2 ]];then
+		cat "$0"
+		echo '# my path: '" $0"
+	else
+		grep -n "$2" "$0" | grep -v -e "IGNORE" -e ^"# "
+	fi
+	;;
+--sys-section-name | --ssn)
+	grep -e ^"\[" -h -R --include *\.desktop  /usr /etc /opt | sort | uniq
+	;;
+--default-section-name | --dsn)
+	OffPrint="no"
+	Opts='sdsn'
+	ReCreateDskPath "$@"
+
+	SearchContentOfVariable
+	;;	
+* ) 
+	ReCreateDskPath "$@"
+
+	ListDefault "$@"
+	;;
+esac
