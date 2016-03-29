@@ -545,7 +545,7 @@ info	-	show short info about *.desktop specified Exec'
 		cat "$0"
 		echo '# my path: '" $0"
 	else
-		grep -n "$2" "$0" | grep -v -e "IGNORE" -e ^"#" -e \-\-
+		grep -n "$2" "$0" | grep -v -e "IGNORE" -e ^"# "
 	fi
 	;;
 --sys-section-name | --ssn)
