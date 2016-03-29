@@ -1,11 +1,11 @@
 #!/bin/bash
-##Version 1.0.0-4
+# Version 1.0.0-4
 #
-#License: GPL3
+# License: GPL3
 #
-#Author: Andy Crowd
-#Tested in Arch Linux
-#Search in *.desktop for "Categories" and "Exec"
+# Author: Andy Crowd
+# Tested in Arch Linux
+# Search in *.desktop for "Categories" and "Exec"
 #
 
 unset IFS
@@ -16,6 +16,8 @@ One="$1"
 
 GlobalArray="/opt/share/list-desktop-files/sorted.test"
 LocalArray="$HOME/.list-desktop-path/custom-path/sorted.test"
+
+### The DefDskPath variable contains list of default folders
 DefDskPath+=("/etc/dynamic/launchers/scanner")
 DefDskPath+=("/etc/xdg/autostart")
 DefDskPath+=("/etc/xdg/xfce*/panel/launcher-*")
@@ -93,8 +95,10 @@ if [[  ! -f "$LocalArray" ]];then
 	FilePath="$GlobalArray"
 
 	else
-
-####################
+### ADskPath contains list of "decoded" path with command "file"
+### command "file" can handle wildcards such as * that is useful when it is multiple or new path with versions number is available
+### command "grep" is used to separate available from not existing path
+### command "awk" is used only to show name of the path without any additional description
 ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
 	file "$FromDDP";
 done |sort|uniq|grep -v \)$ | grep ^/ |awk -F': ' '{print $1}'))
@@ -107,6 +111,7 @@ if [[ "${#ADskPath[@]}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
 	done < "$FilePath"|awk '{system("file "$0)}'|sort|uniq|grep -v \)$ |grep ^/ |awk -F': ' '{print $1}'))
+### $BDskPath is used to add path that depends on such variables as $HOME and $XDG related
 		BDskPath+=("$HOME/.local/share/applications")
 		BDskPath+=("$HOME/.config/autostart")
 		BDskPath+=("$XDG_CONFIG_DIRS/autostart")
@@ -119,8 +124,10 @@ do
 	fi
 done
 
+### soring out only uniq path in case if $XDG related and $HOME are pointing on a similar destination. || $InDskPath, $ADskPath, NoEmpty
 NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort|uniq;));
 
+### used to find out path that can be used || scan-sys-path, $DskPath, NoEmpty
 ReCreateDskPath(){
 case "$Opts" in
 	OnlyNew1 )
@@ -149,6 +156,7 @@ fi))
 esac
 }
 ########################################
+### ListDefault listing or searching in default output for content of Name, Exec, Comment. || awk, DskPath, fdPath
 ListDefault(){
 for fdPath in "${DskPath[@]}";do
 if [[ ! -z "$1"   ]];then
@@ -205,18 +213,23 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
 	case $Opts in
+### "$var" is used to search for variable names with "grep" in *.desktop
 	var )
 		grep -e ^"$Var" "${OptionsToGrep[@]:2}" -H -E -R --include \*.desktop "${fdPath}" 
 		;;
+### "ddp" is used to raw dump cotent of all *.desktop found in default path. || grep
 	ddp ) 
                 grep ^ -H -R --include \*.desktop "${fdPath}"
 		;;
+### "sud" showing uniq variables found in default path. || grep, cut
 	sud )
 		grep '=' -R -h --include \*.desktop "${fdPath}"|cut -d= -f 1|grep -v -e "\[" -e ^\# |sort|uniq
 		;;
+### "no-var" showing all *.desktop except them that contains contains specified string. || grep, find
 	no-var )
 		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" "$Additional" "{}" \;
 		;;
+### "sdsn" showing only uniq section names found in default path. || grep, sed 
 	sdsn )
 		grep '\[*\]'$ -R -h --include \*.desktop "${fdPath}" | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort|uniq		
 		;;
@@ -227,15 +240,18 @@ fi
 done
 
 case  "$Opts" in
-	sys-uniq)
-find "/usr/" "/etc/" "/opt"  -type f -name "*\.desktop" -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort | uniq
-;;
-var-sys)
-	grep -e ^"$Var" "$Additional" -H -E -R --include \*.desktop /usr/ /etc /opt
-	;;
+### "sys-uniq" showing uniq variable names found in /usr /etc /opt path. || find, cut, grep
+	sys-uniq )
+		find "/usr" "/etc" "/opt"  -type f -name "*\.desktop" -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort | uniq
+		;;
+### "var-sys" searching for variable name in system path /usr /etc /opt
+	var-sys )
+		grep -e ^"$Var" "$Additional" -H -E -R --include \*.desktop /usr /etc /opt
+		;;
 esac
 }
 ########################################
+
 RawView(){
 for fdPath in "${DskPath[@]}";do
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
@@ -529,7 +545,7 @@ info	-	show short info about *.desktop specified Exec'
 		cat "$0"
 		echo '# my path: '" $0"
 	else
-		grep -n $2 "$0" | grep -v -e "IGNORE" -e ^"#" -e \-\-
+		grep -n "$2" "$0" | grep -v -e "IGNORE" -e ^"#" -e \-\-
 	fi
 	;;
 --sys-section-name | --ssn)
