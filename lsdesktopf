@@ -1,5 +1,5 @@
 #!/bin/bash
-##Version 1.0.0-3
+##Version 1.0.0-4
 #
 #License: GPL3
 #
@@ -159,7 +159,7 @@ fi
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
   printf "\e[1;36m %s  ${fdPath} \e[0m \n";
-  if [ ! -z "$2" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+  if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then
      find "${fdPath}" -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
 if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
