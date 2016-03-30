@@ -282,7 +282,8 @@ var	-	list available variables or search a value
 sec	-	list available sections
 def	-	options that are using default output
 debug	-	view or search in content of this script
-info	-	show short info about *.desktop specified Exec'
+info	-	show short info about *.desktop specified Exec
+tips	-	show some tips about some commands used in this script'
 	else
 		case "$2" in
 	default )
@@ -312,6 +313,7 @@ info	-	show short info about *.desktop specified Exec'
  --show-uniq-def |--sud : show all uniq base variable names found in default path
  --var-sys | --vs 	: show all uniq base variable names found in /usr /etc /opt
  --show-sys-uniq |--ssu : show uniq variable names found in sys path /usr /etc /opt
+ --show-uniq-only |--suo: show RAW output of uniq variables found in default path  
  --no-var-sys|--nvs [xx]: show file names that does not contain string /usr /etc /opt
  --no-var | --nv [text] : show file names that does not contain string in default path'
 		;;
@@ -377,6 +379,24 @@ info	-	show short info about *.desktop specified Exec'
  Update a file that contains list of path
 	--upf filename'
 		;;
+	tips )
+	echo '
+ command "rev" is used to reverse text that is useful to show or exclude last column
+ to show only specfic column can be used commands such as awk,cut. 
+	The "awk" command can use more then one symbol as delimer but "cut" supports only one
+	awk -F"AB" "{print $1}"
+	awk "{print substr($0,0,index($0,"AB")-2) }"
+	cut -dA -f1
+	to show everything after specified column
+	cut -dA -f2-
+	awk "{print substr($0,index($0,"AB")+2) }"
+
+ command "basename" is used to show only the filename but cutting away path to it.
+	find / -type f -exec basename "{}" \;
+	find / -type f | xargs basename
+ command "dirname" is used to show only path to file.
+	find / -type f -exec dirname "{}" \;
+	find / -type f | xargs dirname'
 		esac
 	fi
 		;;
@@ -405,7 +425,7 @@ info	-	show short info about *.desktop specified Exec'
 		Opts="no-var"
 		SearchContentOfVariable "$@"
 	else
-		echo "Error, parameter to --var is missing
+		echo "Error, parameter to --no-var is missing
 	example: --no-var MimeType"
  	fi	 	
  	;;
@@ -421,7 +441,7 @@ info	-	show short info about *.desktop specified Exec'
 	SearchContentOfVariable "$@"
 	else
 		echo "Error, parameter to --var-sys is missing
-	example: --var MimeType"
+	example: --var-sys MimeType"
  	fi	
 	;;
 --no-var-sys | --nvs )
@@ -443,6 +463,7 @@ info	-	show short info about *.desktop specified Exec'
      	SearchContentOfVariable
 	;;
 --show-uniq-def | --sud )
+	OffPrint="no"
 	Opts="sud"
  	ReCreateDskPath "$@"
       	SearchContentOfVariable "$@"
