@@ -168,7 +168,7 @@ if [[  ! -f "$LocalArray" ]];then
 ### command "awk" is used only to show name of the path without any additional description
 ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
 	file "$FromDDP";
-done |sort|uniq|grep -v \)$ | grep ^/ |rev|cut -d: -f2- |rev))
+done |sort -u | grep -v \)$ | grep ^/ |rev|cut -d: -f2- |rev))
 ####################
 	fi
 else
@@ -177,7 +177,7 @@ fi
 if [[ "${#ADskPath[@]}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
-	done < "$FilePath"|xargs file|sort|uniq|grep -v \)$ |grep ^/ |rev|cut -d: -f2-|rev))
+	done < "$FilePath"|xargs file|sort -u | grep -v \)$ |grep ^/ |rev|cut -d: -f2-|rev))
 ### $BDskPath is used to add path that depends on such variables as $HOME and $XDG related
 		BDskPath+=("$HOME/.local/share/applications")
 		BDskPath+=("$HOME/.config/autostart")
@@ -192,7 +192,7 @@ do
 done
 
 ### soring out only uniq path in case if $XDG related and $HOME are pointing on a similar destination. || $InDskPath, $ADskPath, NoEmpty
-NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort|uniq;));
+NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort -u;));
 
 ### used to find out path that can be used || scan-sys-path, $DskPath, NoEmpty
 ReCreateDskPath(){
@@ -204,18 +204,18 @@ DskPath=($(if [[ ! -z $2 ]]; then
  		if [[ -d "$StartCmdLine" ]]; then
 		  InPath="$StartCmdLine"
  		fi
-find "$InPath" -type f -name "*\.desktop" -exec dirname "{}" \;|sort|uniq
+find "$InPath" -type f -name "*\.desktop" -exec dirname "{}" \;|sort -u
 
  		if [[ "$InPath" == "/" ]];then 
   		exit 0
  		fi
 	done
 else
-	find / -type f -name "*\.desktop" -exec dirname "{}" \; |sort|uniq
+	find / -type f -name "*\.desktop" -exec dirname "{}" \; |sort -u
 fi))
 ;;
 	scan-sys-path )
-		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop" -exec dirname "{}" \;|sort|uniq))
+		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop" -exec dirname "{}" \;|sort -u))
 		;;
 	*)
 	DskPath=(${NoEmpty[@]})
@@ -290,7 +290,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		;;
 ### "sud" showing uniq variables found in default path. || grep, cut
 	sud )
-		grep '=' -R -h --include \*.desktop "${fdPath}"|cut -d= -f 1|grep -v -e "\[" -e ^\# |sort|uniq
+		grep '=' -R -h --include \*.desktop "${fdPath}"|cut -d= -f 1|grep -v -e "\[" -e ^\# |sort -u
 		;;
 ### "no-var" showing all *.desktop except them that contains contains specified string. || grep, find
 	no-var )
@@ -298,7 +298,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		;;
 ### "sdsn" showing only uniq section names found in default path. || grep, sed 
 	sdsn )
-		grep '\[*\]'$ -R -h --include \*.desktop "${fdPath}" | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort|uniq		
+		grep '\[*\]'$ -R -h --include \*.desktop "${fdPath}" | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort -u
 		;;
 	esac
 
@@ -309,7 +309,7 @@ done
 case  "$Opts" in
 ### "sys-uniq" showing uniq variable names found in /usr /etc /opt path. || find, cut, grep
 	sys-uniq )
-		find "/usr" "/etc" "/opt"  -type f -name "*\.desktop" -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort | uniq
+		find "/usr" "/etc" "/opt"  -type f -name "*\.desktop" -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort -u
 		;;
 ### "var-sys" searching for variable name in system path /usr /etc /opt
 	var-sys )
@@ -331,7 +331,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 fi
 done | case $Opts in
 	suo )
-		grep = |cut -d= -f1 |grep -v -e "\[" -e ^\#|sort | uniq
+		grep = |cut -d= -f1 |grep -v -e "\[" -e ^\#|sort -u
 		;;
 esac
 }
@@ -554,13 +554,13 @@ tips	-	show some tips about some commands used in this script'
 		if [[ -d "$StartCmdLine" ]]; then
   		InPath="$StartCmdLine"
  		fi
-	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort | uniq
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort -u
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop" -exec dirname "{}" \;| sort | uniq
+		find / -type f -name "*\.desktop" -exec dirname "{}" \;| sort -u
 	fi	;;
 --all-sys-path | --asc)
 	Opts="scan-sys-path"
@@ -569,7 +569,7 @@ tips	-	show some tips about some commands used in this script'
 	;;
 --create-local-list | --cll)
 	mkdir -p "$(dirname $LocalArray)"
-	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$LocalArray"
+	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$LocalArray"
 	;;
 --update-path-file | --upf)
 	if [[ "$UID" != 0 ]];then  
@@ -581,7 +581,7 @@ tips	-	show some tips about some commands used in this script'
 		else
 			if [[ -f "$2" ]];then
 				mkdir -p "$(dirname $GlobalArray)"
-				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq >> "$2";
+				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u >> "$2";
 				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' "$2";
 				uniq -u "$2" /tmp/uniq-tmp.txt
 				cp "/tmp/uniq-tmp.txt" "$2"
@@ -597,7 +597,7 @@ tips	-	show some tips about some commands used in this script'
 		exit 1
 	else
 		mkdir -p "$(dirname $GlobalArray)"
-		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort | uniq > "$GlobalArray"
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$GlobalArray"
 	fi
 	;;
 
@@ -627,7 +627,7 @@ tips	-	show some tips about some commands used in this script'
 	if [[ "$UID" -eq "0" ]];then
 		rm -i "/opt/share/list-desktop-files/sorted.test"
 	else
-		echo You must be root!
+		echo 'You must be root!'
 	fi
 	;;
 --show-me | --sm)
@@ -639,7 +639,7 @@ tips	-	show some tips about some commands used in this script'
 	fi
 	;;
 --sys-section-name | --ssn)
-	grep -e ^"\[" -h -R --include *\.desktop  /usr /etc /opt | sort | uniq
+	grep -e ^"\[" -h -R --include *\.desktop  /usr /etc /opt | sort -u
 	;;
 --default-section-name | --dsn)
 	OffPrint="no"
