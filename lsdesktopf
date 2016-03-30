@@ -458,6 +458,7 @@ tips	-	show some tips about some commands used in this script'
 	cut -dA -f2-
 	awk "{print substr($0,index($0,"AB")+2) }"
  to show amount columns in a string
+ 	awk -F"AB" "{print NF}"
  	awk "{print split($0,A,"AB") }"
  command "basename" is used to show only the filename but cutting away path to it.
 	find / -type f -exec basename "{}" \;
