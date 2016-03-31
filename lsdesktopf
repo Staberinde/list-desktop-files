@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.0-4
+# Version 1.0.0-5
 #
 # License: GPL3
 #
@@ -319,13 +319,20 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 	sdsn )
 		grep '\[*\]'$ -R -h --include "*\.desktop" "${fdPath}" | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort -u
 		;;
-	upfd ) 
-		find "${fdPath}" -type f -name "*\.desktop" -exec awk -F= '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";
-		if(index($1,"]") == 0) print $0}' "{}" \; | grep -v ^"\#"
+	upfd )
+		if [[ ! -z "$2"  ]];then FLang="$2";
+		else
+			FLang="";
+		fi
+
+		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v GetLang="$FLang"  -F= '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" "%s",$1"\n";
+		if(index($1,"["GetLang"]") != 0 ){print $0}else { if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
 		;;
 	more )
-		find "${fdPath}" -type f -name "*\.desktop" -exec awk -F= '{if (index($1,"[") == 1)  printf "#"FILENAME"\n" $1"\n";if(index($1,"]") == 0) printf "%s",substr($0,index($0,$2))" # " }'  "{}"  \;
-		echo
+		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
+		if(index($1,"]") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));if(FindIt)if(index($2,FindIt) != 0)YES="1"; };}END{
+		if(YES == "1" ){print " "FILENAME;for (I in InString)print Var[I]"="InString[I]};
+		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I];InString[I]}}'  "{}"  \;|grep -v ^"#"
 		;;
 	esac
 
@@ -388,7 +395,13 @@ tips	-	show some tips about some commands used in this script'
 	 Search for content in 
 	 Deafult output to search in: Name/Comment,Exec,Category, path to the file
  --all-sys-path | --asc (options): search only in /etc /usr /opt
- Without supported options (begins with --) will list or search in default output'
+ Without supported options (begins with --) will list or search in default output
+
+ --more | --m : search text in all available variables in default directories
+ --more-sys | --ms : search text in all available variables in /usr /etc /opt
+ 
+ --uniq-per-file-default | --upfd : list variables with their content but you can also show variables on choosen language
+ --uniq-per-file-sys | --upfs : list variables found in /usr /etc /opt'
 		;; 
 	dump ) 
 		echo '
@@ -519,16 +532,23 @@ tips	-	show some tips about some commands used in this script'
 --uniq-per-file-default | --upfd )
 	Opts="upfd"	
 	ReCreateDskPath "$@"
-	SearchContentOfVariable
+	SearchContentOfVariable "$@"
 	;;
 --uniq-per-file-sys | --upfs )
-	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -F= '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";
-		if(index($1,"]") == 0) print $0}' "{}" \; | grep -v ^"\#"
+
+	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v GetLang="ru" -F"=" '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";if(index($1,"["GetLang"]")){print $0}else{if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
 	;;
 --more | --m )
 	Opts="more"
 	ReCreateDskPath "$@"
-        SearchContentOfVariable
+        SearchContentOfVariable "$@"
+	;;
+--more-sys | --ms )
+	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
+		if(index($1,"]") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));if(FindIt)if(index($2,FindIt) != 0)YES="1"; };}END{
+		if(YES == "1" ){print " "FILENAME;for (I in InString)print Var[I]"="InString[I]};
+		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v ^"#"
+
 	;;
 --no-var | --nv )
 	ReCreateDskPath "$@"
