@@ -324,7 +324,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		if(index($1,"]") == 0) print $0}' "{}" \; | grep -v ^"\#"
 		;;
 	more )
-		find "${fdPath}" -type f -name "*\.desktop" -exec awk -F= '{if (index($1,"[") == 1)  printf "#"FILENAME"\n" $1"\n";if(index($1,"]") == 0) printf substr($0,index($0,$2))" # " }'  "{}"  \;
+		find "${fdPath}" -type f -name "*\.desktop" -exec awk -F= '{if (index($1,"[") == 1)  printf "#"FILENAME"\n" $1"\n";if(index($1,"]") == 0) printf "%s",substr($0,index($0,$2))" # " }'  "{}"  \;
 		echo
 		;;
 	esac
