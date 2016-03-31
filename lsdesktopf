@@ -321,7 +321,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		;;
 	upfd ) 
 		find "${fdPath}" -type f -name "*\.desktop" -exec awk -F= '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";
-		if(index($1,"]") == 0) print $1}' "{}" \; | grep -v ^"\#"
+		if(index($1,"]") == 0) print $0}' "{}" \; | grep -v ^"\#"
 		;;
 	esac
 
@@ -519,7 +519,7 @@ tips	-	show some tips about some commands used in this script'
 	;;
 --uniq-per-file-sys | --upfs )
 	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -F= '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";
-		if(index($1,"]") == 0) print $1}' "{}" \; | grep -v ^"\#"
+		if(index($1,"]") == 0) print $0}' "{}" \; | grep -v ^"\#"
 	;;
 --no-var | --nv )
 	ReCreateDskPath "$@"
