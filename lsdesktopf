@@ -322,14 +322,23 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 			FLang="";
 		fi
 
-		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v GetLang="$FLang"  -F= '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" "%s",$1"\n";
-		if(index($1,"["GetLang"]") != 0 ){print $0}else { if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
+		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
+		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
+		if(index($1,"["GetLang"]") != 0 ){Item[cnt++]=$0}else { if(index($1,"]") == 0)Item[cnt++]=$0}
+		}END{
+		printf "  %s",FILENAME"\n";
+		print " ** Total translations: "length(UniqLang);
+		if(ShowAvailableLanguages)if(ShowAvailableLanguages == "all")if(length(UniqLang) != 0 ){
+			for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang","};print "."	
+			};
+		for (ItemNumber in Item)print Item[ItemNumber];			
+		}' "{}" \; | grep -v ^"\#"
 		;;
 	more )
 		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
 		if(index($1,"]") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));if(FindIt)if(index($2,FindIt) != 0)YES="1"; };}END{
-		if(YES == "1" ){print " "FILENAME;for (I in InString)print Var[I]"="InString[I]};
-		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I];InString[I]}}'  "{}"  \;|grep -v ^"#"
+		if(YES == "1" ){print " "FILENAME;        for(I in InString)print Var[I]"="InString[I]};
+		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v ^"#"
 		;;
 	esac
 
@@ -397,8 +406,10 @@ tips	-	show some tips about some commands used in this script'
  --more | --m : search text in all available variables in default directories
  --more-sys | --ms : search text in all available variables in /usr /etc /opt
  
- --uniq-per-file-default | --upfd : list variables with their content but you can also show variables on choosen language
- --uniq-per-file-sys | --upfs : list variables found in /usr /etc /opt'
+ By using option "all" as 3rd option will show all available translations in a *.desktop file, 
+ without it will show only amount of translations or additional variables with a chosen translation.
+ --uniq-per-file-default (lang) ("all") | --upfd : list variables found in default path
+ --uniq-per-file-sys (lang) ("all")  | --upfs : list variables found in /usr /etc /opt'
 		;; 
 	dump ) 
 		echo '
@@ -412,14 +423,16 @@ tips	-	show some tips about some commands used in this script'
 		;;
 	var )
 		echo '
-	 Search value of variables
+	 Search value of variables. Supporting grep syntax
  --var [variable]	: search for variable in the *.desktop
- --show-uniq-def |--sud : show all uniq base variable names found in default path
- --var-sys | --vs 	: show all uniq base variable names found in /usr /etc /opt
- --show-sys-uniq |--ssu : show uniq variable names found in sys path /usr /etc /opt
- --show-uniq-only |--suo: show RAW output of uniq variables found in default path  
+ --var-sys | --vs [variable] 	: show all uniq base variable names found in /usr /etc /opt
+
  --no-var-sys|--nvs [xx]: show file names that does not contain string /usr /etc /opt
- --no-var | --nv [text] : show file names that does not contain string in default path'
+ --no-var | --nv [text] : show file names that does not contain string in default path
+
+ --show-uniq-def |--sud : show all uniq base variable names found in default path
+ --show-sys-uniq |--ssu : show uniq variable names found in sys path /usr /etc /opt
+ --show-uniq-only |--suo: show RAW output of uniq variables found in default path'
 		;;
 	sec ) 
 		echo '
@@ -533,8 +546,19 @@ tips	-	show some tips about some commands used in this script'
 	;;
 --uniq-per-file-sys | --upfs )
 
-	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v GetLang="ru" -F"=" '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";if(index($1,"["GetLang"]")){print $0}else{if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
-	;;
+#	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v GetLang="ru" -F"=" '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";if(index($1,"["GetLang"]")){print $0}else{if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
+		find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
+		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
+		if(index($1,"["GetLang"]") != 0 ){Item[cnt++]=$0}else { if(index($1,"]") == 0)Item[cnt++]=$0}
+		}END{
+		printf "  %s",FILENAME"\n";
+		print " ** Total translations: "length(UniqLang);
+		if(ShowAvailableLanguages)if(ShowAvailableLanguages == "all")if(length(UniqLang) != 0 ){
+			for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang","};print "."	
+			};
+		for (ItemNumber in Item)print Item[ItemNumber];			
+		}' "{}" \; | grep -v ^"\#"
+		;;
 --more | --m )
 	Opts="more"
 	ReCreateDskPath "$@"
