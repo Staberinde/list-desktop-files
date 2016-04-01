@@ -337,8 +337,8 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 	more )
 		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
 		if(index($1,"]") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));if(FindIt)if(index($2,FindIt) != 0)YES="1"; };}END{
-		if(YES == "1" ){print " "FILENAME;        for(I in InString)print Var[I]"="InString[I]};
-		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v ^"#"
+		if(YES == "1" ){print " "FILENAME;        for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]};
+		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v ^"#"
 		;;
 	esac
 
