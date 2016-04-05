@@ -13,6 +13,7 @@ IFS="
 "
 One="$1"
 #Two="$2"
+AddCmd=($@);
 
 GlobalArray="/opt/share/list-desktop-files/sorted.test"
 LocalArray="$HOME/.list-desktop-path/custom-path/sorted.test"
@@ -298,7 +299,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 	case $Opts in
 ### "$var" is used to search for variable names with "grep" in *.desktop
 	var )
-		grep -e ^"$Var" "${OptionsToGrep[@]:2}" -H -E -R --include "*\.desktop" "${fdPath}" 
+		grep -e ^"$Var" "${AddCmd[@]:2}" -H -E -R --include "*\.desktop" "${fdPath}" 
 		;;
 ### "ddp" is used to raw dump cotent of all *.desktop found in default path. || grep
 	ddp ) 
@@ -310,7 +311,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		;;
 ### "no-var" showing all *.desktop except them that contains contains specified string. || grep, find
 	no-var )
-		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" "${OptionsToGrep[@]:2}" "{}" \;
+		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" "${AddCmd[@]:2}" "{}" \;
 		;;
 ### "sdsn" showing only uniq section names found in default path. || grep, sed 
 	sdsn )
@@ -370,7 +371,7 @@ case  "$Opts" in
 		;;
 ### "var-sys" searching for variable name in system path /usr /etc /opt
 	var-sys )
-		grep -e ^"$Var" "${OptionsToGrep[@]:2}" -H -E -R --include "*\.desktop" /usr /etc /opt
+		grep -e ^"$Var" "${AddCmd[@]:2}" -H -E -R --include "*\.desktop" /usr /etc /opt
 		;;
 esac
 }
@@ -545,11 +546,11 @@ tips	-	show some tips about some commands used in this script'
 	if [[  ! -z "$2"    ]];then  
 		Var="$2"
  	if [[ "$#" -gt 2  ]];then 
-	OptionsToGrep=($@);
-#	Additional="${OptionsToGrep[@]:2}"  ;
+	AddCmd=($@);
+#	Additional="${AddCmd[@]:2}"  ;
  	fi;
 		Opts="var"
-	echo "${OptionsToGrep[@]:2}"	
+	echo "${AddCmd[@]:2}"	
 		SearchContentOfVariable "$@"
 	else
 		echo "Error, parameter to --var is missing
@@ -583,31 +584,48 @@ tips	-	show some tips about some commands used in this script'
 	;;
 --more-sys | --ms )
 	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
-		if(index($1,"]") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));if(FindIt)if(index($2,FindIt) != 0)YES="1"; };}END{
-		if(YES == "1" ){print " "FILENAME;for (I in InString)print Var[I]"="InString[I]};
-		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v ^"#"
+		if(index($1,"]") == 0){
+			Var[CountV++]=$1;
+			InString[CountS++]=substr($0,index($0,$2));
+			if(FindIt)if(index($2,FindIt) != 0)YES="1"; };
+			}END{
+		if(YES == "1" )
+			{
+			print " "FILENAME;
+			for (I in InString)print Var[I]"="InString[I]
+			};
+		if(length(FindIt) == 0)
+			{
+			print " "FILENAME;
+			for(I in InString)print Var[I]"="InString[I]
+			}
+			     }'  "{}"  \;|grep -v ^"#"
 	;;
 --less | --l )
 	Opts="luf"
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
 	;;
----less-user-friendly-sys | --lufs )
-	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
-		if(index($1,"]") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));if(FindIt)if(index($2,FindIt) != 0)YES="1"; };
+---less-user-friendly-sys | --ls )
+	find  /etc/xdg -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="${AddCmd:2}" -F= '/^create/;{ 
+		if(index($1,"]") == 0){
+			Var[CountV++]=$1;
+			InString[CountS++]=substr($0,index($0,$2));
+			if(FindIt)if(index($2,FindIt) != 0)YES="1"; };
 		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
 		if(index($1,"]") == 0)Item[cnt++]=$0;
 		}END{
-		print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";
-		if(length(UniqLang) != 0 ){
+		if(YES == "1" ){
+			print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";};
+		if(length(UniqLang) != 0 )
+			{
 		for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang","};print "."	
-		}else{printf "\n"};
+			}else{printf "\n"};
 		for (I in InString)print Var[I]"="InString[I];
 		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I]"="InString[I]}
 		for (ItemNumber in Item)print Item[ItemNumber];			
 		}'  "{}"  \;|grep -v ^"#"
-
-;;
+	;;
 -no-var | --nv )
 	ReCreateDskPath "$@"
 
@@ -624,10 +642,9 @@ tips	-	show some tips about some commands used in this script'
 #	ReCreateDskPath
 	if [[  ! -z "$2"    ]];then  
 	Var="$2"
- 	if [[ "$#" -gt 2  ]];then 
-	OptionsToGrep=($@);
-#	Additional="${OptionsToGrep[@]:2}"  ;
-	 fi;
+# 	if [[ "$#" -gt 2  ]];then 
+#	Additional="${AddCmd[@]:2}"  ;
+# 	 fi;
 	Opts="var-sys"
 	SearchContentOfVariable "$@"
 	else
