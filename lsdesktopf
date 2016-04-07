@@ -467,7 +467,7 @@ tips	-	show some tips about some commands used in this script'
  
 	Same as option --more but is less userfiendly by outputing much more information
  --less | --l (text) (translation) : in default path
- --less-sys | --ls --l (text) (translation) : only in /usr /etc /opt'
+ --less-sys | --ls (text) (translation) : only in /usr /etc /opt'
  		;;
 
 	debug ) 
