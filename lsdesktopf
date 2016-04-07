@@ -342,22 +342,46 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v ^"#"
 		;;
 	luf )
-		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
-		if(index($1,"]") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));if(FindIt)if(index($2,FindIt) != 0)YES="1"; };
-		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
-		if(index($1,"]") == 0)Item[cnt++]=$0;
-		}END{
-		print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";
-		if(length(UniqLang) != 0 ){
-		for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang","};print "."	
-		}else{printf "\n"};
-		for (I in InString)print Var[I]"="InString[I];
-		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I]"="InString[I]}
-		for (ItemNumber in Item)print Item[ItemNumber];			
-		}'  "{}"  \;|grep -v ^"#"
-
-	;;
-
+		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
+			if(length(Trans) != 0)split(Trans,ArrayTransLang,",");
+			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]++;
+		if(index($1,"]") == 0)
+			{
+			Var[CountV++]=$1;
+			InString[CountS++]=substr($0,index($0,$2));
+			if(FindIt)if(index($2,FindIt) != 0)YES="1"; 
+			};
+		if(index($1,"[") != 0 && index($1,"[") != 1 ){
+			split($1,Lang,"[");
+			TmpULang=Lang[2];
+			sub("]","",TmpULang);sub("]","",TmpULang);
+			UniqLang[TmpULang]++;
+			TmpLang=Lang[2];
+			sub("]","",TmpLang);sub("]","",TmpLang);
+			if(length(ArrayTransLang) != 0 )NewArrTrans[TmpLang]++;
+			if(NewArrTrans[TmpLang] > 2 ){
+				Var[CountV++]=$1;
+				InString[CountS++]=substr($0,index($0,$2));}
+			};
+			if(index($1,"[") == 1){
+			Var[CountV++]=$1;
+			InString[CountS++]=$0}			
+			}END{
+		if(YES == "1" )
+			{
+			print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";
+			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
+			print " ";
+			for (I in InString)if(index(Var[I],"[") != 1){print Var[I]"="InString[I];}else{print Var[I]}						}
+		if(length(FindIt) == 0)
+			{
+			print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";
+			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}
+				print " ";
+				for (I in InString)if(index(Var[I],"[") != 1){print Var[I]"="InString[I];}else{print Var[I]}
+				}
+			     }'  "{}"  \;|grep -v ^"#"
+		;;
 	esac
 
     fi;
@@ -584,7 +608,8 @@ tips	-	show some tips about some commands used in this script'
 	;;
 --more-sys | --ms )
 	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
-		if(index($1,"]") == 0){
+		if(index($1,"]") == 0)
+			{
 			Var[CountV++]=$1;
 			InString[CountS++]=substr($0,index($0,$2));
 			if(FindIt)if(index($2,FindIt) != 0)YES="1"; };
@@ -607,24 +632,45 @@ tips	-	show some tips about some commands used in this script'
         SearchContentOfVariable "$@"
 	;;
 ---less-user-friendly-sys | --ls )
-	find  /etc/xdg -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="${AddCmd:2}" -F= '/^create/;{ 
-		if(index($1,"]") == 0){
+	find  /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
+			if(length(Trans) != 0)split(Trans,ArrayTransLang,",");
+			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]++;
+		if(index($1,"]") == 0)
+			{
 			Var[CountV++]=$1;
 			InString[CountS++]=substr($0,index($0,$2));
-			if(FindIt)if(index($2,FindIt) != 0)YES="1"; };
-		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
-		if(index($1,"]") == 0)Item[cnt++]=$0;
-		}END{
-		if(YES == "1" ){
-			print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";};
-		if(length(UniqLang) != 0 )
+			if(FindIt)if(index($2,FindIt) != 0)YES="1"; 
+			};
+		if(index($1,"[") != 0 && index($1,"[") != 1 ){
+			split($1,Lang,"[");
+			TmpULang=Lang[2];
+			sub("]","",TmpULang);sub("]","",TmpULang);
+			UniqLang[TmpULang]++;
+			TmpLang=Lang[2];
+			sub("]","",TmpLang);sub("]","",TmpLang);
+			if(length(ArrayTransLang) != 0 )NewArrTrans[TmpLang]++;
+			if(NewArrTrans[TmpLang] > 2 ){
+				Var[CountV++]=$1;
+				InString[CountS++]=substr($0,index($0,$2));}
+			};
+			if(index($1,"[") == 1){
+			Var[CountV++]=$1;
+			InString[CountS++]=$0}			
+			}END{
+		if(YES == "1" )
 			{
-		for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang","};print "."	
-			}else{printf "\n"};
-		for (I in InString)print Var[I]"="InString[I];
-		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)print Var[I]"="InString[I]}
-		for (ItemNumber in Item)print Item[ItemNumber];			
-		}'  "{}"  \;|grep -v ^"#"
+			print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";
+			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
+			print " ";
+			for (I in InString)if(index(Var[I],"[") != 1){print Var[I]"="InString[I];}else{print Var[I]}						}
+		if(length(FindIt) == 0)
+			{
+			print " "FILENAME;printf " ** Total translations: "length(UniqLang)": ";
+			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}
+				print " ";
+				for (I in InString)if(index(Var[I],"[") != 1){print Var[I]"="InString[I];}else{print Var[I]}
+				}
+			     }'  "{}"  \;|grep -v ^"#"
 	;;
 -no-var | --nv )
 	ReCreateDskPath "$@"
