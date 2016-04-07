@@ -15,8 +15,8 @@ One="$1"
 #Two="$2"
 AddCmd=($@);
 
-GlobalArray="/opt/share/list-desktop-files/sorted.test"
-LocalArray="$HOME/.list-desktop-path/custom-path/sorted.test"
+GlobalArray="/opt/share/ldf/sorted.test"
+LocalArray="$HOME/.ldf/sorted.test"
 
 ### The DefDskPath variable contains list of default folders
 DefDskPath+=("/etc/dynamic/launchers/scanner")
@@ -418,6 +418,22 @@ done | case $Opts in
 esac
 }
 ###################
+# Disabled options
+###################
+#By using option "all" as 3rd option will show all available translations in a *.desktop file, 
+# without it will show only amount of translations or additional variables with a chosen translation.
+# --uniq-per-file-default (lang) ("all") | --upfd : list variables found in default path
+# --uniq-per-file-sys (lang) ("all")  | --upfs : list variables found in /usr /etc /opt'
+############################
+# dump	-	dump content of *.desktop files
+#	dump ) 
+#		echo '
+#	Dump RAW content of *.desktop files to stdout
+# --dump-all | --da : search in  / (may need root rights)
+# --dump-default-path | --ddp : from default path
+# --dump-sys-path | --dsp : dump content from /usr /etc /opt'
+#		;;
+ 
 case "$1" in
 --help )
 	if [[ -z "$2" ]];then 
@@ -426,7 +442,6 @@ case "$1" in
 	echo '
 usage	-	show usage of commands	
 config	-	configuration
-dump	-	dump content of *.desktop files
 var	-	list available variables or search a value
 sec	-	list available sections
 def	-	options that are using default output
@@ -440,26 +455,21 @@ tips	-	show some tips about some commands used in this script'
 		;;
 	def )
 		echo '
-	 Search for content in 
-	 Deafult output to search in: Name/Comment,Exec,Category, path to the file
- --all-sys-path | --asc (options): search only in /etc /usr /opt
- Without supported options (begins with --) will list or search in default output
+	Showing all basic searchable content in a single line per file.
+	Without any options it will list from all default path.
+	All extended supported options begins with --
+	Deafult output to search in: Name/Comment,Exec,Category, path to the file
+ --all-sys-path | --asc (options): search only in /usr /etc /opt
 
- --more | --m : search text in all available variables in default directories
- --more-sys | --ms : search text in all available variables in /usr /etc /opt
+	Vertical and more userfiendly output. Search text in all available variables
+ --more | --m (text) :  in predefined default directories
+ --more-sys | --ms (text) : only in /usr /etc /opt
  
- By using option "all" as 3rd option will show all available translations in a *.desktop file, 
- without it will show only amount of translations or additional variables with a chosen translation.
- --uniq-per-file-default (lang) ("all") | --upfd : list variables found in default path
- --uniq-per-file-sys (lang) ("all")  | --upfs : list variables found in /usr /etc /opt'
-		;; 
-	dump ) 
-		echo '
-	Dump RAW content of *.desktop files to stdout
- --dump-all | --da : search in  / (may need root rights)
- --dump-default-path | --ddp : from default path
- --dump-sys-path | --dsp : dump content from /usr /etc /opt'
-		;;
+	Same as option --more but is less userfiendly by outputing much more information
+ --less | --l (text) (translation) : in default path
+ --less-sys | --ls --l (text) (translation) : only in /usr /etc /opt'
+ 		;;
+
 	debug ) 
 		echo '--show-me | --sm (options): show content of this script'
 		;;
@@ -482,22 +492,21 @@ tips	-	show some tips about some commands used in this script'
  --sys-section-name 	| --ssn  : search for uniq section names in /usr /etc /opt
  --default-section-name | --dsn  : search for uniq section names in default path
  --uniq-per-file-default | --upfd : show uniq entries per file in default path
- --uniq-per-file-sys | --upfs : show uniq entries per file found in /usr /etc /opt
-
-'		;;
+ --uniq-per-file-sys | --upfs : show uniq entries per file found in /usr /etc /opt'		
+		;;
 	config ) 
 		echo '
 	Configuration
- --create-global-list | --cgl : scan system and save dirs into /opt/share/list-desktop-files/sorted.test
- --create-local-list  | --cll : scan system and save dirs into $HOME/.list-desktop-path/custom-path/sorted.test
+ --create-global-list | --cgl : scan system and save dirs into /opt/share/ldf/sorted.test
+ --create-local-list  | --cll : scan system and save dirs into $HOME/.ldf/sorted.test
 
- --show-local-defaults	| --sld : show content of $HOME/.list-desktop-path/custom-path/sorted.test
- --show-global-defaults	| --sgd : show content of /opt/share/list-desktop-files/sorted.test
+ --show-local-defaults	| --sld : show content of $HOME/.ldf/sorted.test
+ --show-global-defaults	| --sgd : show content of /opt/share/ldf/sorted.test
 
  --show-default-directories | --sdd : show internal dirs defined in array DefDskPath 
 
- --remove-local-config	: removing $HOME/.list-desktop-path/custom-path/sorted.test
- --remove-global-config	: removing /opt/share/list-desktop-files/sorted.test
+ --remove-local-config	: removing $HOME/.ldf/sorted.test
+ --remove-global-config	: removing /opt/share/ldf/sorted.test
 
  --find-uniq-path | --fup (path)	: find path that contain *.desktop files, default starting path is /
  --update-path-file | --upf [file name]	: replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
@@ -524,6 +533,11 @@ tips	-	show some tips about some commands used in this script'
  Search only for specific text in default output:
 	 lsdesktopf gtk
 	 lsdesktopf game
+	 lsdesktopf --more 
+	 lsdesktopf --more kde
+	 lsdesktopf --less
+	 lsdesktopf --less gnome 
+	 lsdesktopf --less gtk zh_CN,zh_TW
  Use --var option (supporting grep syntax):
 	--var-sys has same syntax as --var
 	--var Name=
@@ -739,13 +753,13 @@ tips	-	show some tips about some commands used in this script'
 		if [[ -d "$StartCmdLine" ]]; then
   		InPath="$StartCmdLine"
  		fi
-	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort -u
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort -u 2> /dev/null
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop" -exec dirname "{}" \;| sort -u
+		find / -type f -name "*\.desktop" -exec dirname "{}" \;| sort -u 2> /dev/null
 	fi	;;
 --all-sys-path | --asc)
 	Opts="scan-sys-path"
@@ -787,17 +801,17 @@ tips	-	show some tips about some commands used in this script'
 	;;
 
 --show-local-defaults | --sld)
-	if [[ -f "$HOME/.list-desktop-path/custom-path/sorted.test" ]];then
-		cat "$HOME/.list-desktop-path/custom-path/sorted.test"
+	if [[ -f "$HOME/.ldf/sorted.test" ]];then
+		cat "$HOME/.ldf/sorted.test"
 	else
-		echo 'Does not exist $HOME/.list-desktop-path/custom-path/sorted.test'
+		echo 'Does not exist $HOME/.ldf/sorted.test'
 	fi
 	;;
 --show-global-defaults | --sgd)
-	if [[ -f "/opt/share/list-desktop-files/sorted.test" ]];then
-		cat "/opt/share/list-desktop-files/sorted.test"
+	if [[ -f "/opt/share/ldf/sorted.test" ]];then
+		cat "/opt/share/ldf/sorted.test"
 	else
-		echo 'Does not exist /opt/share/list-desktop-files/sorted.test'
+		echo 'Does not exist /opt/share/ldf/sorted.test'
 	fi
 	;;
 --show-default-directories | --sdd)
@@ -806,11 +820,11 @@ tips	-	show some tips about some commands used in this script'
 	done
 	;;
 --remove-local-config) 
-	rm -i "$HOME/.list-desktop-path/custom-path/sorted.test"
+	rm -i "$HOME/.ldf/sorted.test"
 	;;
 --remove-global-config) 
 	if [[ "$UID" -eq "0" ]];then
-		rm -i "/opt/share/list-desktop-files/sorted.test"
+		rm -i "/opt/share/ldf/sorted.test"
 	else
 		echo 'You must be root!'
 	fi
