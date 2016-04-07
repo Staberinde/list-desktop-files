@@ -595,26 +595,26 @@ tips	-	show some tips about some commands used in this script'
 	example: --var MimeType"
  	fi	 	
  	;;
---uniq-per-file-default | --upfd )
-	Opts="upfd"	
-	ReCreateDskPath "$@"
-	SearchContentOfVariable "$@"
-	;;
---uniq-per-file-sys | --upfs )
+#--uniq-per-file-default | --upfd )
+#	Opts="upfd"	
+#	ReCreateDskPath "$@"
+#	SearchContentOfVariable "$@"
+#	;;
+#--uniq-per-file-sys | --upfs )
 
 #	find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v GetLang="ru" -F"=" '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";if(index($1,"["GetLang"]")){print $0}else{if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
-		find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
-		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
-		if(index($1,"["GetLang"]") != 0 ){Item[cnt++]=$0}else { if(index($1,"]") == 0)Item[cnt++]=$0}
-		}END{
-		printf "  %s",FILENAME"\n";
-		print " ** Total translations: "length(UniqLang);
-		if(ShowAvailableLanguages)if(ShowAvailableLanguages == "all")if(length(UniqLang) != 0 ){
-			for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang","};print "."	
-			};
-		for (ItemNumber in Item)print Item[ItemNumber];			
-		}' "{}" \; | grep -v ^"\#"
-		;;
+#		find /usr /etc /opt -type f -name "*\.desktop" -exec awk -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
+#		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
+#		if(index($1,"["GetLang"]") != 0 ){Item[cnt++]=$0}else { if(index($1,"]") == 0)Item[cnt++]=$0}
+#		}END{
+#		printf "  %s",FILENAME"\n";
+#		print " ** Total translations: "length(UniqLang);
+#		if(ShowAvailableLanguages)if(ShowAvailableLanguages == "all")if(length(UniqLang) != 0 ){
+#			for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang","};print "."	
+#			};
+#		for (ItemNumber in Item)print Item[ItemNumber];			
+#		}' "{}" \; | grep -v ^"\#"
+#		;;
 --more | --m )
 	Opts="more"
 	ReCreateDskPath "$@"
