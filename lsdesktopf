@@ -719,17 +719,17 @@ tips	-	show some tips about some commands used in this script'
 		echo 'No options are given.'
 	fi
 	;;
---dump-all | --da ) 
-	grep -i ^ -H -R --include \*.desktop "/"
-	;;
---dump-sys-path | --dsp )
-	grep -i ^ -H -R --include \*.desktop "/usr /etc /opt"
-	;;
---dump-default-path | --ddp )
-	Opts="ddp"
-  	ReCreateDskPath "$@"
-     	SearchContentOfVariable
-	;;
+#--dump-all | --da ) 
+#	grep -i ^ -H -R --include \*.desktop "/"
+#	;;
+#--dump-sys-path | --dsp )
+#	grep -i ^ -H -R --include \*.desktop "/usr /etc /opt"
+#	;;
+#--dump-default-path | --ddp )
+#	Opts="ddp"
+#  	ReCreateDskPath "$@"
+#     	SearchContentOfVariable
+#	;;
 --show-uniq-def | --sud )
 	OffPrint="no"
 	Opts="sud"
