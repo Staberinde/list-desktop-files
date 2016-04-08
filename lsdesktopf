@@ -433,7 +433,12 @@ esac
 # --dump-default-path | --ddp : from default path
 # --dump-sys-path | --dsp : dump content from /usr /etc /opt'
 #		;;
- 
+# Update a file that contains list of path
+#	--upf filename
+#  --update-path-file | --upf [file name]	: replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
+
+
+
 case "$1" in
 --help )
 	if [[ -z "$2" ]];then 
@@ -508,8 +513,7 @@ tips	-	show some tips about some commands used in this script'
  --remove-local-config	: removing $HOME/.ldf/sorted.test
  --remove-global-config	: removing /opt/share/ldf/sorted.test
 
- --find-uniq-path | --fup (path)	: find path that contain *.desktop files, default starting path is /
- --update-path-file | --upf [file name]	: replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
+ --find-path | --fp (path)	: find path that contain *.desktop files, default starting path is /'
 		;;
 	info ) 
 	echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
@@ -549,11 +553,10 @@ tips	-	show some tips about some commands used in this script'
  has same syntax as without supported options
 	--asc 
 	--asc gtk
-	Use --find-uniq-path or --fup 
-	--fup 
-	--fup /usr /etc
- Update a file that contains list of path
-	--upf filename'
+	Use --find-path or --fp 
+	--fp 
+	--fp /usr /etc
+'
 		;;
 	tips )
 	echo '
@@ -746,21 +749,42 @@ tips	-	show some tips about some commands used in this script'
 		Opts="sys-uniq"
 		SearchContentOfVariable "$@"
 	;;
---find-uniq-path | --fup )
+--find-path | --fp )
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
 		if [[ -d "$StartCmdLine" ]]; then
   		InPath="$StartCmdLine"
  		fi
-	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; | sort -u 2> /dev/null
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null | sort -u
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop" -exec dirname "{}" \;| sort -u 2> /dev/null
-	fi	;;
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
+	fi
+	;;
+--find-path-uniq | --fpu )
+	if [[ ! -z "$2" ]]; then  
+	for StartCmdLine in "$@"; 
+		do
+		if [[ -d "$StartCmdLine" ]]; then
+  		InPath="$StartCmdLine"
+ 		fi
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null |\
+	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' |\
+	       	sort -u
+	 if [[ "$InPath" == "/" ]];then 
+	  	exit 0
+ 		fi
+	done
+	else
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null |\
+		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' |\
+			sort -u
+	fi
+	;;
 --all-sys-path | --asc)
 	Opts="scan-sys-path"
 	ReCreateDskPath "$@"
@@ -770,26 +794,30 @@ tips	-	show some tips about some commands used in this script'
 	mkdir -p "$(dirname $LocalArray)"
 	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$LocalArray"
 	;;
---update-path-file | --upf)
-	if [[ "$UID" != 0 ]];then  
-		echo 'You must start it as user root'
-		exit 1
-	else
-		if [[ -z "$2"  ]];then
-			echo 'path to file is missing'
-		else
-			if [[ -f "$2" ]];then
-				mkdir -p "$(dirname $GlobalArray)"
-				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u >> "$2";
-				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' "$2";
-				uniq -u "$2" /tmp/uniq-tmp.txt
-				cp "/tmp/uniq-tmp.txt" "$2"
-			else
-				echo "Destion is not a file"
-			fi
-		fi
-	fi
-	;;
+#--update-path-file | --upf)
+#	if [[ "$UID" != 0 ]];then  
+#		echo 'You must start it as user root'
+#		exit 1
+#	else
+#		if [[ -z "$2"  ]];then
+#			echo 'path to file is missing'
+#		else
+#			if [[ -f "$2" ]];then
+#				mkdir -p "$(dirname $GlobalArray)"
+#				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u >> "$2";
+#				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' "$2";
+#				uniq -u "$2" /tmp/uniq-tmp.txt
+#				cp "/tmp/uniq-tmp.txt" "$2"
+#			else
+#				echo "Destion is not a file"
+#			fi
+#		fi
+#	fi
+#	;;
+--fix )
+echo yyyyyeeeeeeeee
+;;
+
 --create-global-list | --cgl)
 	if [[ "$UID" != 0 ]];then  
 		echo 'You must start it as user root'
