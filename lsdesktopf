@@ -653,7 +653,7 @@ tips	-	show some tips about commands used in this script'
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
 	;;
---less-user-friendly-sys | --ls )
+--less-sys | --ls )
 	find  /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
 			if(length(Trans) != 0)split(Trans,ArrayTransLang,",");
 			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]++;
