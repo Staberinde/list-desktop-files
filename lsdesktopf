@@ -452,7 +452,7 @@ sec	-	list available sections
 def	-	options that are using default output
 debug	-	view or search in content of this script
 info	-	show short info about *.desktop specified Exec
-tips	-	show some tips about some commands used in this script'
+tips	-	show some tips about commands used in this script'
 	else
 		case "$2" in
 	default )
@@ -480,7 +480,7 @@ tips	-	show some tips about some commands used in this script'
 		;;
 	var )
 		echo '
-	 Search value of variables. Supporting grep syntax
+	 Search a value of the variables. Supporting grep syntax
  --var [variable]	: search for variable in the *.desktop
  --var-sys | --vs [variable] 	: show all uniq base variable names found in /usr /etc /opt
 
@@ -513,8 +513,11 @@ tips	-	show some tips about some commands used in this script'
  --remove-local-config	: removing $HOME/.ldf/sorted.test
  --remove-global-config	: removing /opt/share/ldf/sorted.test
 
- --find-path | --fp (path)	: find path that contain *.desktop files, default starting path is /'
-		;;
+ --find-path | --fp (path)	: find path that contain *.desktop files, default starting path is /
+ --formated-path-output | --fpo : same as --fp but showing already formated path (replaced numbers,spaces with *)  
+
+ --format-path-file | --fpf [filename] : replace all spaces and numbers with *'
+		 ;;
 	info ) 
 	echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
 	Short overview:
@@ -547,7 +550,7 @@ tips	-	show some tips about some commands used in this script'
 	--var Name=
 	--var "Name\[zn_CN\]" -e "Exec="
  Reverse search 
-	--no-var Execute
+	--no-var Exec=
 	--no-var-sys "Name\[en_GB\]"
  Scan for all *.desktop files in /usr /etc /opt
  has same syntax as without supported options
@@ -555,8 +558,7 @@ tips	-	show some tips about some commands used in this script'
 	--asc gtk
 	Use --find-path or --fp 
 	--fp 
-	--fp /usr /etc
-'
+	--fp /usr /etc'
 		;;
 	tips )
 	echo '
@@ -577,7 +579,10 @@ tips	-	show some tips about some commands used in this script'
 	find / -type f | xargs basename
  command "dirname" is used to show only path to file.
 	find / -type f -exec dirname "{}" \;
-	find / -type f | xargs dirname'
+	find / -type f | xargs dirname
+ ignore error messages from stderr, such as e.g. "permission denied"
+ 	find / -type f 2> /dev/null | grep desktop'
+ 
 		esac
 	fi
 		;;
@@ -648,7 +653,7 @@ tips	-	show some tips about some commands used in this script'
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
 	;;
----less-user-friendly-sys | --ls )
+--less-user-friendly-sys | --ls )
 	find  /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
 			if(length(Trans) != 0)split(Trans,ArrayTransLang,",");
 			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]++;
@@ -689,7 +694,7 @@ tips	-	show some tips about some commands used in this script'
 				}
 			     }'  "{}"  \;|grep -v ^"#"
 	;;
--no-var | --nv )
+--no-var | --nv )
 	ReCreateDskPath "$@"
 
 	if [[  ! -z "$2"    ]];then  
@@ -701,7 +706,7 @@ tips	-	show some tips about some commands used in this script'
 	example: --no-var MimeType"
  	fi	 	
  	;;
- --var-sys | --vs)
+--var-sys | --vs)
 #	ReCreateDskPath
 	if [[  ! -z "$2"    ]];then  
 	Var="$2"
@@ -765,7 +770,7 @@ tips	-	show some tips about some commands used in this script'
 		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
 	fi
 	;;
---find-path-uniq | --fpu )
+--formated-path-output | --fpo )
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
@@ -773,7 +778,7 @@ tips	-	show some tips about some commands used in this script'
   		InPath="$StartCmdLine"
  		fi
 	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null |\
-	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' |\
+	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
 	       	sort -u
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
@@ -781,7 +786,7 @@ tips	-	show some tips about some commands used in this script'
 	done
 	else
 		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null |\
-		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' |\
+		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' |\
 			sort -u
 	fi
 	;;
@@ -814,10 +819,21 @@ tips	-	show some tips about some commands used in this script'
 #		fi
 #	fi
 #	;;
---fix )
-echo yyyyyeeeeeeeee
-;;
 
+--format-path-file | --fpf )
+	if [[ ! -z "$2" ]];then 
+	 if [[ -f "$2" ]];then
+	  if [[ $(grep -c -v ^/  "$2" ) != "0" ]];then
+	   echo 'The file should contain only full path per line. ( all should begin with / )'
+	  else
+	   sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' "$2"
+	   sort -u -o "$2" "$2"
+	  fi
+	 else
+	  echo 'Path to file is missing!'	 
+	 fi 
+	fi
+	;;
 --create-global-list | --cgl)
 	if [[ "$UID" != 0 ]];then  
 		echo 'You must start it as user root'
