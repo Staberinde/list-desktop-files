@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.0-7
+# Version 1.0.0-8
 #
 # License: GPL3
 #
@@ -605,7 +605,7 @@ tips	-	show some tips about commands used in this script'
  	;;
 #--uniq-per-file-default | --upfd )
 #	Opts="upfd"	
-#	ReCreateDskPath "$@"
+# 	ReCreateDskPath "$@"
 #	SearchContentOfVariable "$@"
 #	;;
 #--uniq-per-file-sys | --upfs )
