@@ -444,30 +444,8 @@ esac
 #	--upf filename
 #  --update-path-file | --upf [file name]	: replacing all numbers and spaces with * in a file then sorting and leaving only uniq path'
 
-
-
-case "$1" in
---help )
-	if [[ -z "$2" ]];then 
-	echo '
-	use additional options with --help'
-	echo '
-usage	-	show usage of commands	
-config	-	configuration
-var	-	list available variables or search a value
-sec	-	list available sections
-def	-	options that are using default output
-debug	-	view or search in content of this script
-info	-	show short info about *.desktop specified Exec
-tips	-	show some tips about commands used in this script'
-	else
-		case "$2" in
-	default )
-		echo '--help : show this help message'
-		;;
-	def )
-		echo '
-	Showing all basic searchable content in a single line per file.
+help_def(){
+	echo 'Showing all basic searchable content in a single line per file.
 	Without any options it will list from all default path.
 	All extended supported options begins with --
 	Deafult output to search in: Name/Comment,Exec,Category, path to the file
@@ -480,14 +458,13 @@ tips	-	show some tips about commands used in this script'
 	Same as option --more but is less userfiendly by outputing much more information
  --less | --l (text) (translation) : in default path
  --less-sys | --ls (text) (translation) : only in /usr /etc /opt'
- 		;;
-
-	debug ) 
-		echo '--show-me | --sm (options): show content of this script'
-		;;
-	var )
-		echo '
-	 Search a value of the variables. Supporting grep syntax
+	}
+help_debug(){
+	echo '--show-me | --sm (options): show content of this script'
+		
+	}
+help_var(){
+echo 'Search a value of the variables. Supporting grep syntax
  --var [variable]	: search for variable in the *.desktop
  --var-sys | --vs [variable] 	: show all uniq base variable names found in /usr /etc /opt
 
@@ -497,16 +474,14 @@ tips	-	show some tips about commands used in this script'
  --show-uniq-def |--sud : show all uniq base variable names found in default path
  --show-sys-uniq |--ssu : show uniq variable names found in sys path /usr /etc /opt
  --show-uniq-only |--suo: show RAW output of uniq variables found in default path'
-		;;
-	sec ) 
-		echo '
-	Search section names in *.desktop files
+	}
+help_sec(){
+echo 'Search section names in *.desktop files
  --sys-section-name 	| --ssn  : search for uniq section names in /usr /etc /opt
  --default-section-name | --dsn  : search for uniq section names in default path'
-		;;
-	config ) 
-		echo '
-	Configuration
+	}
+help_config(){
+echo 'Configuration
  --create-global-list | --cgl : scan system and save dirs into /opt/share/ldf/sorted.test
  --create-local-list  | --cll : scan system and save dirs into $HOME/.ldf/sorted.test
 
@@ -522,9 +497,9 @@ tips	-	show some tips about commands used in this script'
  --formated-path-output | --fpo : same as --fp but showing already formated path (replaced numbers,spaces with *)  
 
  --format-path-file | --fpf [filename] : replace all spaces and numbers with *'
-		 ;;
-	info ) 
-	echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
+	}
+help_info(){
+echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
 	Short overview:
 "f" - File name with full path
 "u" - URL to website
@@ -537,9 +512,9 @@ tips	-	show some tips about commands used in this script'
 	Other:
 %k URI/location of desktop file 
 %v name of the device'	
-		;;
-	usage ) 
-	echo 'Usage examples
+	}
+help_usage(){
+echo 'Usage examples
  List content with default options:
 	 lsdesktopf
  Search only for specific text in default output:
@@ -564,10 +539,9 @@ tips	-	show some tips about commands used in this script'
 	Use --find-path or --fp 
 	--fp 
 	--fp /usr /etc'
-		;;
-	tips )
-	echo '
- command "rev" is used to reverse text that is useful to show or exclude last column
+	}
+help_tips(){
+	echo 'command "rev" is used to reverse text that is useful to show or exclude last column
  to show only specfic column can be used commands such as awk,cut. 
 	The "awk" command can use more then one symbol as delimer but "cut" supports only one
 	awk -F"AB" "{print $1}"
@@ -587,7 +561,57 @@ tips	-	show some tips about commands used in this script'
 	find / -type f | xargs dirname
  ignore error messages from stderr, such as e.g. "permission denied"
  	find / -type f 2> /dev/null | grep desktop'
- 
+}
+	
+case "$1" in
+--help )
+	if [[ -z "$2" ]];then
+	echo 'use additional options with --help'
+	echo ' all	-	show all help sections
+ def	-	options that are using default output
+ var	-	list available variables or search a value
+ sec	-	list available sections 
+ usage	-	show usage of commands	
+ config	-	configuration  
+ debug	-	view or search in content of this script
+ info	-	show short info about *.desktop specified Exec
+ tips	-	show some tips about commands used in this script'
+	else
+		case "$2" in	
+	def )
+		help_def
+		;;
+	debug ) 
+		help_debug
+		;;
+	var )
+		help_var
+		;;
+	sec ) 
+		help_sec
+		;;
+	config ) 
+		help_config
+		 ;;
+	info ) 
+		help_info	
+		;;
+	usage ) 
+		help_usage
+		;;
+	tips )
+		help_tips
+		;;
+	all )
+	help_def
+	help_var
+	help_sec
+	help_usage
+	help_config
+	help_debug
+	help_info
+	help_tips
+		;;
 		esac
 	fi
 		;;
