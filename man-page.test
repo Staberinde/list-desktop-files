@@ -24,6 +24,7 @@ programs with their command lines available *.desktop files.
 But can also be used to search for a specific content in them. 
 .SH OPTIONS
 .IP --help\ [options]
+ all - show all options in stdout
  def	-	options that are using default output
  var	-	list available variables or search a value
  sec	-	list available sections 
