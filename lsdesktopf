@@ -502,7 +502,7 @@ tips	-	show some tips about commands used in this script'
 		echo '
 	Search section names in *.desktop files
  --sys-section-name 	| --ssn  : search for uniq section names in /usr /etc /opt
- --default-section-name | --dsn  : search for uniq section names in default path
+ --default-section-name | --dsn  : search for uniq section names in default path'
 		;;
 	config ) 
 		echo '
