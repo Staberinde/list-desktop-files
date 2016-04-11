@@ -429,6 +429,8 @@ esac
 # without it will show only amount of translations or additional variables with a chosen translation.
 # --uniq-per-file-default (lang) ("all") | --upfd : list variables found in default path
 # --uniq-per-file-sys (lang) ("all")  | --upfs : list variables found in /usr /etc /opt'
+# --uniq-per-file-default | --upfd : show uniq entries per file in default path
+# --uniq-per-file-sys | --upfs : show uniq entries per file found in /usr /etc /opt'		
 ############################
 # dump	-	dump content of *.desktop files
 #	dump ) 
@@ -501,8 +503,6 @@ tips	-	show some tips about commands used in this script'
 	Search section names in *.desktop files
  --sys-section-name 	| --ssn  : search for uniq section names in /usr /etc /opt
  --default-section-name | --dsn  : search for uniq section names in default path
- --uniq-per-file-default | --upfd : show uniq entries per file in default path
- --uniq-per-file-sys | --upfs : show uniq entries per file found in /usr /etc /opt'		
 		;;
 	config ) 
 		echo '
