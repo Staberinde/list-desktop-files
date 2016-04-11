@@ -1,0 +1,134 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\"
+.TH LSDESKTOPF 1 "APRIL" List 
+.SH NAME
+lsdesktopf \- list available *.desktop files or search in their content.
+.SH SYNOPSIS
+.br
+.B lsdesktopf
+.I [word]
+.br
+.B lsdesktopf 
+.I [options] [word]
+.br
+.B lsdesktopf 
+.I [options] [word] [language1,language2]
+.br
+.B lsdesktopf 
+.I [options] [path]
+.SH DESCRIPTION
+.B lsdesktopf
+is a bash script with main purpose to get a quick overview of the
+programs with their command lines available *.desktop files. 
+But can also be used to search for a specific content in them. 
+.SH OPTIONS
+.IP --help\ [options]
+ def	-	options that are using default output
+ var	-	list available variables or search a value
+ sec	-	list available sections 
+ usage	-	show usage of commands	
+ config	-	configuration  
+ debug	-	view or search in content of this script
+ info	-	show short info about *.desktop specified Exec
+ tips	-	show some tips about commands used in this script
+
+.P 
+All supported options begins with \-\- otherwise it interpreted 
+as a text to search for. 
+Default path are path pedefined in the script
+or in a configuration file. 
+System path that script can search in are /usr /etc /opt.
+.SH
+.IP DEFAULT\ OUTPUT
+Without options it lists searchable content in a single line. 
+Or searching for a word and showing result in a single line. (see usage)
+.IP --more 
+[word]
+ same as without any supported options but is 
+"more" userfriedly by outputing text vertically
+for a better readbility and including associated variable names. 
+.B (short --m)
+.IP --less
+[word] [language,language]
+same as --more but is "less" userfirendly by outputing much more 
+searchable content such as amount of found translations and list of 
+present translations in the *.desktop file that can be used 
+as addition output of the translated values. 
+.B (short --l)
+.IP --less-sys
+same as --less but searching only in system path.
+.B (short --ls)
+.IP --more-sys
+same as --more but searching only in system path.
+.B (short --ms)
+.SH
+.IP VARIABLES,\ RAW\ CONTENT
+Search for a specific content or variables
+.IP --var\ [variable]\ (additional\ grep\ pattern)
+ search for variable name or any other additional content in default path
+.IP --no-var\ [string]\ (additional\ grep\ pattern)
+show file names that does not contain string in default path.
+.B (short --nv)
+.IP --no-var-sys
+same as --no-var but seaching only in system path.
+.B (short --nvs)
+.IP --var-sys
+same as --var but search only in system path.
+.B (short --vs)
+.IP --show-uniq-def 
+show uniq basename variables per directory found in default path.
+.B (short --sud)
+.IP --show-uniq-only
+show only uniq variable names found in all default path.
+.B (short --suo)
+.IP --show-sys-uniq
+show uniq variable names found in system path.
+.B (short --ssu)
+.SH
+.IP SECTIONS
+.IP --sys-section-name
+search for uniq section names only in system path.
+.B (short --ssn)
+.IP --default-section-name
+search for uniq section names in default path
+.B (short --dsn)
+.SH CONFIGURATION
+.IP --create-global-list 
+.B (short --cgl)
+scan system and save dirs into /opt/share/ldf/sorted.test
+.IP --create-local-list
+scan system and save dirs into $HOME/.ldf/sorted.test
+.B (short --cll)
+.IP --show-local-defaults
+show content of $HOME/.ldf/sorted.test.
+.B (short --sld)
+.IP --show-global-defaults
+show content of /opt/share/ldf/sorted.test.
+.B (short --sgd)
+.IP --show-default-directories
+show internal dirs defined in array DefDskPath .
+.B (short --sdd)
+.IP --remove-local-config
+removing $HOME/.ldf/sorted.test
+.IP --remove-global-config
+/opt/share/ldf/sorted.test
+
+.IP --find-path\ (path)
+find path that contain *.desktop files, default starting path is /.
+.B (short --fp)
+.IP --formated-path-output
+same as --fp but showing already formated path (replaced numbers,spaces with *).
+.B (short --fpo)
+.IP --format-path-file\ [filename]
+replace all spaces and numbers with *.
+.B (short --fpf)
+.SH FILES
+.IP configuration files should contain only full path to directories
+.I /opt/share/ldf/sorted.test system wide
+.I $HOME/.ldf/sorted.test local configuration
+.SH BUGS
+Report all bug or suggestions on 
+https://aur.archlinux.org/packages/lsdesktopf/
+.SH AUTHOR
+Andy Crowd
