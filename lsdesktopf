@@ -528,7 +528,7 @@ echo 'Usage examples
  Use --var option (supporting grep syntax):
 	--var-sys has same syntax as --var
 	--var Name=
-	--var "Name\[zn_CN\]" -e "Exec="
+	--var "Name\[zn_CN\]" -e "^Exec="
  Reverse search 
 	--no-var Exec=
 	--no-var-sys "Name\[en_GB\]"
@@ -541,9 +541,11 @@ echo 'Usage examples
 	--fp /usr /etc'
 	}
 help_tips(){
-	echo 'command "rev" is used to reverse text that is useful to show or exclude last column
+	echo 'The script is based around commands: "grep", "awk", "find" 
+	and a loop: for Line in "${Array[@]}";do ..;done
+	command "rev" is used to reverse text that is useful to show or exclude last column
  to show only specfic column can be used commands such as awk,cut. 
-	The "awk" command can use more then one symbol as delimer but "cut" supports only one
+	The "awk" command can use more than one symbol as delimer but "cut" supports only one
 	awk -F"AB" "{print $1}"
 	awk "{print substr($0,0,index($0,"AB")-2) }"
 	cut -dA -f1
@@ -559,7 +561,7 @@ help_tips(){
  command "dirname" is used to show only path to file.
 	find / -type f -exec dirname "{}" \;
 	find / -type f | xargs dirname
- ignore error messages from stderr, such as e.g. "permission denied"
+ hide error messages from stderr, such as e.g. "permission denied"
  	find / -type f 2> /dev/null | grep desktop'
 }
 	
