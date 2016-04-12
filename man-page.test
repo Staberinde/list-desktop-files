@@ -43,15 +43,13 @@ System path that script can search in are /usr /etc /opt.
 .SH
 .IP DEFAULT\ OUTPUT
 Without options it lists searchable content in a single line. 
-Or searching for a word and showing result in a single line. (see usage)
-.IP --more 
-[word]
- same as without any supported options but is 
+Or searching for a word and showing result in a single line. (see --help usage)
+.IP --more\ [word]
+same as without any supported options but is 
 "more" userfriedly by outputing text vertically
 for a better readbility and including associated variable names. 
 .B (short --m)
-.IP --less
-[word] [language,language]
+.IP --less\ [word]\ [language,language]
 same as --more but is "less" userfirendly by outputing much more 
 searchable content such as amount of found translations and list of 
 present translations in the *.desktop file that can be used 
@@ -67,7 +65,7 @@ same as --more but searching only in system path.
 .IP VARIABLES,\ RAW\ CONTENT
 Search for a specific content or variables
 .IP --var\ [variable]\ (additional\ grep\ pattern)
- search for variable name or any other additional content in default path
+search for variable name or any other additional content in default path
 .IP --no-var\ [string]\ (additional\ grep\ pattern)
 show file names that does not contain string in default path.
 .B (short --nv)
@@ -96,8 +94,8 @@ search for uniq section names in default path
 .B (short --dsn)
 .SH CONFIGURATION
 .IP --create-global-list 
-.B (short --cgl)
 scan system and save dirs into /opt/share/ldf/sorted.test
+.B (short --cgl)
 .IP --create-local-list
 scan system and save dirs into $HOME/.ldf/sorted.test
 .B (short --cll)
@@ -125,9 +123,14 @@ same as --fp but showing already formated path (replaced numbers,spaces with *).
 replace all spaces and numbers with *.
 .B (short --fpf)
 .SH FILES
-.IP configuration files should contain only full path to directories
-.I /opt/share/ldf/sorted.test system wide
-.I $HOME/.ldf/sorted.test local configuration
+.PP
+configuration files should contain only full path to directories
+.br
+.I /opt/share/ldf/sorted.test 
+system wide
+.br
+.I $HOME/.ldf/sorted.test 
+local configuration
 .SH BUGS
 Report all bug or suggestions on 
 https://aur.archlinux.org/packages/lsdesktopf/
