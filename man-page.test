@@ -7,16 +7,16 @@ lsdesktopf \- list available *.desktop files or search in their content.
 .SH SYNOPSIS
 .br
 .B lsdesktopf
-.I [word]
+[word]
 .br
 .B lsdesktopf 
-.I [options] [word]
+[option] [word]
 .br
 .B lsdesktopf 
-.I [options] [word] [language1,language2]
+[option] [word] [language1,language2]
 .br
 .B lsdesktopf 
-.I [options] [path]
+[option] [path]
 .SH DESCRIPTION
 .B lsdesktopf
 is a bash script with main purpose to get a quick overview of the
@@ -37,7 +37,7 @@ But can also be used to search for a specific content in them.
 .P 
 All supported options begins with \-\- otherwise it interpreted 
 as a text to search for. 
-Default path are path pedefined in the script
+Default path are path predefined in the script
 or in a configuration file. 
 System path that script can search in are /usr /etc /opt.
 .SH
@@ -55,6 +55,7 @@ searchable content such as amount of found translations and list of
 present translations in the *.desktop file that can be used 
 as addition output of the translated values. 
 .B (short --l)
+
 .IP --less-sys
 same as --less but searching only in system path.
 .B (short --ls)
@@ -66,15 +67,17 @@ same as --more but searching only in system path.
 Search for a specific content or variables
 .IP --var\ [variable]\ (additional\ grep\ pattern)
 search for variable name or any other additional content in default path
+.IP --var-sys
+same as --var but search only in system path.
+.B (short --vs)
+
 .IP --no-var\ [string]\ (additional\ grep\ pattern)
 show file names that does not contain string in default path.
 .B (short --nv)
 .IP --no-var-sys
 same as --no-var but seaching only in system path.
 .B (short --nvs)
-.IP --var-sys
-same as --var but search only in system path.
-.B (short --vs)
+
 .IP --show-uniq-def 
 show uniq basename variables per directory found in default path.
 .B (short --sud)
@@ -111,7 +114,7 @@ show internal dirs defined in array DefDskPath .
 .IP --remove-local-config
 removing $HOME/.ldf/sorted.test
 .IP --remove-global-config
-/opt/share/ldf/sorted.test
+removing /opt/share/ldf/sorted.test
 
 .IP --find-path\ (path)
 find path that contain *.desktop files, default starting path is /.
@@ -132,7 +135,9 @@ system wide
 .I $HOME/.ldf/sorted.test 
 local configuration
 .SH BUGS
-Report all bug or suggestions on 
+.PP
+Report all problems or add suggestions on 
+.br
 https://aur.archlinux.org/packages/lsdesktopf/
 .SH AUTHOR
 Andy Crowd
