@@ -65,13 +65,13 @@ same as --more but searching only in system path.
 .SH
 .IP VARIABLES,\ RAW\ CONTENT
 Search for a specific content or variables
-.IP --var\ [variable]\ (additional\ grep\ pattern)
+.IP --var\ variable\ (additional\ grep\ pattern)
 search for variable name or any other additional content in default path
 .IP --var-sys
 same as --var but search only in system path.
 .B (short --vs)
 
-.IP --no-var\ [string]\ (additional\ grep\ pattern)
+.IP --no-var\ variable\ (additional\ grep\ pattern)
 show file names that does not contain string in default path.
 .B (short --nv)
 .IP --no-var-sys
@@ -90,10 +90,10 @@ show uniq variable names found in system path.
 .SH
 .IP SECTIONS
 .IP --sys-section-name
-search for uniq section names only in system path.
+list uniq section names found  system path.
 .B (short --ssn)
 .IP --default-section-name
-search for uniq section names in default path
+list uniq section names found  in default path
 .B (short --dsn)
 .SH CONFIGURATION
 .IP --create-global-list 
@@ -122,7 +122,7 @@ find path that contain *.desktop files, default starting path is /.
 .IP --formated-path-output
 same as --fp but showing already formated path (replaced numbers,spaces with *).
 .B (short --fpo)
-.IP --format-path-file\ [filename]
+.IP --format-path-file\ filename
 replace all spaces and numbers with *.
 .B (short --fpf)
 .SH FILES
