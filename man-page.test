@@ -1,143 +1,112 @@
 .\" Process this file with
 .\" groff -man -Tascii foo.1
-.\"
-.TH LSDESKTOPF 1 "APRIL" List 
+.\" 
+.TH LSDESKTOPF 1 "APRIL 2016" LSDESKTOPF 1 
 .SH NAME
-lsdesktopf \- list available *.desktop files or search in their content.
+lsdesktopf \- list available *.desktop files and search in their content.
 .SH SYNOPSIS
 .br
 .B lsdesktopf
-[word]
+.I [word]
 .br
 .B lsdesktopf 
-[option] [word]
+.I [options] [word]
 .br
 .B lsdesktopf 
-[option] [word] [language1,language2]
+.I [options] [word] [language1,language2]
 .br
 .B lsdesktopf 
-[option] [path]
+.I [options] [path]
 .SH DESCRIPTION
 .B lsdesktopf
-is a bash script with main purpose to get a quick overview of the
-programs with their command lines available *.desktop files. 
-But can also be used to search for a specific content in them. 
+is a bash script with the main purpose to get a quick overview of programs with their command lines available in *.desktop files. 
+It can also be used to search for specific content in them. 
 .SH OPTIONS
 .IP --help\ [options]
- all - show all options in stdout
- def	-	options that are using default output
- var	-	list available variables or search a value
- sec	-	list available sections 
- usage	-	show usage of commands	
- config	-	configuration  
- debug	-	view or search in content of this script
- info	-	show short info about *.desktop specified Exec
- tips	-	show some tips about commands used in this script
+ all    - show all options to stdout
+ def    - options that are using default output
+ var    - list available variables or search a value
+ sec    - list available sections
+ usage  - show usage of commands
+ config - configuration
+ debug  - view or search in content of this script
+ info   - show short info about an executable specified in a *.desktop file
+ tips   - show some tips about commands used in this script
 
 .P 
-All supported options begins with \-\- otherwise it interpreted 
-as a text to search for. 
-Default path are path predefined in the script
-or in a configuration file. 
-System path that script can search in are /usr /etc /opt.
+All supported options (short or long) begin with \-\- otherwise the input is interpreted as a text search pattern. 
+Default paths are pre-defined in the script or in a configuration file. 
+System paths that the script searches are /usr /etc /opt.
 .SH
 .IP DEFAULT\ OUTPUT
-Without options it lists searchable content in a single line. 
-Or searching for a word and showing result in a single line. (see --help usage)
-.IP --more\ [word]
-same as without any supported options but is 
-"more" userfriedly by outputing text vertically
-for a better readbility and including associated variable names. 
-.B (short --m)
-.IP --less\ [word]\ [language,language]
-same as --more but is "less" userfirendly by outputing much more 
-searchable content such as amount of found translations and list of 
-present translations in the *.desktop file that can be used 
-as addition output of the translated values. 
-.B (short --l)
-
-.IP --less-sys
-same as --less but searching only in system path.
-.B (short --ls)
-.IP --more-sys
-same as --more but searching only in system path.
-.B (short --ms)
+Without options searchable content is listed in a single line. 
+Likewise word search results are output in a single line (see usage). 
+.IP "\fB\--m, \-\-more [word]"
+search results are output vertically for (more) user-friendly readability, including associated variable names. 
+.IP "\fB\--l, \-\-less [word] [language,language]"
+search results are output vertically (same as --more), but including output for any found translations and an additional list of translations present in the *.desktop files. 
+.IP "\fB\--ms, \-\-more-sys"
+same as --more but search limited to the system path.
+.IP "\fB\--ls, \-\-less-sys"
+same as --less but search limited to the system path.
 .SH
 .IP VARIABLES,\ RAW\ CONTENT
-Search for a specific content or variables
-.IP --var\ variable\ (additional\ grep\ pattern)
-search for variable name or any other additional content in default path
-.IP --var-sys
-same as --var but search only in system path.
-.B (short --vs)
-
-.IP --no-var\ variable\ (additional\ grep\ pattern)
-show file names that does not contain string in default path.
-.B (short --nv)
-.IP --no-var-sys
-same as --no-var but seaching only in system path.
-.B (short --nvs)
-
-.IP --show-uniq-def 
-show uniq basename variables per directory found in default path.
-.B (short --sud)
-.IP --show-uniq-only
-show only uniq variable names found in all default path.
-.B (short --suo)
-.IP --show-sys-uniq
-show uniq variable names found in system path.
-.B (short --ssu)
+Search for specific content or variables
+.IP "\fB\--var\ [variable]\ (additional\ grep\ pattern)"
+search for\ [variable] names or any other additional content in the default path.
+.IP "\fB\--nv, \-\-no-var\ [string]\ (additional\ grep\ pattern)"
+show file names that do not contain\ [string]\ in the default path.
+.IP "\fB\--nvs, \-\-no-var-sys"
+same as --no-var, but limiting the search to the system path.
+.IP "\fB\--vs, \-\-var-sys"
+same as --var, but search limited to the system path.
+.IP "\fB\--sud, \-\-show-uniq-def"
+show unique basename variables per directory found in the default path.
+.IP "\fB\--suo, \-\-show-uniq-only"
+show only unique variable names found in all default paths.
+.IP "\fB\--ssu, \-\-show-sys-uniq"
+show unique variable names found in the system path.
 .SH
 .IP SECTIONS
-.IP --sys-section-name
-list uniq section names found  system path.
-.B (short --ssn)
-.IP --default-section-name
-list uniq section names found  in default path
-.B (short --dsn)
+.IP "\fB\--dsn, \-\-default-section-name"
+search for unique section names in the default path
+.IP "\fB\--ssn, \-\-sys-section-name"
+search for unique section names in the system path.
 .SH CONFIGURATION
-.IP --create-global-list 
-scan system and save dirs into /opt/share/ldf/sorted.test
-.B (short --cgl)
-.IP --create-local-list
-scan system and save dirs into $HOME/.ldf/sorted.test
-.B (short --cll)
-.IP --show-local-defaults
-show content of $HOME/.ldf/sorted.test.
-.B (short --sld)
-.IP --show-global-defaults
-show content of /opt/share/ldf/sorted.test.
-.B (short --sgd)
-.IP --show-default-directories
-show internal dirs defined in array DefDskPath .
-.B (short --sdd)
-.IP --remove-local-config
-removing $HOME/.ldf/sorted.test
-.IP --remove-global-config
-removing /opt/share/ldf/sorted.test
-
-.IP --find-path\ (path)
-find path that contain *.desktop files, default starting path is /.
-.B (short --fp)
-.IP --formated-path-output
-same as --fp but showing already formated path (replaced numbers,spaces with *).
-.B (short --fpo)
-.IP --format-path-file\ filename
-replace all spaces and numbers with *.
-.B (short --fpf)
+./ What is saved? directories containing .desktop files? 
+.IP "\fB\--cgl, \-\-create-global-list" 
+scan system and save directories into /opt/share/ldf/sorted.test
+.IP "\fB\-cll, \-\-create-local-list"
+scan system and save directories into $HOME/.ldf/sorted.test
+.IP "\fB\--sld, \-\-show-local-defaults"
+show content of $HOME/.ldf/sorted.test
+.IP "\fB\--sgd, \-\-show-global-defaults"
+show content of /opt/share/ldf/sorted.test
+.IP "\fB\--sdd, \-\-show-default-directories"
+show internal dirs defined in array DefDskPath
+.IP "\fB\--remove-local-config"
+remove $HOME/.ldf/sorted.test
+.IP "\fB\--remove-global-config"
+remove /opt/share/ldf/sorted.test
+.IP "\fB\--fp, \-\-find-path\ (path)"
+find paths that contain *.desktop files, default starting path is /
+.IP "\fB\--fpo, \-\-formated-path-output"
+same as --fp but showing already formatted path (numbers and spaces replaced with *)
+.IP "\fB\--fpf, \-\-format-path-file\ [filename]"
+replaces all spaces and numbers with a *
 .SH FILES
-.PP
-configuration files should contain only full path to directories
-.br
-.I /opt/share/ldf/sorted.test 
-system wide
-.br
-.I $HOME/.ldf/sorted.test 
-local configuration
+.IP "Configuration files should contain only full paths to directories."
+.IP "/opt/share/ldf/sorted.test" 
+The system wide configuration file.
+.IP "$HOME/.ldf/sorted.test" 
+The user configuration file.
 .SH BUGS
-.PP
-Report all problems or add suggestions on 
-.br
+Report all bugs or suggestions via
+.P 
 https://aur.archlinux.org/packages/lsdesktopf/
 .SH AUTHOR
-Andy Crowd
+Andy Crowd (QQ 3188952872)
+Thanks to
+Indigo for the review and update of the man page.
+.SH "SEE ALSO"
+.BR desktop-file-validate(1)
