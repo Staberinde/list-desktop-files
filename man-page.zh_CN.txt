@@ -108,5 +108,6 @@ https://aur.archlinux.org/packages/lsdesktopf/
 .SH 作者
 Andy Crowd (QQ 3188952872)
 感谢Indigo为本帮助页面的审阅和更新。
+Glen (QQ 200802781)
 .SH "参见"
 .BR desktop-file-validate(1)
