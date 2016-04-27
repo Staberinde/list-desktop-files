@@ -1,0 +1,110 @@
+.\" Process this file with
+.\" groff -man -Tascii foo.1
+.\" 
+.TH LSDESKTOPF 1 "2016年4月" LSDESKTOPF 1
+.SH 名称
+lsdesktopf \- 列举出所有 *.desktop 文件，并在它们的内容中搜索。
+.SH 纲要
+.br
+.B lsdesktopf
+.I [word]
+.br
+.B lsdesktopf 
+.I [options] [word]
+.br
+.B lsdesktopf 
+.I [options] [word] [language1,language2]
+.br
+.B lsdesktopf 
+.I [options] [path]
+.SH 描述
+.B lsdesktop
+是一个bash脚本，主要目的是对\ *.desktop\ 文件中的程序及其命令行进行快速预览。
+它也可以被用来搜索其中的特定内容。
+.SH 选项
+.IP --help\ [options]
+ all    - 在标准输出流中显示所有选项
+ def    - 使用默认输出的选项
+ var    - 列出可用的变量或者搜索一个值
+ sec    - 列出可用的段
+ usage  - 显示命令的用法
+ config - 配置
+ debug  - 查看或搜索本脚本的内容
+ info   - 显示在 *.desktop 文件中指定的可执行文件的简要信息
+ tips   - 显示在本脚本中使用的命令的一些技巧
+
+.P 
+所有支持的选项（无论长或短）都以\-\-\ 开始，否则输入会按文本检索模式进行解释断。默认路径预先定义在脚本或配置文件中。脚本搜索的系统路径为/usr /etc /opt。
+
+.SH
+.IP 默认的输出
+无选项可揵搜索内容在一行中列出。
+同样地，搜索的结果也会输出到一行（详见用法）。
+.IP "\fB\--m, \-\-more [word]"
+为了（更好的）用户可读性，包括附带变量名的搜索结果以竖直的方式输出。
+.IP "\fB\--l, \-\-less [word] [language,language]"
+以竖直方式输出搜索结果（与\ --more\ 相同），但输出中也包含了所有能在\ *.desktop\ 文件中找到的文档翻译和额外的翻译清单。
+.IP "\fB\--ms, \-\-more-sys"
+与--more相同，但是搜索限制在系统路径下。
+.IP "\fB\--ls, \-\-less-sys"
+与\ --less\ 相同，但是搜索限制在系统路径下。
+.SH
+.IP 变量,\ 原始内容\ 
+搜索指定的内容或变量
+.IP "\fB\--var\ [变量]\ (附加\ grep\  模式)"
+在默认路径下搜索\ [变量] 名或任何其他内容。
+.IP "\fB\--nv, \-\-no-var\ [字符串]\ (附加\ grep\ 模式)"
+显示在默认路径下不包含\ [字符串]\ 的文件名。
+.IP "\fB\--nvs, \-\-no-var-sys"
+与\ --no-var\ 相同，但是搜索限制在系统路径下。
+.IP "\fB\--vs, \-\-var-sys"
+与\ --var\ 相同，但是搜索限制在系统路径下。
+.IP "\fB\--sud, \-\-show-uniq-def"
+显示在默认路径下找到的每个目录独有的变量名。
+.IP "\fB\--suo, \-\-show-uniq-only"
+仅显示在所有默认路径下找到的独有变量名。
+.IP "\fB\--ssu, \-\-show-sys-uniq"
+仅显示在系统路径下找到的独有变量名。
+.SH
+.IP 段
+.IP "\fB\--dsn, \-\-default-section-name"
+搜索在默认路径下独有的段名。
+.IP "\fB\--ssn, \-\-sys-section-name"
+搜索在系统路径下独有的段名。
+.SH CONFIGURATION
+./ 保存了什么？包含 .desktop 文件的目录吗？
+.IP "\fB\--cgl, \-\-create-global-list" 
+扫描系统并将目录存放在 /opt/share/ldf/sorted.test 中。
+.IP "\fB\-cll, \-\-create-local-list"
+扫描系统并将目录保存在 $HOME/.ldf/sorted.test 中。
+.IP "\fB\--sld, \-\-show-local-defaults"
+显示 $HOME/.ldf/sorted.test 文件中的内容。
+.IP "\fB\--sgd, \-\-show-global-defaults"
+显示 /opt/share/ldf/sorted.test 文件中的内容。
+.IP "\fB\--sdd, \-\-show-default-directories"
+显示在 DefDskPath 数组中定义的目录。
+.IP "\fB\--remove-local-config"
+删除 $HOME/.ldf/sorted.test 文件。
+.IP "\fB\--remove-global-config"
+删除 remove /opt/share/ldf/sorted.test 文件。
+.IP "\fB\--fp, \-\-find-path\ (path)"
+搜索包含 *.desktop 文件的路径，默认开始路径是 /
+.IP "\fB\--fpo, \-\-formated-path-output"
+与 --fp 相同，但显示已经格式化的路径（数字和空格都用*代替）。
+.IP "\fB\--fpf, \-\-format-path-file\ [filename]"
+将所有的数字和空格用*代替。
+.SH 文件
+.IP "配置文件应该仅包含目录的全路径。"
+.IP "/opt/share/ldf/sorted.test" 
+系统的通用配置文件。
+.IP "$HOME/.ldf/sorted.test" 
+用户的配置文件。
+.SH 漏洞
+请通过以下方式报告漏洞或提供建议：
+.P 
+https://aur.archlinux.org/packages/lsdesktopf/
+.SH 作者
+Andy Crowd (QQ 3188952872)
+感谢Indigo审阅和更新本帮助页面。
+.SH "参见"
+.BR desktop-file-validate(1)
