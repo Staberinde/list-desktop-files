@@ -337,9 +337,12 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		;;
 	more )
 		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
+		ToLowerOne=tolower($1);
+		ToLowerFindIt=tolower(FindIt);
+		ToLowerTwo=tolower($2);
 		if(index($1,"]") == 0 )
-		if( index($1,"Exec") != 0 || index($1,"Exec") != 0  || index($1,"Name") != 0  || index($1,"Comment") != 0  || index($1,"Categories") != 0  || index($1,"Command") != 0 || index($1,"Module") != 0 || index($1,"X-XFCE-Binaries") != 0 )	{Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
-		if(FindIt)if( index($1,"Exec") != 0 || index($1,"Exec") != 0  || index($1,"Name") != 0  || index($1,"Comment") != 0  || index($1,"Categories") != 0  || index($1,"Command") != 0 || index($1,"Module") != 0 || index($1,"X-XFCE-Binaries") != 0 )if(index($2,FindIt) != 0 )YES="1"; };}END{
+		if( index(ToLowerOne,"exec") != 0 || index(ToLowerOne,"name") != 0  || index(ToLowerOne,"comment") != 0  || index(ToLowerOne,"categories") != 0  || index(ToLowerOne,"command") != 0 || index(ToLowerOne,"module") != 0 || index(ToLowerOne,"x-xfce-binaries") != 0 )	{Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
+		if(FindIt)if( index($1,"Exec") != 0 || index($1,"Exec") != 0  || index($1,"Name") != 0  || index($1,"Comment") != 0  || index($1,"Categories") != 0  || index($1,"Command") != 0 || index($1,"Module") != 0 || index($1,"X-XFCE-Binaries") != 0 )if(index(ToLowerTwo,ToLowerFindIt) != 0 )YES="1"; };}END{
 		if(YES == "1" ){print " "FILENAME;        for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]};
 		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
