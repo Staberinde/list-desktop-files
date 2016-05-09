@@ -356,6 +356,8 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 
 	less )
 		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
+		ToLowerTwo=tolower($2);
+		ToLowerFindIt=tolower(FindIt);
 			if(Trans)
 			{
 			split(Trans,ArrayTransLang,",");
@@ -365,7 +367,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 			{
 			Var[CountV++]=$1;
 			InString[CountS++]=substr($0,index($0,$2));
-			if(FindIt)if(index($2,FindIt) != 0)YES="1"; 
+			if(FindIt)if(index(ToLowerTwo,ToLowerFindIt) != 0)YES="1"; 
 			};
 		if(index($1,"[") != 0 && index($1,"[") != 1 ){
 			split($1,Lang,"[");			
