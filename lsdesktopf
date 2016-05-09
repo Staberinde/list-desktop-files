@@ -337,11 +337,20 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		;;
 	more )
 		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
-	 		  if(index($1,"]") == 0    && index($1,"MimeType") == 0 && index($1,"Keywords") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
-		if(FindIt)if(index($2,FindIt) != 0 && index($1,"MimeType") == 0 && index($1,"Keywords") == 0)YES="1"; };}END{
+		if(index($1,"]") == 0 )
+		if( index($1,"Exec") != 0 || index($1,"Exec") != 0  || index($1,"Name") != 0  || index($1,"Comment") != 0  || index($1,"Categories") != 0  || index($1,"Command") != 0 || index($1,"Module") != 0 || index($1,"X-XFCE-Binaries") != 0 )	{Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
+		if(FindIt)if( index($1,"Exec") != 0 || index($1,"Exec") != 0  || index($1,"Name") != 0  || index($1,"Comment") != 0  || index($1,"Categories") != 0  || index($1,"Command") != 0 || index($1,"Module") != 0 || index($1,"X-XFCE-Binaries") != 0 )if(index($2,FindIt) != 0 )YES="1"; };}END{
 		if(YES == "1" ){print " "FILENAME;        for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]};
 		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
+#	more )
+#		find "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2"  -F= '/^create/;{ 
+#	 		  if(index($1,"]") == 0    && index($1,"MimeType") == 0 && index($1,"Keywords") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
+#		if(FindIt)if(index($2,FindIt) != 0 && index($1,"MimeType") == 0 && index($1,"Keywords") == 0)YES="1"; };}END{
+#		if(YES == "1" ){print " "FILENAME;        for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]};
+#		if(length(FindIt) == 0){print " "FILENAME;for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]}}'  "{}"  \;|grep -v -e ^"#" -e ^$
+#		;;
+
 	less )
 		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
 			if(Trans)
