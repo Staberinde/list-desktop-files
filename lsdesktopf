@@ -944,7 +944,7 @@ case "$1" in
 	ListDefault "$@"
 	;;
 --create-local-list | --cll)
-	mkdir -p "$(dirname $LocalArray)"
+	mkdir -p "$(dirname "$LocalArray")"
 	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$LocalArray"
 	;;
 #--update-path-file | --upf)
