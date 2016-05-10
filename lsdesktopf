@@ -402,6 +402,19 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 				}
 			     }'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
+	sov )
+		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2" -F= '{ 
+			if(FindIt)
+			{
+			SizeArray=split(FindIt,ArrayFindIt,",");
+			for(CountFindItArray in ArrayFindIt ){NewArrFindIt[ArrayFindIt[CountFindItArray]]=1;
+			print ArrayFindIt[CountFindItArray] }
+			}
+			
+		}' "{}" \;
+
+		;;
+
 	esac
 
     fi;
@@ -694,6 +707,12 @@ case "$1" in
 			}
 			     }'  "{}"  \;|grep -v ^"#"
 	;;
+--show-only-var  | --sov )
+	Opts="sov"
+	ReCreateDskPath "$@"
+        SearchContentOfVariable "$@"
+	;;
+
 --less | --l )
 	Opts="less"
 	ReCreateDskPath "$@"
