@@ -414,10 +414,10 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 					}	
 			}}END{
 			if( length(UniqFound) == SizeArray )
-			{
+			{	if(Fname == "filename")print FILENAME;
 				for (GotFound in YesFoundIt )
 				{
-					if(Fname == "filename")print FILENAME;
+
 				print YesFoundIt[GotFound];
 				};
 			}
@@ -781,11 +781,10 @@ case "$1" in
 				}	
 		}}END{
 		if( length(UniqFound) == SizeArray )
-		{
+		{	if(Fname == "filename")print FILENAME;
 			for (GotFound in YesFoundIt )
 			{
-				if(Fname == "filename")print FILENAME;
-			print YesFoundIt[GotFound];
+					print YesFoundIt[GotFound];
 			};
 		}
 	}' "{}" \;
