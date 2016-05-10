@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.0-11
+# Version 1.0.0-12
 #
 # License: GPL3
 #
@@ -402,15 +402,25 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 				}
 			     }'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
-	sov )
-		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2" -F= '{ 
-			if(FindIt)
-			{
+	iov )
+		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Fname="$3" -F= '//{ 
+			if(FindIt){
 			SizeArray=split(FindIt,ArrayFindIt,",");
-			for(CountFindItArray in ArrayFindIt ){NewArrFindIt[ArrayFindIt[CountFindItArray]]=1;
-			print ArrayFindIt[CountFindItArray] }
+			for(CountFindItArray in ArrayFindIt )NewArrFindIt[ArrayFindIt[CountFindItArray]]=1;
+				if(NewArrFindIt[$1] == 1 )
+					{
+					YesFoundIt[CountFinds++]=$0;
+					UniqFound[$1]=1;
+					}	
+			}}END{
+			if( length(UniqFound) == SizeArray )
+			{
+				for (GotFound in YesFoundIt )
+				{
+					if(Fname == "filename")print FILENAME;
+				print YesFoundIt[GotFound];
+				};
 			}
-			
 		}' "{}" \;
 
 		;;
@@ -477,54 +487,91 @@ help_def(){
 	Without any options it will list from all default path.
 	All extended supported options begins with --
 	Deafult output to search in: Name/Comment,Exec,Category, path to the file
- --all-sys-path | --asc (options): search only in /usr /etc /opt
+ --all-sys-path | --asc (options)
+ 	using system path /usr /etc /opt
 
 	Vertical and more userfiendly output. Search text in all available variables
- --more | --m (text) :  in predefined default directories
- --more-sys | --ms (text) : only in /usr /etc /opt
+ --more | --m (text)
+ 	using default path
+ --more-sys | --ms (text)
+ 	using system path
  
 	Same as option --more but is less userfiendly by outputing much more information
- --less | --l (text) (translation) : in default path
- --less-sys | --ls (text) (translation) : only in /usr /etc /opt'
+ --less | --l (text) (translation)
+ 	using default path
+ --less-sys | --ls (text) (translation)
+ 	using system path /usr /etc /opt'
 	}
 help_debug(){
-	echo '--show-me | --sm (options): show content of this script'
-		
+	echo '--show-me | --sm (options)
+		show or search content in this script'		
 	}
 help_var(){
 echo 'Search a value of the variables. Supporting grep syntax
- --var [variable]	: search for variable in the *.desktop
- --var-sys | --vs [variable] 	: show all uniq base variable names found in /usr /etc /opt
+ --var [variable] 
+ 	using default path
+ --var-sys | --vs [variable]
+	using system path /usr /etc /opt
 
- --no-var-sys|--nvs [xx]: show file names that does not contain string /usr /etc /opt
- --no-var | --nv [text] : show file names that does not contain string in default path
+	show file names that does not contain string 
+ --no-var-sys|--nvs [xx]
+ 	using system path /usr /etc /opt
+ --no-var | --nv [text]
+ 	using default path
 
- --show-uniq-def |--sud : show all uniq base variable names found in default path
- --show-sys-uniq |--ssu : show uniq variable names found in sys path /usr /etc /opt
- --show-uniq-only |--suo: show RAW output of uniq variables found in default path'
+	show all uniq base variable names 
+ --show-uniq-def |--sud
+ 	using default path
+ --show-sys-uniq |--ssu
+ 	using system path /usr /etc /opt
+
+	show RAW output of uniq variables found
+ --show-uniq-only |--suo
+ 	using default path
+
+Not supporting grep syntax, using awk
+	show content of choosen variables only if all them are present in the file. Option "filename" is used only if you want to see names of the files that contains choosen variables.
+ --including-only-var  | --iov [var1,var2] filename
+	using default path
+ --including-only-var-sys  | --iovs [var1,var2] filename
+	using system path /usr /etc /opt'
 	}
 help_sec(){
 echo 'Search section names in *.desktop files
- --sys-section-name 	| --ssn  : search for uniq section names in /usr /etc /opt
- --default-section-name | --dsn  : search for uniq section names in default path'
+ --sys-section-name 	| --ssn
+ 	using system path /usr /etc /opt
+ 	search for uniq section names
+ --default-section-name | --dsn
+ 	using default path
+ 	search for uniq section names'
 	}
 help_config(){
 echo 'Configuration
- --create-global-list | --cgl : scan system and save dirs into /opt/share/ldf/sorted.test
- --create-local-list  | --cll : scan system and save dirs into $HOME/.ldf/sorted.test
+ --create-global-list | --cgl
+ 	scan system and save dirs into /opt/share/ldf/sorted.test
+ --create-local-list  | --cll
+ 	scan system and save dirs into $HOME/.ldf/sorted.test
 
- --show-local-defaults	| --sld : show content of $HOME/.ldf/sorted.test
- --show-global-defaults	| --sgd : show content of /opt/share/ldf/sorted.test
+ --show-local-defaults	| --sld
+ 	show content of $HOME/.ldf/sorted.test
+ --show-global-defaults	| --sgd
+ 	show content of /opt/share/ldf/sorted.test
 
- --show-default-directories | --sdd : show internal dirs defined in array DefDskPath 
+ --show-default-directories | --sdd
+ 	show internal dirs defined in array DefDskPath 
 
- --remove-local-config	: removing $HOME/.ldf/sorted.test
- --remove-global-config	: removing /opt/share/ldf/sorted.test
+ --remove-local-config
+ 	removing $HOME/.ldf/sorted.test
+ --remove-global-config
+ 	removing /opt/share/ldf/sorted.test
 
- --find-path | --fp (path)	: find path that contain *.desktop files, default starting path is /
- --formated-path-output | --fpo : same as --fp but showing already formated path (replaced numbers,spaces with *)  
+ --find-path | --fp (path)
+ 	find path that contain *.desktop files, default starting path is /
+ --formated-path-output | --fpo
+ 	same as --fp but showing already formated path (replaced numbers,spaces with *)  
 
- --format-path-file | --fpf [filename] : replace all spaces and numbers with *'
+ --format-path-file | --fpf [filename]
+ 	replace all spaces and numbers with *'
 	}
 help_info(){
 echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
@@ -707,12 +754,42 @@ case "$1" in
 			}
 			     }'  "{}"  \;|grep -v ^"#"
 	;;
---show-only-var  | --sov )
-	Opts="sov"
+--including-only-var  | --iov )
+	if [[ -z "$2" ]];then
+		echo 'Use options!
+		Example: --iov Exec,Type filename'
+		exit 1
+	fi
+	Opts="iov"
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
 	;;
-
+--including-only-var-sys  | --iovs)
+	if [[ -z "$2" ]];then
+		echo 'Use options!
+		Example: --iovs Exec,Type filename'
+		exit 1
+	fi
+	find  /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Fname="$3" -F= '//{ 
+		if(FindIt){
+		SizeArray=split(FindIt,ArrayFindIt,",");
+		for(CountFindItArray in ArrayFindIt )NewArrFindIt[ArrayFindIt[CountFindItArray]]=1;
+			if(NewArrFindIt[$1] == 1 )
+				{
+				YesFoundIt[CountFinds++]=$0;
+				UniqFound[$1]=1;
+				}	
+		}}END{
+		if( length(UniqFound) == SizeArray )
+		{
+			for (GotFound in YesFoundIt )
+			{
+				if(Fname == "filename")print FILENAME;
+			print YesFoundIt[GotFound];
+			};
+		}
+	}' "{}" \;
+	;;	
 --less | --l )
 	Opts="less"
 	ReCreateDskPath "$@"
