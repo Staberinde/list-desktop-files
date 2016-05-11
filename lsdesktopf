@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.0-12
+# Version 1.0.0-13
 #
 # License: GPL3
 #
@@ -250,7 +250,7 @@ if [[ ! -z "$1"   ]];then
 fi
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
-  printf "\e[1;36m %s  ${fdPath} \e[0m \n";
+  printf "#\e[1;36m %s ${fdPath} \e[0m \n";
   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then
      find "${fdPath}" -iname "*\.desktop" -exec awk -v Fil="{}"  -v Seek="$One" -F"=" '//{
@@ -293,7 +293,7 @@ SearchContentOfVariable(){
 for fdPath in "${DskPath[@]}";do
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
-[[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m %s ${fdPath} \e[0m \n";
+[[ "$OffPrint" == "no" ]] &&  printf "#\e[1;36m %s ${fdPath} \e[0m \n";
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
 	case $Opts in
@@ -406,6 +406,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		find  "${fdPath}" -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Fname="$3" -F= '//{ 
 			if(FindIt){
 			SizeArray=split(FindIt,ArrayFindIt,",");
+			if (index($0,"[") == 1 ) YesFoundIt[CountFinds++]=$0;
 			for(CountFindItArray in ArrayFindIt )NewArrFindIt[ArrayFindIt[CountFindItArray]]=1;
 				if(NewArrFindIt[$1] == 1 )
 					{
@@ -448,7 +449,7 @@ RawView(){
 for fdPath in "${DskPath[@]}";do
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
  then
- [[ "$OffPrint" == "no" ]] &&  printf "\e[1;36m %s ${fdPath} \e[0m \n";
+ [[ "$OffPrint" == "no" ]] &&  printf "#\e[1;36m %s ${fdPath} \e[0m \n";
    if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
     then 
 [[ "$Opts" == "suo"  ]] &&  grep ^ -R -h --include "*\.desktop" "${fdPath}";
@@ -513,7 +514,7 @@ echo 'Search a value of the variables. Supporting grep syntax
  --var-sys | --vs [variable]
 	using system path /usr /etc /opt
 
-	show file names that does not contain string 
+	show file names that does not contain a string 
  --no-var-sys|--nvs [xx]
  	using system path /usr /etc /opt
  --no-var | --nv [text]
@@ -525,7 +526,7 @@ echo 'Search a value of the variables. Supporting grep syntax
  --show-sys-uniq |--ssu
  	using system path /usr /etc /opt
 
-	show RAW output of uniq variables found
+	show RAW output of the uniq variables
  --show-uniq-only |--suo
  	using default path
 
@@ -538,12 +539,13 @@ Not supporting grep syntax, using awk
 	}
 help_sec(){
 echo 'Search section names in *.desktop files
- --sys-section-name 	| --ssn
+
+	search for uniq section names
+--sys-section-name 	| --ssn
  	using system path /usr /etc /opt
- 	search for uniq section names
  --default-section-name | --dsn
- 	using default path
- 	search for uniq section names'
+ 	using default path'
+
 	}
 help_config(){
 echo 'Configuration
@@ -600,13 +602,20 @@ echo 'Usage examples
 	 lsdesktopf --less
 	 lsdesktopf --less gnome 
 	 lsdesktopf --less gtk zh_CN,zh_TW
+
  Use --var option (supporting grep syntax):
 	--var-sys has same syntax as --var
 	--var Name=
 	--var "Name\[zn_CN\]" -e "^Exec="
- Reverse search 
+ Reverse search (supporting grep syntax)
 	--no-var Exec=
 	--no-var-sys "Name\[en_GB\]"
+ 
+ Use --including-only-var option to show content of choosen and optionaly show filename
+ 	NOTE: filename is an option and not path to existing file.
+ 	--iov Exec,MimeType filename
+	--iov Exec,MimeType | grep -v ^#
+
  Scan for all *.desktop files in /usr /etc /opt
  has same syntax as without supported options
 	--asc 
@@ -773,6 +782,7 @@ case "$1" in
 	find  /usr /etc /opt -type f -name "*\.desktop" -exec awk -v FindIt="$2" -v Fname="$3" -F= '//{ 
 		if(FindIt){
 		SizeArray=split(FindIt,ArrayFindIt,",");
+		if (index($0,"[") == 1 ) YesFoundIt[CountFinds++]=$0;
 		for(CountFindItArray in ArrayFindIt )NewArrFindIt[ArrayFindIt[CountFindItArray]]=1;
 			if(NewArrFindIt[$1] == 1 )
 				{
