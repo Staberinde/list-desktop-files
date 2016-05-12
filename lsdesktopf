@@ -666,9 +666,13 @@ case "$1" in
  config	-	configuration  
  debug	-	view or search in content of this script
  info	-	show short info about *.desktop specified Exec
- tips	-	show some tips about commands used in this script'
+ tips	-	show some tips about commands used in this script
+ mime	-	list available mimetypes'
 	else
 		case "$2" in	
+	mime )
+		help_mimetypes
+		;;
 	def )
 		help_def
 		;;
