@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.0-13
+# Version 1.0.0-14
 #
 # License: GPL3
 #
@@ -648,7 +648,12 @@ help_tips(){
  hide error messages from stderr, such as e.g. "permission denied"
  	find / -type f 2> /dev/null | grep desktop'
 }
-	
+help_mimetypes(){
+echo 'Show list of mimetypes with associated *.desktop files. 
+Output is similar that is used in "mimeapps.list" file under section [Added Associations]
+ --gen-mimeapps | --gm'
+}
+
 case "$1" in
 --help )
 	if [[ -z "$2" ]];then
@@ -1048,25 +1053,39 @@ case "$1" in
 
 	SearchContentOfVariable
 	;;	
---mime-gen | --mg )
-#TEST FUNCTION
-awk -F= '//{
+--generate-mimeapps.list | --gen-mimeapps | --gm )
+
+if [[  -z "$XDG_CONFIG_HOME" ]];	then
+PName="$HOME/.local/share/applications/"
+else
+	if [[  "${XDG_CONFIG_HOME/#\//}" == "$XDG_CONFIG_HOME"   ]];	then
+		PName="$HOME/$XDG_CONFIG_HOME/.local/share/applications/"
+	else
+		PName="$XDG_CONFIG_HOME/.local/share/applications/"
+	fi
+fi
+	awk -F= '//{
 if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
 	for (inArray in MimeArray)
-		if(MimeArray[inArray]){
-			inMA=MimeArray[inArray];
-			FName=FILENAME;
-			gsub(/[^*]*\//,"",FName);
-			UniqMimeArray[inMA]=FName;
-			AllMimeArray[FName]=inMA}; }
+		if(MimeArray[inArray])
+			{
+				inMA=MimeArray[inArray];
+				FName=FILENAME;
+				gsub(/[^*]*\//,"",FName);
+		if(UniqMimeArray[inMA])	{
+				UniqMimeArray[inMA]=UniqMimeArray[inMA]";"FName
+					}
+					else
+					{
+				UniqMimeArray[inMA]=FName;
+					}
+			};
+		}
 		}END{
-		print length(UniqMimeArray);
 		for ( inMime in UniqMimeArray)print inMime"="UniqMimeArray[inMime];
-		print "####################";
-		for ( inAllMime in AllMimeArray)print AllMimeArray[inAllMime]"="inAllMime;
-}' /usr/share/applications/*.desktop 
-
+}' "/usr/share/applications/"*\.desktop "$PName"*\.desktop ;
 ;;
+
 * ) 
 	ReCreateDskPath "$@"
 
