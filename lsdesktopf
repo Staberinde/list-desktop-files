@@ -1056,14 +1056,19 @@ case "$1" in
 --generate-mimeapps.list | --gen-mimeapps | --gm )
 
 if [[  -z "$XDG_CONFIG_HOME" ]];	then
-PName="$HOME/.local/share/applications/"
+PName="$HOME/.local/share/applications"
 else
 	if [[  "${XDG_CONFIG_HOME/#\//}" == "$XDG_CONFIG_HOME"   ]];	then
-		PName="$HOME/$XDG_CONFIG_HOME/.local/share/applications/"
+		PName="$HOME/$XDG_CONFIG_HOME/.local/share/applications"
 	else
-		PName="$XDG_CONFIG_HOME/.local/share/applications/"
+		PName="$XDG_CONFIG_HOME/.local/share/applications"
 	fi
 fi
+
+[[ -d "/usr/local/share/applications" ]] &&  A=" /usr/local/share/applications"
+[[ -d "/usr/share/applications" ]] && B=" /usr/share/applications"
+[[ -d "$PName" ]] && C=" $PName"
+
 	awk -F= '//{
 if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
 	for (inArray in MimeArray)
@@ -1083,7 +1088,7 @@ if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
 		}
 		}END{
 		for ( inMime in UniqMimeArray)print inMime"="UniqMimeArray[inMime];
-}' "/usr/share/applications/"*\.desktop "$PName"*\.desktop ;
+		}'  "$PName/"*\.desktop "/usr/local/share/applications/"*\.desktop "/usr/share/applications/"*\.desktop ;
 ;;
 
 * ) 
