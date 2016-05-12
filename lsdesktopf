@@ -1048,6 +1048,25 @@ case "$1" in
 
 	SearchContentOfVariable
 	;;	
+--mime-gen | --mg )
+#TEST FUNCTION
+awk -F= '//{
+if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
+	for (inArray in MimeArray)
+		if(MimeArray[inArray]){
+			inMA=MimeArray[inArray];
+			FName=FILENAME;
+			gsub(/[^*]*\//,"",FName);
+			UniqMimeArray[inMA]=FName;
+			AllMimeArray[FName]=inMA}; }
+		}END{
+		print length(UniqMimeArray);
+		for ( inMime in UniqMimeArray)print inMime"="UniqMimeArray[inMime];
+		print "####################";
+		for ( inAllMime in AllMimeArray)print AllMimeArray[inAllMime]"="inAllMime;
+}' /usr/share/applications/*.desktop 
+
+;;
 * ) 
 	ReCreateDskPath "$@"
 
