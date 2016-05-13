@@ -1105,7 +1105,7 @@ for inMime in "${MimePathArray[@]}" ;do
 		;;
 
 --list-mimeapps | --lm )
-	find "$HOME/.config/" "/etc/xdg/" "$HOME/.local/share/applications/" "/usr/local/share/applications/" "/usr/share/applications/" -type f  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  '{ 
+	find "$HOME/.config/" "/etc/xdg/" "$HOME/.local/share/applications/" "/usr/local/share/applications/" "/etc/gnome/" "/usr/share/applications/" -type f  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  '{ 
 	       	CollectMIMEContent[count++]=$0 
 		}END{
 		printf "# \033[1;36m "FILENAME "\033[0m \n";
