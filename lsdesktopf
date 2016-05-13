@@ -650,8 +650,12 @@ help_tips(){
 }
 help_mimetypes(){
 echo 'Show list of mimetypes with associated *.desktop files. 
-Output is similar that is used in "mimeapps.list" file under section [Added Associations]
- --gen-mimeapps | --gm'
+ --gen-mimeapps | --gm
+	Output is similar that is used in "mimeapps.list" file under section [Added Associations]
+
+ --list-mimeapps | --lm 
+ 	List available "*mimeapps.list" with colored path and their content'
+
 }
 
 case "$1" in
@@ -1076,8 +1080,6 @@ find "/usr/local/share/applications" "/usr/share/applications" "$PName" -type f 
 sort -u |
 sed "s/$/\/\*.desktop/" )")
 
-#echo ${#MimePathArray[@]}
-#echo ${MimePathArray[@]}
 for inMime in "${MimePathArray[@]}" ;do
 	[[ ! -d "$inMime" ]] && awk -F= '//{
   if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
@@ -1097,12 +1099,20 @@ for inMime in "${MimePathArray[@]}" ;do
 			};
 		}
 		}END{
-		for ( inMime in UniqMimeArray)print inMime"="UniqMimeArray[inMime];
+		for ( inMime in UniqMimeArray)print inMime"="UniqMimeArray[inMime]";";
 		}' ${inMime} ;
 	done | sort --field-separator=\= --key=1,1
 		;;
 
-* ) 
+--list-mimeapps | --lm )
+	find "$HOME/.config/" "/etc/xdg/" "$HOME/.local/share/applications/" "/usr/local/share/applications/" "/usr/share/applications/" -type f  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  '{ 
+	       	CollectMIMEContent[count++]=$0 
+		}END{
+		printf "# \033[1;36m "FILENAME "\033[0m \n";
+		for (GotMIME in CollectMIMEContent)print CollectMIMEContent[GotMIME] }' "{}" \;
+		;;
+
+	* ) 
 	ReCreateDskPath "$@"
 
 	ListDefault "$@"
