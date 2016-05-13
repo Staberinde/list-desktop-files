@@ -1069,12 +1069,18 @@ else
 	fi
 fi
 
-[[ -d "/usr/local/share/applications" ]] &&  A=" /usr/local/share/applications"
-[[ -d "/usr/share/applications" ]] && B=" /usr/share/applications"
-[[ -d "$PName" ]] && C=" $PName"
+IFS="
+"
+MimePathArray+=("$(
+find "/usr/local/share/applications" "/usr/share/applications" "$PName" -type f -name "*\.desktop" -exec dirname "{}" \; | 
+sort -u |
+sed "s/$/\/\*.desktop/" )")
 
-	awk -F= '//{
-if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
+#echo ${#MimePathArray[@]}
+#echo ${MimePathArray[@]}
+for inMime in "${MimePathArray[@]}" ;do
+	[[ ! -d "$inMime" ]] && awk -F= '//{
+  if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
 	for (inArray in MimeArray)
 		if(MimeArray[inArray])
 			{
@@ -1092,8 +1098,9 @@ if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
 		}
 		}END{
 		for ( inMime in UniqMimeArray)print inMime"="UniqMimeArray[inMime];
-		}'  "$PName/"*\.desktop "/usr/local/share/applications/"*\.desktop "/usr/share/applications/"*\.desktop ;
-;;
+		}' ${inMime} ;
+	done | sort --field-separator=\= --key=1,1
+		;;
 
 * ) 
 	ReCreateDskPath "$@"
