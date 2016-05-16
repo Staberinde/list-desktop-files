@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-0
+# Version 1.0.1-1
 #
 # License: GPL3
 #
@@ -561,6 +561,9 @@ echo 'Search a value of the variables. Supporting grep syntax
  --show-uniq-only |--suo
  	using default path
 
+--list-categories | --lc
+	Show all categories found in "/usr/share/applications/" and "$HOME/.local/share/applications/" 
+
 Not supporting grep syntax, using awk
 	show content of choosen variables only if all them are present in the file. To show path to file use "sf" as last option.
  --including-only-var  | --iov [var1,var2] sf
@@ -689,8 +692,8 @@ echo 'Show list of mimetypes with associated *.desktop files.
 		3 - show only filenames that can open same MIME-type
 
  --list-mimeapps | --lm 
- 	List available "*mimeapps.list" with colored path and their content'
-
+ 	List available "*mimeapps.list" with colored path and their content
+' 
 }
 
 case "$1" in
@@ -1189,7 +1192,6 @@ for inMime in "${MimePathArray[@]}" ;do
 		}' ${inMime} ;
 	done | sort --field-separator=\= --key=1,1
 		;;
-
 --list-mimeapps | --lm )
 	find "$HOME/.config/" "/etc/xdg/" "$HOME/.local/share/applications/" "/usr/local/share/applications/" "/etc/gnome/" "/usr/share/applications/" -type f  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  '{ 
 	       	CollectMIMEContent[count++]=$0 
@@ -1197,7 +1199,9 @@ for inMime in "${MimePathArray[@]}" ;do
 		printf "# \033[1;36m "FILENAME "\033[0m \n";
 		for (GotMIME in CollectMIMEContent)print CollectMIMEContent[GotMIME] }' "{}" \; 2> /dev/null
 		;;
-
+--list-categories | --lc )
+		grep ^Categories -h -R "/usr/share/applications/" "$HOME/.local/share/applications/" | awk -F= '//{A[$2]=1}END{for(E in A){gsub(";","\n",E);printf E}}' | sort -u
+		;;
 	* ) 
 	ReCreateDskPath "$@"
 
