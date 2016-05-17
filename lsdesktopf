@@ -650,6 +650,13 @@ echo 'Usage examples
  	--iov Exec,MimeType filename
 	--iov Exec,MimeType | grep -v ^#
 
+ Use --gm option that shows various information about MIME-types in *.desktop files
+	--gm 1
+	--gm 
+	--gm 0
+	--gm -gx video
+	--gm -gx text
+
  Scan for all *.desktop files in /usr /etc /opt
  has same syntax as without supported options
 	--asc 
@@ -687,9 +694,16 @@ echo 'Show list of mimetypes with associated *.desktop files.
  --gen-mimeapps | --gm [options]
 	Output is similar that is used in "mimeapps.list" file under section [Added Associations]
 	Options:
-		1 - show type of mime. First part of MIME-type 
-		2 - show extension. Second part of MIME-type
-		3 - show only filenames that can open same MIME-type
+		0 
+	       		show only MIME-types
+		1 
+	       		show type of mime. First part of MIME-type 
+		2 
+	       		show extension. Second part of MIME-type
+		3 
+	       		show only filenames that can open same MIME-type
+		-gx [type of MIME] 
+	       		shows all extensions in your systems *.desktop files that belongs to type of MIME
 
  --list-mimeapps | --lm 
  	List available "*mimeapps.list" with colored path and their content
