@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-1
+# Version 1.0.1-2
 #
 # License: GPL3
 #
@@ -1136,7 +1136,7 @@ sort -u |
 sed "s/$/\/\*.desktop/" )")
 
 for inMime in "${MimePathArray[@]}" ;do
-	[[ ! -d "$inMime" ]] && awk -F= -v MimeParts="$2" '//{
+	[[ ! -d "$inMime" ]] && awk -F= -v MimeParts="$2" -v MimeExt="$3"  '//{
   if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
 	for (inArray in MimeArray)
 		if(MimeArray[inArray])
@@ -1188,6 +1188,26 @@ for inMime in "${MimePathArray[@]}" ;do
 					for ( inMimeFile in NameCollect )
 						print inMimeFile;
 				};
+			if(MimeParts == "0" || MimeParts == "mime" || MimeParts == "m")
+				{
+					for(GetMIME in UniqMimeArray)
+						{
+							print GetMIME
+						;
+						};										
+				};
+				if(MimeParts == "-gx" || MimeParts == "-g" || MimeParts == "-getext")
+				if( length(MimeExt) != 0 )
+					{
+					for(GetMIME in UniqMimeArray)
+						{GetType=substr(GetMIME,0,index(GetMIME,"/")-1)							
+							if(MimeExt == GetType )print substr(GetMIME,index(GetMIME,"/")+1)
+						;
+						};										
+					}
+				else
+					{print "No option are given. Use first part of MIME-type!"};
+
 			}
 		}' ${inMime} ;
 	done | sort --field-separator=\= --key=1,1
