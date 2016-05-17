@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-2
+# Version 1.0.1-3
 #
 # License: GPL3
 #
@@ -1234,7 +1234,8 @@ for inMime in "${MimePathArray[@]}" ;do
 		for (GotMIME in CollectMIMEContent)print CollectMIMEContent[GotMIME] }' "{}" \; 2> /dev/null
 		;;
 --list-categories | --lc )
-		grep ^Categories -h -R "/usr/share/applications/" "$HOME/.local/share/applications/" | awk -F= '//{A[$2]=1}END{for(E in A){gsub(";","\n",E);printf E}}' | sort -u
+	grep ^Categories -h -R "/usr/share/applications/" "$HOME/.local/share/applications/" | awk -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for(I in YY)HH[YY[I]];for(QQ in HH)print QQ}'
+		#\ awk -F= '//{A[$2]=1}END{for(E in A){gsub(";","\n",E);printf E}}' | sort -u
 		;;
 	* ) 
 	ReCreateDskPath "$@"
