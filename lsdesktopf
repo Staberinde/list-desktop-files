@@ -1226,16 +1226,74 @@ for inMime in "${MimePathArray[@]}" ;do
 		}' ${inMime} ;
 	done | sort --field-separator=\= --key=1,1
 		;;
---list-mimeapps | --lm )
-	find "$HOME/.config/" "/etc/xdg/" "$HOME/.local/share/applications/" "/usr/local/share/applications/" "/etc/gnome/" "/usr/share/applications/" -type f  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  '{ 
-	       	CollectMIMEContent[count++]=$0 
-		}END{
-		printf "# \033[1;36m "FILENAME "\033[0m \n";
-		for (GotMIME in CollectMIMEContent)print CollectMIMEContent[GotMIME] }' "{}" \; 2> /dev/null
+--list-mime | --lm )
+
+	List_Dirs+=("$HOME/.config/")
+	List_Dirs+=("/etc/xdg/")
+	List_Dirs+=("$HOME/.local/share/applications/")
+	List_Dirs+=("/usr/local/share/applications/")
+	List_Dirs+=("/etc/gnome/")
+	List_Dirs+=("/usr/share/applications/")
+
+	List_Dirs+=("/usr/share/mime/packages/")
+	List_Dirs+=("/usr/share/mime-info/")
+	if [[ -z "$2"  ]];then
+		for In_List in "${List_Dirs[@]}";do
+[[ -d "${In_List}" ]]	&& find "${In_List}" -type f  \( -name "*mimeapps.list" -o -name "defaults.list"  -o -name "*.keys" -o -name "*.xml" -o -name "*.mime"  \) | \
+				xargs awk '{GetListName=length(FILENAME)-4;
+			if(index(FILENAME,".list") == GetListName ){
+				GetContentList[CountItems++]=$0;YesFN=FILENAME
+				};
+			if(index(FILENAME,".keys") == GetListName){
+				if(index($0,"[") == 0 && index($0,"#") == 0 && index($0,"]description") == 0 &&  index($0,"]category") == 0 && index($0,"_") == 0 )
+					{
+					GetContentList[CountItems++]=$0;YesFN=FILENAME;
+					};
+				};
+			if(index(FILENAME,".xml")-1 == GetListName )
+				{			
+					if(index($0,"<comment>") != 0)
+					{
+							C=substr($0,0,index($0,"/")-2);
+							GetContentList[CountItems++]=substr(C,index($0,">")+1);
+							YesFN=FILENAME
+					};
+					if(index($0,"mime-type type=") != 0)
+					{
+							AA=substr($0,index($0,"\"")+1);
+							GetContentList[CountItems++]=substr(AA,0,index(AA,"\"")-1)" # ";
+							YesFN=FILENAME;
+					}
+				};
+			}END{if(length(YesFN) != 0)print "* "YesFN ;for(GetList in GetContentList )print GetContentList[GetList];
+		}' ;
+		
+		done;
+
+	else
+
+		for In_List in "${List_Dirs[@]}";do
+
+		[[ -d  "${In_List}"  ]]	&&	find "${In_List}" -type f  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  '{ 
+		       	CollectMIMEContent[count++]=$0 
+			}END{
+			printf "# \033[1;36m "FILENAME "\033[0m \n";
+			for (GotMIME in CollectMIMEContent)print CollectMIMEContent[GotMIME] }' "{}" \;
+		done
+	fi
 		;;
 --list-categories | --lc )
-	grep ^Categories -h -R "/usr/share/applications/" "$HOME/.local/share/applications/" | awk -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for(I in YY)HH[YY[I]];for(QQ in HH)print QQ}'
+#	grep ^Categories -h -R "/usr/share/applications/" "$HOME/.local/share/applications/" | awk -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for(I in YY)HH[YY[I]];for(QQ in HH)print QQ}'
+#		#\ awk -F= '//{A[$2]=1}END{for(E in A){gsub(";","\n",E);printf E}}' | sort -u
+List_Dirs=("/usr/share/applications/")
+List_Dris+=("$HOME/.local/share/applications/")
+List_Dris+=("/usr/local/share/applications/")
+for In_List in "${List_Dirs[@]}" ;do
+[[ -d "${In_List}" ]] && find "${In_List}" -exec grep ^Categories -h -R "{}" \;
+done | awk -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for(I in YY)HH[YY[I]];for(QQ in HH)print QQ}'
 		#\ awk -F= '//{A[$2]=1}END{for(E in A){gsub(";","\n",E);printf E}}' | sort -u
+
+
 		;;
 	* ) 
 	ReCreateDskPath "$@"
