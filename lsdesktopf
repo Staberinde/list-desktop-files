@@ -1160,17 +1160,18 @@ IFS=" "
 #			List_XML=("$(find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml")");
 #echo "${#List_XML[@]}"
 #			for In_XML_List in "${List_XML[@]}";do
-#				echo '* '"$In_XML_List"
-find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml"	| xargs awk '{
+#if( length(MimeExt) != 0 i				echo '* '"$In_XML_List"
+find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml" -print0 | xargs -0 awk  '{
 			if(index($0,"<comment>"))
 			{
 				A=substr($0,0,index($0,"/")-2);B=substr(A,index(A,">")+1);
+				printf B
 			}else{
 			if(index($0,"mime-type type="))
 				{
 				Q=substr($0,index($0,"\"")+1);
 				W=substr(Q,0,index(Q,"\"")-1);
-				print W" == "B;
+				print " == " W;
 				}
 			}}' 
 			#$In_XML_List
@@ -1270,8 +1271,8 @@ find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml"	| 
 	List_Dirs+=("/usr/share/mime-info/")
 	if [[ -z "$2"  ]];then
 		for In_List in "${List_Dirs[@]}";do
-[[ -d "${In_List}" ]]	&& find "${In_List}" -type f  \( -name "*mimeapps.list" -o -name "defaults.list"  -o -name "*.keys" -o -name "*.xml" -o -name "*.mime"  \) | \
-				xargs awk -v GetType="$2"  '{GetListName=length(FILENAME)-4;
+[[ -d "${In_List}" ]]	&& find "${In_List}" -type f  \( -name "*mimeapps.list" -o -name "defaults.list"  -o -name "*.keys" -o -name "*.xml" -o -name "*.mime"  \) -print0 | \
+				xargs -0 awk -v GetType="$2"  '{GetListName=length(FILENAME)-4;
 			if(index(FILENAME,".list") == GetListName ){
 				GetContentList[CountItems++]=$0;YesFN=FILENAME
 				};
