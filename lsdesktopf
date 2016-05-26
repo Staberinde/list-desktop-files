@@ -704,6 +704,10 @@ echo 'Show list of mimetypes with associated *.desktop files.
 	       		show only filenames that can open same MIME-type
 		-gx [type of MIME] 
 	       		shows all extensions in your systems *.desktop files that belongs to type of MIME
+		-gdx 
+			shows MIME-types with their descriptions found in
+			/usr/share/mime/packages/
+			~/.local/share/mime/packages/
 
  --list-mimeapps | --lm 
  	List available "*mimeapps.list" with colored path and their content
@@ -757,6 +761,7 @@ case "$1" in
 	help_def
 	help_var
 	help_sec
+	help_mimetypes
 	help_usage
 	help_config
 	help_debug
@@ -1149,7 +1154,31 @@ find "/usr/local/share/applications" "/usr/share/applications" "$PName" -type f 
 sort -u |
 sed "s/$/\/\*.desktop/" )")
 
-for inMime in "${MimePathArray[@]}" ;do
+	case $2 in
+      		-gdx | -get-description-xdg )
+IFS=" "
+#			List_XML=("$(find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml")");
+#echo "${#List_XML[@]}"
+#			for In_XML_List in "${List_XML[@]}";do
+#				echo '* '"$In_XML_List"
+find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml"	| xargs awk '{
+			if(index($0,"<comment>"))
+			{
+				A=substr($0,0,index($0,"/")-2);B=substr(A,index(A,">")+1);
+			}else{
+			if(index($0,"mime-type type="))
+				{
+				Q=substr($0,index($0,"\"")+1);
+				W=substr(Q,0,index(Q,"\"")-1);
+				print W" == "B;
+				}
+			}}' 
+			#$In_XML_List
+			
+#		done
+	;;
+		* )
+		for inMime in "${MimePathArray[@]}" ;do
 	[[ ! -d "$inMime" ]] && awk -F= -v MimeParts="$2" -v MimeExt="$3"  '//{
   if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
 	for (inArray in MimeArray)
@@ -1224,7 +1253,9 @@ for inMime in "${MimePathArray[@]}" ;do
 
 			}
 		}' ${inMime} ;
-	done | sort --field-separator=\= --key=1,1
+			done | sort --field-separator=\= --key=1,1
+			;;
+			esac
 		;;
 --list-mime | --lm )
 
@@ -1240,7 +1271,7 @@ for inMime in "${MimePathArray[@]}" ;do
 	if [[ -z "$2"  ]];then
 		for In_List in "${List_Dirs[@]}";do
 [[ -d "${In_List}" ]]	&& find "${In_List}" -type f  \( -name "*mimeapps.list" -o -name "defaults.list"  -o -name "*.keys" -o -name "*.xml" -o -name "*.mime"  \) | \
-				xargs awk '{GetListName=length(FILENAME)-4;
+				xargs awk -v GetType="$2"  '{GetListName=length(FILENAME)-4;
 			if(index(FILENAME,".list") == GetListName ){
 				GetContentList[CountItems++]=$0;YesFN=FILENAME
 				};
