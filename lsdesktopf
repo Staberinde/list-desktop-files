@@ -1156,27 +1156,58 @@ sed "s/$/\/\*.desktop/" )")
 
 	case $2 in
       		-gdx | -get-description-xdg )
-IFS=" "
-#			List_XML=("$(find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml")");
+IFS="
+"
+		case $3 in
+			g | glob )
+				List_XML=($(find "/usr/" "/etc/" "$HOME/.local/" "$HOME/.config"  -type f -name "*\.xml"));
+			;;
+			l | local )
+				List_XML=($(find  "$HOME/.config" "$HOME/.local/" -type f -name "*\.xml"));
+			;;
+			* )
+				List_XML=($(find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml"));     
+	    		 ;;
+		esac
 #echo "${#List_XML[@]}"
 #			for In_XML_List in "${List_XML[@]}";do
 #if( length(MimeExt) != 0 i				echo '* '"$In_XML_List"
-find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml" -print0 | xargs -0 awk  '{
+
+#find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml" -print0 
+ for In_XML_List in "${List_XML[@]}";do
+find "$In_XML_List" -type f -name "*\.xml" -print0| xargs -0 awk  '{
 			if(index($0,"<comment>"))
 			{
 				A=substr($0,0,index($0,"/")-2);B=substr(A,index(A,">")+1);
-				print B" = "W
+						ListOfDesc[B]=W;
+						YES=1;
 			}
+			if(index($0,"glob pattern="))
+				{
+		                        Q=substr($0,index($0,"\"")+1);
+		                        W=substr(Q,0,index(Q,"\"")-1);
+					if(length(B) != 0)ListOfDesc[B]=W;
+						YES=1
+				}
+			if(index($0," type="))
+				{
+		                        Q=substr($0,index($0," type=\"")+7);
+		                        W=substr(Q,0,index(Q,"\"")-1);
+					if(length(B) != 0)ListOfDesc[B]=W;
+						YES=1
+				}
+
 			if(index($0,"mime-type type="))
 				{
 				Q=substr($0,index($0,"\"")+1);
 				W=substr(Q,0,index(Q,"\"")-1);
 				
 				}
-			}' 
+
+			}END{if(YES == 1)printf "@ \033[2;32m "FILENAME"\033[2;0m \n";for (ShowXML in ListOfDesc)print ListOfDesc[ShowXML] " == " ShowXML }' 
 			#$In_XML_List
 			
-#		done
+		done
 	;;
 		* )
 		for inMime in "${MimePathArray[@]}" ;do
