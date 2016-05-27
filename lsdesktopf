@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-3
+# Version 1.0.1-4
 #
 # License: GPL3
 #
@@ -704,10 +704,13 @@ echo 'Show list of mimetypes with associated *.desktop files.
 	       		show only filenames that can open same MIME-type
 		-gx [type of MIME] 
 	       		shows all extensions in your systems *.desktop files that belongs to type of MIME
-		-gdx 
-			shows MIME-types with their descriptions found in
-			/usr/share/mime/packages/
-			~/.local/share/mime/packages/
+		-gdx [options]
+			shows MIME-types with their descriptions found in *.xml files
+			by default searching only in /usr/share/mime/packages/ $HOME/.local/share/mime/packages/
+			g
+				search in /etc /usr $HOME/.local $HOME/.config
+			l
+				search in  $HOME/.local $HOME/.config
 
  --list-mimeapps | --lm 
  	List available "*mimeapps.list" with colored path and their content
@@ -1187,14 +1190,12 @@ find "$In_XML_List" -type f -name "*\.xml" -print0| xargs -0 awk  '{
 		                        Q=substr($0,index($0,"\"")+1);
 		                        W=substr(Q,0,index(Q,"\"")-1);
 					if(length(B) != 0)ListOfDesc[B]=W;
-						YES=1
 				}
 			if(index($0," type="))
 				{
 		                        Q=substr($0,index($0," type=\"")+7);
 		                        W=substr(Q,0,index(Q,"\"")-1);
-					if(length(B) != 0)ListOfDesc[B]=W;
-						YES=1
+					if(length(B) != 0)ListOfDesc[B]=W;		
 				}
 
 			if(index($0,"mime-type type="))
