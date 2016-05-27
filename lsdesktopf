@@ -1190,22 +1190,30 @@ find "$In_XML_List" -type f -name "*\.xml" -print0| xargs -0 awk  '{
 		                        Q=substr($0,index($0,"\"")+1);
 		                        W=substr(Q,0,index(Q,"\"")-1);
 					if(length(B) != 0)ListOfDesc[B]=W;
+						OK=1
 				}
 			if(index($0," type="))
 				{
 		                        Q=substr($0,index($0," type=\"")+7);
 		                        W=substr(Q,0,index(Q,"\"")-1);
 					if(length(B) != 0)ListOfDesc[B]=W;		
+						OK=1
 				}
 
 			if(index($0,"mime-type type="))
 				{
 				Q=substr($0,index($0,"\"")+1);
 				W=substr(Q,0,index(Q,"\"")-1);
-				
+						OK=1
 				}
 
-			}END{if(YES == 1)printf "@ \033[2;32m "FILENAME"\033[2;0m \n";for (ShowXML in ListOfDesc)print ListOfDesc[ShowXML] " == " ShowXML }' 
+			}END{
+			if(length(ListOfDesc) != 0 && length(W) != 0)
+			{
+				printf "@ \033[2;32m "FILENAME"\033[2;0m \n";
+				for (ShowXML in ListOfDesc)print ListOfDesc[ShowXML] " == " ShowXML 
+				}
+			}' 
 			#$In_XML_List
 			
 		done
