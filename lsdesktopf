@@ -1165,15 +1165,15 @@ find "/usr/share/mime/packages/" "$HOME/.local/share/" -type f -name "*\.xml" -p
 			if(index($0,"<comment>"))
 			{
 				A=substr($0,0,index($0,"/")-2);B=substr(A,index(A,">")+1);
-				printf B
-			}else{
+				print B" = "W
+			}
 			if(index($0,"mime-type type="))
 				{
 				Q=substr($0,index($0,"\"")+1);
 				W=substr(Q,0,index(Q,"\"")-1);
-				print " == " W;
+				
 				}
-			}}' 
+			}' 
 			#$In_XML_List
 			
 #		done
