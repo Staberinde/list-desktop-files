@@ -1,0 +1,24 @@
+#!/bin/bash
+
+#find /usr/share/mime*/packages/ -type f -name "*\.xml" -print0 | xargs -0 awk -F"\"" '{
+#	if(index($0,"mime-type")) printf "\n" $2;
+# if(index($0,"type type="))printf "\n" $2;
+#	if(index($0,"<comment>")){
+#		GetString=substr($0,index($0,">")+1)
+#		print " # "substr(GetString,0,index(GetString,"/")-2)
+#		};
+#	if(index(tolower($0),"pattern="))printf $2" ; "}' 
+
+
+find /usr/share/mime/packages/ -type f -name "*\.xml" -exec awk -F"\"" '{
+	if(index($0,"mime-type")){ContentArray[Count++]=$2" ";}else{if(index($0,"type type="))ContentArray[Count++]=$2" "};		
+	if(index($0,"<comment>")){
+		GetString=substr($0,index($0,">")+1)
+		GetTMP=" == "substr(GetString,0,index(GetString,"</")-1)" \n";			
+		ContentArray[Count++]=GetTMP;
+		};
+	if(index(tolower($0),"pattern="))ContentArray[Count++]=$2" ;\n";
+	MIMEtmp="#";
+		}END{printf "\n@ "FILENAME"\n";
+	for(GetContent in ContentArray){if(split(ContentArray[GetContent],TMP,"/") != 1  && index(ContentArray[GetContent],"==") == 0)printf "\n";printf "%s",ContentArray[GetContent]};
+		}'  "{}" \;
