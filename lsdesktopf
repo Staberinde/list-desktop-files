@@ -807,6 +807,16 @@ echo 'Show list of mimetypes with associated *.desktop files.
  
  --gdx [options]
 	same as --gm -gdx [options]
+	search in *.xml configuration files
+	additional options
+		0 
+	       		show only MIME-types
+		1 
+	       		show type of mime. First part of MIME-type 
+		2 
+	       		show extension. Second part of MIME-type
+		3 
+	       		show only filename extenstions
 
  --list-mimeapps | --lm 
  	List available "*mimeapps.list" with colored path and their content
