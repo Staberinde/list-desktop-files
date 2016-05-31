@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-4
+# Version 1.0.1-5
 #
 # License: GPL3
 #
@@ -304,32 +304,52 @@ IFS="
 				for (I in ContentArray)print I
 				}'
 	;;
-	*) for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk -F"\"" '{YesM=0;
-	if(index($0,"mime-type")){if(index($0,"type type=")){ContentArray[Count++]=$2" == ";YesM=1}else{if(index($0," type=")){
-		ContentArray[Count++]=$4" == "}}}				
-	if(index($0,"<comment>")){
-		GetString=substr($0,index($0,">")+1)
-		GetTMP=" "substr(GetString,0,index(GetString,"</")-1)" \n";			
-		ContentArray[Count++]=GetTMP;
-		YesC=1
-		};
-	if(index(tolower($0),"pattern="))
-	{
-	ContentArray[Count++]=$2" ;\n";		
-	}
-		}END{printf "\n@ \033[2;32m"FILENAME"\033[0m\n";
-	for(GetContent in ContentArray){
-		if(index(ContentArray[GetContent],"==") != 0 )printf "\n";
-		if(split(ContentArray[GetContent],TMP,"/") != 1  && index(ContentArray[GetContent],"==") == 0)
-		 	 {
-			 printf "\n %s",ContentArray[GetContent];
-		 }else{
-			 printf "%s",ContentArray[GetContent];
-			  };
-		};
-			}' ;			
-		done
+	-gx ) if [[ ! -z "$3" ]];then
+		for In_XML_List in "${List_XML[@]}";do
+	find "$In_XML_List" -type f -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
+		done | awk -F"\"" -v FindForType="$3" '{
+	if(index($0,"mime-type")){
+		if(index($0,"type type=")){
+			A=substr($2,index($2,"/")+1);
+			if(FindForType ==  substr($2,0,index($2,"/")-1))
+				ContentArray[A]=1;
+			}else{
+				if(index($0," type=")){
+			B=substr($4,index($4,"/")+1);
+			if(FindForType ==  substr($2,0,index($2,"/")-1))
+				ContentArray[B]=1
+		}}}}END{for (I in ContentArray)print I}'
+			else
+			echo 'Missing options! Use first part of MIME-type,e.g. inode'
+			fi
+		;;
+	*) 
+	  for In_XML_List in "${List_XML[@]}";do
+		find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk -F"\"" '{YesM=0;
+		if(index($0,"mime-type")){if(index($0,"type type=")){ContentArray[Count++]=$2" == ";YesM=1}else{if(index($0," type=")){
+			ContentArray[Count++]=$4" == "}}}				
+		if(index($0,"<comment>")){
+			GetString=substr($0,index($0,">")+1)
+			GetTMP=" "substr(GetString,0,index(GetString,"</")-1)" \n";			
+			ContentArray[Count++]=GetTMP;
+			YesC=1
+			};
+		if(index(tolower($0),"pattern="))
+		{
+		ContentArray[Count++]=$2" ;\n";		
+		}
+			}END{printf "\n@ \033[2;32m"FILENAME"\033[0m\n";
+		for(GetContent in ContentArray){
+			if(index(ContentArray[GetContent],"==") != 0 )printf "\n";
+			if(split(ContentArray[GetContent],TMP,"/") != 1  && index(ContentArray[GetContent],"==") == 0)
+				{
+				printf "\n %s",ContentArray[GetContent];
+			}else{
+				printf "%s",ContentArray[GetContent];
+				};
+			};
+				}' ;			
+				done	
 		;;
 		esac
 }
