@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-5
+# Version 1.0.1-6
 #
 # License: GPL3
 #
@@ -303,6 +303,59 @@ IFS="
 			}END{
 				for (I in ContentArray)print I
 				}'
+	;;
+	-gfx)
+	for In_XML_List in "${List_XML[@]}";do
+	find "$In_XML_List" -type f -name "*\.xml" -exec awk -v ShowFileName="$3" '{
+		STOPYES=0;
+	if(index($0,"<mime-type") != 0)
+		{
+			Astop=1;
+			YES=1;
+		};
+	if(index($0,"</mime-type>") != 0){Astop=2;YES=0};
+	if(Astop == 1)
+		{
+			SP=SP sprintf( "%s",$0);
+		}
+	else
+		{
+		NumPatt=split(SP,GG,"pattern");
+			if(index(SP,"<comment>") != 0)
+				{
+					Acomment=substr(SP,index(SP,"<comment>")+9);
+					Bcomment=substr(Acomment,0,index(Acomment,"</comment>")-1);				
+				}
+			else
+				{
+					Acomment=substr(SP,index(SP,"<comment ")+9);
+					TMPcomment=substr(Acomment,0,index(Acomment,"</comment>")-1);		
+					Bcomment=substr(TMPcomment,index(Acomment,">")+1);					
+				};
+	NumMT=split(SP,GetMT,"type type");
+		if(length(GetMT) != 0) 
+			{
+				TMPShowMIME=substr(GetMT[2],0,index(GetMT[2],">")-1);
+				if(index(TMPShowMIME,"=") != 0)
+					{
+						ShowMIME=substr(TMPShowMIME,index(TMPShowMIME,"=")+1);						
+					}
+				else
+					{
+						ShowMIME=TMPShowMIME;						
+					};
+			};				
+		for(I=0; I <= NumPatt;I++)
+			{
+				GetStr=substr(GG[I],0,index(GG[I],"\"/>"));
+				if(index(GetStr,"=") == 1 ){printf substr(GetStr,2);					
+					if(length(Bcomment) == 0){printf " ----- %s",ShowMIME}else{printf " ----- %s",Bcomment};
+					if(ShowFileName == "sf")printf " @* \033[2;32m %s",FILENAME"\033[0m";
+				printf "\n";}
+		}
+		SP=1}		
+	}' "{}" \;
+	done
 	;;
 	-gx ) if [[ ! -z "$3" ]];then
 		for In_XML_List in "${List_XML[@]}";do
@@ -837,6 +890,11 @@ echo 'Show list of mimetypes with associated *.desktop files.
 	       		show extension. Second part of MIME-type
 		3 
 	       		show only filename extenstions
+	 -gfx [sf]	
+				list available file name extensions with their description found in ".xml" configuration or database files.
+				 options:
+				sf 
+				 show path to .xml file where was found file name extension.
 
  --list-mimeapps | --lm 
  	List available "*mimeapps.list" with colored path and their content
