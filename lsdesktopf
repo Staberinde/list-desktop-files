@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-6
+# Version 1.0.1-7
 #
 # License: GPL3
 #
@@ -306,17 +306,16 @@ IFS="
 	;;
 	-gfx)
 	for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec awk -v ShowFileName="$3" '{
-		STOPYES=0;
+	find "$In_XML_List" -type f -name "*\.xml" -exec awk -v ShowFileName="$3" '{		
 	if(index($0,"<mime-type") != 0)
 		{
-			Astop=1;
-			YES=1;
+			Astop=1;			
 		};
 	if(index($0,"</mime-type>") != 0){Astop=2;YES=0};
 	if(Astop == 1)
 		{
 			SP=SP sprintf( "%s",$0);
+			AltFix=SP;
 		}
 	else
 		{
@@ -344,12 +343,20 @@ IFS="
 					{
 						ShowMIME=TMPShowMIME;						
 					};
+				
 			};				
 		for(I=0; I <= NumPatt;I++)
 			{
 				GetStr=substr(GG[I],0,index(GG[I],"\"/>"));
 				if(index(GetStr,"=") == 1 ){printf substr(GetStr,2);					
 					if(length(Bcomment) == 0){printf " ----- %s",ShowMIME}else{printf " ----- %s",Bcomment};
+					if(length(ShowMIME) == 0 && length(Bcomment) == 0)
+						{
+							AnewMIME=substr(AltFix,index(AltFix,"mime-type")+1);
+							BnewMIME=substr(AnewMIME,0,index(AnewMIME,">")-1);
+							CnewMIME=substr(BnewMIME,index(BnewMIME,"type=\"")+5);
+							printf CnewMIME;		
+						}
 					if(ShowFileName == "sf")printf " @* \033[2;32m %s",FILENAME"\033[0m";
 				printf "\n";}
 		}
