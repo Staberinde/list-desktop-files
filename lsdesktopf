@@ -312,8 +312,7 @@ IFS="
 			Astop=1;		
 		MimeTag=$0;
 		NumMtag=split(MimeTag,GetMIMEinTag,"type=\"");	
-		ShowMIME=substr(GetMIMEinTag[2],0,index(GetMIMEinTag[2],"\"")-1);
-		};
+	};
 	if(index($0,"</mime-type>") != 0){Astop=2;YES=0;
 ShowMIME="";
 ShowSubClass="";
@@ -328,7 +327,7 @@ ShowAlias="";
 			AltFix=SP;
 		}
 	else
-		{
+		{ShowMIME=substr(GetMIMEinTag[2],0,index(GetMIMEinTag[2],"\"")-1);
 		NumPatt=split(SP,GG,"pattern");
 			if(index(SP,"<comment>") != 0)
 				{
@@ -373,8 +372,8 @@ ShowAlias="";
 					EndTagAlias=substr(StartTagAlias,0,index(StartTagAlias,">")-2);
 					gsub(/ type=/,"Alias: ",EndTagAlias);
 					ShowAlias=EndTagAlias;				
-				}
-		for(I=0; I <= NumPatt;I++)
+				};
+				for(I=0; I <= NumPatt;I++)
 			{
 				GetStr=substr(GG[I],0,index(GG[I],"\"/>"));
 				if(index(GetStr,"=") == 1 ){printf substr(GetStr,2);					
@@ -386,10 +385,10 @@ ShowAlias="";
 							CnewMIME=substr(BnewMIME,index(BnewMIME,"type=\"")+5);
 							printf CnewMIME;		
 						};
-						NumberItems=split(ShowItems,ArrayItems,",");
+						NumberItems=split(ShowItems,ArrayItems,",");						
 						for( getItem in ArrayItems){	
-					if(ArrayItems[getItem] == "sf")printf " @*\033[2;32m %s",FILENAME"\033[0m";
-					if(ArrayItems[getItem] == "sm" && ShowMIME)printf " @*\033[2;93m %s",ShowMIME"\033[0m";
+					if(ArrayItems[getItem] == "sf" )printf " @*\033[2;32m %s",FILENAME"\033[0m";
+					if(ArrayItems[getItem] == "sm" && ShowMIME )printf " @*\033[2;93m %s",ShowMIME"\033[0m";
 					if(ArrayItems[getItem] == "ssc" && ShowSubClass)printf " @*\033[2;53m %s",ShowSubClass"\033[0m";
 					if(ArrayItems[getItem] == "sgi" && ShowGenericIcon)printf " @*\033[2;49m %s",ShowGenericIcon"\033[0m";	
 					if(ArrayItems[getItem] == "sa" && ShowAcronym)printf " @*\033[2;49m %s",ShowAcronym"\033[0m";
