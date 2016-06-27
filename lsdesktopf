@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-7
+# Version 1.0.1-8
 #
 # License: GPL3
 #
@@ -306,10 +306,13 @@ IFS="
 	;;
 	-gfx)
 	for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec awk -v ShowFileName="$3" '{		
+	find "$In_XML_List" -type f -name "*\.xml" -exec awk -v ShowItems="$3" '{		
 	if(index($0,"<mime-type") != 0)
 		{
-			Astop=1;			
+			Astop=1;		
+		MimeTag=$0;
+		NumMtag=split(MimeTag,GetMIMEinTag,"type=\"");	
+		ShowMIME=substr(GetMIMEinTag[2],0,index(GetMIMEinTag[2],"\"")-1);
 		};
 	if(index($0,"</mime-type>") != 0){Astop=2;YES=0};
 	if(Astop == 1)
@@ -323,7 +326,7 @@ IFS="
 			if(index(SP,"<comment>") != 0)
 				{
 					Acomment=substr(SP,index(SP,"<comment>")+9);
-					Bcomment=substr(Acomment,0,index(Acomment,"</comment>")-1);				
+					Bcomment=substr(Acomment,0,index(Acomment,"</comment>")-1);	
 				}
 			else
 				{
@@ -331,20 +334,39 @@ IFS="
 					TMPcomment=substr(Acomment,0,index(Acomment,"</comment>")-1);		
 					Bcomment=substr(TMPcomment,index(Acomment,">")+1);					
 				};
-	NumMT=split(SP,GetMT,"type type");
-		if(length(GetMT) != 0) 
-			{
-				TMPShowMIME=substr(GetMT[2],0,index(GetMT[2],">")-1);
-				if(index(TMPShowMIME,"=") != 0)
-					{
-						ShowMIME=substr(TMPShowMIME,index(TMPShowMIME,"=")+1);						
-					}
-				else
-					{
-						ShowMIME=TMPShowMIME;						
-					};
-				
-			};				
+			if(index(SP,"<sub-class-of") != 0)
+				{
+					StartTagSSC=substr(SP,index(SP,"sub-class-of")+12)
+					EndTagSSC=substr(StartTagSSC,0,index(StartTagSSC,">")-2);
+					gsub(/ type=/,"Sub class of: ",EndTagSSC);
+					ShowSubClass=EndTagSSC;				
+				}
+			if(index(SP,"<generic-icon") != 0)
+				{
+					StartTagGI=substr(SP,index(SP,"generic-icon")+12)
+					EndTagGI=substr(StartTagGI,0,index(StartTagGI,">")-2);
+					gsub(/ name=/,"Icon: ",EndTagGI);
+					ShowGenericIcon=EndTagGI;				
+				}
+				if(index(SP,"<acronym>") != 0)
+				{
+					StartTagAcr=substr(SP,index(SP,"<acronym>")+10)
+					EndTagAcr=substr(StartTagAcr,0,index(StartTagAcr,"/")-2);				
+					ShowAcronym=EndTagAcr;				
+				}
+				if(index(SP,"<expanded-acronym>") != 0)
+				{
+					StartTagEAcr=substr(SP,index(SP,"<expanded-acronym>")+18)
+					EndTagEAcr=substr(StartTagEAcr,0,index(StartTagEAcr,"/")-2);				
+					ShowEAcronym=EndTagEAcr;				
+				}
+			if(index(SP,"<alias") != 0)
+				{
+					StartTagAlias=substr(SP,index(SP,"<alias")+6)
+					EndTagAlias=substr(StartTagAlias,0,index(StartTagAlias,">")-2);
+					gsub(/ type=/,"Alias: ",EndTagAlias);
+					ShowAlias=EndTagAlias;				
+				}
 		for(I=0; I <= NumPatt;I++)
 			{
 				GetStr=substr(GG[I],0,index(GG[I],"\"/>"));
@@ -356,8 +378,17 @@ IFS="
 							BnewMIME=substr(AnewMIME,0,index(AnewMIME,">")-1);
 							CnewMIME=substr(BnewMIME,index(BnewMIME,"type=\"")+5);
 							printf CnewMIME;		
-						}
-					if(ShowFileName == "sf")printf " @* \033[2;32m %s",FILENAME"\033[0m";
+						};
+						NumberItems=split(ShowItems,ArrayItems,",");
+						for( getItem in ArrayItems){	
+					if(ArrayItems[getItem] == "sf")printf " @*\033[2;32m %s",FILENAME"\033[0m";
+					if(ArrayItems[getItem] == "sm" && ShowMIME)printf " @*\033[2;93m %s",ShowMIME"\033[0m";
+					if(ArrayItems[getItem] == "ssc" && ShowSubClass)printf " @*\033[2;53m %s",ShowSubClass"\033[0m";
+					if(ArrayItems[getItem] == "sgi" && ShowGenericIcon)printf " @*\033[2;49m %s",ShowGenericIcon"\033[0m";	
+					if(ArrayItems[getItem] == "sa" && ShowAcronym)printf " @*\033[2;49m %s",ShowAcronym"\033[0m";
+					if(ArrayItems[getItem] == "sea" && ShowEAcronym)printf " @*\033[2;49m %s",ShowEAcronym"\033[0m";
+					if(ArrayItems[getItem] == "sal" && ShowAlias)printf " @*\033[2;49m %s",ShowAlias"\033[0m";
+					}
 				printf "\n";}
 		}
 		SP=1}		
@@ -897,11 +928,23 @@ echo 'Show list of mimetypes with associated *.desktop files.
 	       		show extension. Second part of MIME-type
 		3 
 	       		show only filename extenstions
-	 -gfx [sf]	
+	 -gfx [options]	
 				list available file name extensions with their description found in ".xml" configuration or database files.
-				 options:
+			additional comma separated options:
 				sf 
 				 show path to .xml file where was found file name extension.
+				sm
+				 show MIME type
+				sa
+				 show acronym
+				sea
+				 show extended acronim
+				ssc
+				 show sub class
+				sal
+				 show alias
+				sgi
+				 show general icon description
 
  --list-mimeapps | --lm 
  	List available "*mimeapps.list" with colored path and their content
