@@ -386,8 +386,9 @@ ShowAlias="";
 							printf CnewMIME;		
 						};
 						NumberItems=split(ShowItems,ArrayItems,",");						
+						ShowFileName=FILENAME;
 						for( getItem in ArrayItems){	
-					if(ArrayItems[getItem] == "sf" )printf " @*\033[2;32m %s",FILENAME"\033[0m";
+					if(ArrayItems[getItem] == "sf" && ShowFileName ){printf " @*\033[2;32m %s",ShowFileName"\033[0m";ShowFileName=""}
 					if(ArrayItems[getItem] == "sm" && ShowMIME ){printf " @*\033[2;93m %s",ShowMIME"\033[0m";ShowMIME=""}
 					if(ArrayItems[getItem] == "ssc" && ShowSubClass){printf " @*\033[2;53m %s",ShowSubClass"\033[0m";ShowSubClass=""}
 					if(ArrayItems[getItem] == "sgi" && ShowGenericIcon){printf " @*\033[2;49m %s",ShowGenericIcon"\033[0m";ShowGenericIcon=""}
