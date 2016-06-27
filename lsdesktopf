@@ -389,12 +389,12 @@ ShowAlias="";
 						ShowFileName=FILENAME;
 						for( getItem in ArrayItems){	
 					if(ArrayItems[getItem] == "sf" && ShowFileName ){printf " @*\033[2;32m %s",ShowFileName"\033[0m";ShowFileName=""}
-					if(ArrayItems[getItem] == "sm" && ShowMIME ){printf " @*\033[2;93m %s",ShowMIME"\033[0m";ShowMIME=""}
+					if(ArrayItems[getItem] == "sm" && ShowMIME ){printf " @*\033[2;93m %s",ShowMIME"\033[0m";}
 					if(ArrayItems[getItem] == "ssc" && ShowSubClass){printf " @*\033[2;53m %s",ShowSubClass"\033[0m";ShowSubClass=""}
 					if(ArrayItems[getItem] == "sgi" && ShowGenericIcon){printf " @*\033[2;49m %s",ShowGenericIcon"\033[0m";ShowGenericIcon=""}
 					if(ArrayItems[getItem] == "sa" && ShowAcronym){printf " @*\033[2;49m %s",ShowAcronym"\033[0m";ShowAcronym=""}
 					if(ArrayItems[getItem] == "sea" && ShowEAcronym){printf " @*\033[2;49m %s",ShowEAcronym"\033[0m";ShowEAcronym=""}
-					if(ArrayItems[getItem] == "sal" && ShowAlias){printf " @*\033[2;49m %s",ShowAlias"\033[0m";ShowAlias=""}
+					if(ArrayItems[getItem] == "sal" && ShowAlias){printf " @*\033[2;49m %s",ShowAlias"\033[0m";}
 					}
 				printf "\n";}
 		}
