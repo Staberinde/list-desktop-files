@@ -357,7 +357,7 @@ ShowAlias="";
 				}
 				if(index(SP,"<acronym>") != 0)
 				{
-					StartTagAcr=substr(SP,index(SP,"<acronym>")+10)
+					StartTagAcr=substr(SP,index(SP,"<acronym>")+9)
 					EndTagAcr=substr(StartTagAcr,0,index(StartTagAcr,"/")-2);				
 					ShowAcronym=EndTagAcr;				
 				}
