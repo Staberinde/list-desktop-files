@@ -314,7 +314,14 @@ IFS="
 		NumMtag=split(MimeTag,GetMIMEinTag,"type=\"");	
 		ShowMIME=substr(GetMIMEinTag[2],0,index(GetMIMEinTag[2],"\"")-1);
 		};
-	if(index($0,"</mime-type>") != 0){Astop=2;YES=0};
+	if(index($0,"</mime-type>") != 0){Astop=2;YES=0;
+ShowMIME="";
+ShowSubClass="";
+ShowGenericIcon="";
+ShowAcronym="";
+ShowEAcronym="";
+ShowAlias="";
+};
 	if(Astop == 1)
 		{
 			SP=SP sprintf( "%s",$0);
@@ -387,7 +394,7 @@ IFS="
 					if(ArrayItems[getItem] == "sgi" && ShowGenericIcon)printf " @*\033[2;49m %s",ShowGenericIcon"\033[0m";	
 					if(ArrayItems[getItem] == "sa" && ShowAcronym)printf " @*\033[2;49m %s",ShowAcronym"\033[0m";
 					if(ArrayItems[getItem] == "sea" && ShowEAcronym)printf " @*\033[2;49m %s",ShowEAcronym"\033[0m";
-					if(ArrayItems[getItem] == "sal" && ShowAlias)printf " @*\033[2;49m %s",ShowAlias"\033[0m";
+					if(ArrayItems[getItem] == "sal" && ShowAlias)printf " @*\033[2;49m %s",ShowAlias"\033[0m";					
 					}
 				printf "\n";}
 		}
