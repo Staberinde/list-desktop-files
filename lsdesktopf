@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.1-8
+# Version 1.0.2-0
 #
 # License: GPL3
 #
@@ -320,11 +320,15 @@ ShowGenericIcon="";
 ShowAcronym="";
 ShowEAcronym="";
 ShowAlias="";
+GAcal=0;
 };
 	if(Astop == 1)
 		{
-			SP=SP sprintf( "%s",$0);
-			AltFix=SP;
+			if(index($0,"<magic") == 0 && index($0,"magic>") == 0 && index($0,"<match") == 0 )
+			{
+				SP=SP sprintf( "%s",$0);
+				AltFix=SP;
+			}
 		}
 	else
 		{ShowMIME=substr(GetMIMEinTag[2],0,index(GetMIMEinTag[2],"\"")-1);
@@ -372,7 +376,7 @@ ShowAlias="";
 					EndTagAlias=substr(StartTagAlias,0,index(StartTagAlias,">")-2);
 					gsub(/ type=/,"Alias: ",EndTagAlias);
 					ShowAlias=EndTagAlias;				
-				};
+				};			
 				for(I=0; I <= NumPatt;I++)
 			{
 				GetStr=substr(GG[I],0,index(GG[I],"\"/>"));
@@ -394,7 +398,19 @@ ShowAlias="";
 					if(ArrayItems[getItem] == "sgi" && ShowGenericIcon){printf " @*\033[2;49m %s",ShowGenericIcon"\033[0m";ShowGenericIcon=""}
 					if(ArrayItems[getItem] == "sa" && ShowAcronym){printf " @*\033[2;49m %s",ShowAcronym"\033[0m";ShowAcronym=""}
 					if(ArrayItems[getItem] == "sea" && ShowEAcronym){printf " @*\033[2;49m %s",ShowEAcronym"\033[0m";ShowEAcronym=""}
-					if(ArrayItems[getItem] == "sal" && ShowAlias){printf " @*\033[2;49m %s",ShowAlias"\033[0m";}
+					if(ArrayItems[getItem] == "sal" && ShowAlias)
+						{							
+							TotalAliases=split(SP,GetAliasStart,"<alias")-1;			
+							printf " @*\033[2;49m Alias:";
+								for(T in GetAliasStart)
+									{
+									GetAls[GAcal++]=substr(GetAliasStart[T],0,index(GetAliasStart[T],">")-2);
+									};
+									if(TotalAliases >= 0)for (II in GetAls)
+									 if(index(GetAls[II],"<") <= index(GetAls[II],"/>") )printf substr(GetAls[II],index(GetAls[II],"=")+1)";";
+									delete GetAls;						
+									printf "\033[0m"
+						}
 					}
 				printf "\n";}
 		}
