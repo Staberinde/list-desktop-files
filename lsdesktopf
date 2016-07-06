@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.2-0
+# Version 1.0.3-0
 #
 # License: GPL3
 #
@@ -883,6 +883,7 @@ echo 'Usage examples
 	--gm 0
 	--gm -gx video
 	--gm -gx text
+	--gm -fm application/oxps,application/vnd.ms-xpsdocument,application/x-brasero
 
  Scan for all *.desktop files in /usr /etc /opt
  has same syntax as without supported options
@@ -938,6 +939,8 @@ echo 'Show list of mimetypes with associated *.desktop files.
 				search in /etc /usr $HOME/.local $HOME/.config
 			l
 				search in  $HOME/.local $HOME/.config
+		-fm [options]
+			find .desktop files only for comma separated MIME types
  
  --gdx [options]
 	same as --gm -gdx [options]
@@ -1458,6 +1461,50 @@ find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk -F"\"" '{YesM=
 
 			
 		done
+	;;
+	-fm)
+	if [[ ! -z "$3" ]];then	
+		for inMime in "${MimePathArray[@]}" ;do
+	[[ ! -d "$inMime" ]] && awk -F= -v MimeToList="$3"  '//{	
+  if($1 == "MimeType"){SizeArr=split($2,MimeArray,";");
+	for (inArray in MimeArray)
+		if(MimeArray[inArray])
+			{
+				inMA=MimeArray[inArray];
+				FName=FILENAME;
+				GetTypeMime=substr(inMA,0,index(inMA,"/")-1)
+				GetExtMime=substr(inMA,index(inMA,"/")+1)
+				UniqMimeTypes[GetTypeMime]=inMA;
+				UniqMimeExts[inMA]=GetExtMime;
+				gsub(/[^*]*\//,"",FName);
+		if(UniqMimeArray[inMA])	{
+				UniqMimeArray[inMA]=UniqMimeArray[inMA]";"FName;
+					}
+					else
+					{
+				UniqMimeArray[inMA]=FName;
+				NameCollect[FName]=inMA
+					}
+			};	
+	
+		}
+	}END{
+		if(length(MimeToList) != 0)
+			{
+				split(MimeToList,MimeArray,",");
+			for(MiAr in MimeArray)
+				MimeToShow[MimeArray[MiAr]]=1;
+			for ( inMime in UniqMimeArray)
+				{
+					if(MimeToShow[inMime] == 1)print inMime"="UniqMimeArray[inMime]";";
+				}
+			}
+		}' ${inMime} ;
+			done | sort --field-separator=\= --key=1,1
+		else
+			echo "List of comma separated MIME types is missing.";
+		fi;	
+
 	;;
 		* )
 		for inMime in "${MimePathArray[@]}" ;do
