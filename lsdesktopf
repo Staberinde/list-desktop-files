@@ -640,7 +640,14 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 				for (I in InString)
 					if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1  )
 						{
-							print Var[I]"="InString[I];
+							if(index(InString[I]"=",Var[I]"=") != 1 )
+								{
+								print Var[I]"="InString[I]
+								}
+							else
+								{	
+								print Var[I]"="
+								}
 						}
 						else
 						{ 
