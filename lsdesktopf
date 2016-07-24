@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.3-1
+# Version 1.0.4-1
 #
 # License: GPL3
 #
@@ -726,6 +726,33 @@ done | case $Opts in
 		;;
 esac
 }
+
+ShowOrStartXsession(){
+for FileName in /usr/share/xsessions/*;do
+	X_Sessions+=("$(grep ^'Exec=' $FileName| cut -d= -f2-)")
+	X_Names+=("$(grep ^'Name=' $FileName| cut -d= -f2-)")
+done
+CC=0;
+
+for ReadSessions in "${X_Sessions[@]}";do
+	echo $CC $ReadSessions
+	 ((CC++))
+ done
+
+if [[ "$StartIt" == "1"  ]];then
+echo 'Enter a session number:';
+       	read Session_Number;
+	 if [[  "$Session_Number" =~ [0-9]+$ ]];then
+
+		 if [[  "${X_Sessions[Session_Number]/\//}" == "${X_Sessions[Session_Number]}" ]];then
+			 startx /usr/bin/${X_Sessions[Session_Number]}
+		 else
+			 startx ${X_Sessions[Session_Number]}
+		 fi
+	 fi
+fi
+}
+
 ###################
 # Disabled options
 ###################
@@ -984,6 +1011,14 @@ echo 'Show list of mimetypes with associated *.desktop files.
 ' 
 }
 
+help_Sessions(){
+	echo '
+--sxs	
+ list numbered content of Exec in .desktop files located at /usr/share/xsessions/
+--rxs
+ as above but also asking to choose number of a session to start.'
+}
+
 case "$1" in
 --help )
 	if [[ -z "$2" ]];then
@@ -997,7 +1032,8 @@ case "$1" in
  debug	-	view or search in content of this script
  info	-	show short info about *.desktop specified Exec
  tips	-	show some tips about commands used in this script
- mime	-	list available mimetypes'
+ mime	-	list available mimetypes
+ ses	-	list or run sessions'
 	else
 		case "$2" in	
 	mime )
@@ -1664,6 +1700,14 @@ done | awk -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for
 		;;
 --gdx | --get-description-xdg )
 	gdxstdalone "$@"
+	;;
+--sxs | --show-x-sessions )	
+	StartIt=0;
+	ShowOrStartXsession "$@"
+	;;
+--rxs | --run-x-session )
+	StartIt=1;
+	ShowOrStartXsession "$@"
 	;;
 	* ) 
 	ReCreateDskPath "$@"
