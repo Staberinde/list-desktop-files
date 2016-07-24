@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.4-1
+# Version 1.0.4-2
 #
 # License: GPL3
 #
@@ -620,8 +620,15 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
 			print " ";
 			for (I in InString)if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1 )
-				{
-					print Var[I]"="InString[I];
+				{	
+						if(index(InString[I]"=",Var[I]"=") != 1 )
+							{
+							print Var[I]"="InString[I]
+							}
+						else
+							{	
+							print Var[I]"="
+							}			
 				}
 				else
 				{
@@ -742,7 +749,7 @@ for ReadSessions in "${X_Sessions[@]}";do
 if [[ "$StartIt" == "1"  ]];then
 echo 'Enter a session number:';
        	read Session_Number;
-	 if [[  "$Session_Number" =~ [0-9]+$ ]];then
+	 if [[  "$Session_Number" =~ [0-9]+$ &&  "$Session_Number" -le "${#X_Sessions[@]}" ]];then
 
 		 if [[  "${X_Sessions[Session_Number]/\//}" == "${X_Sessions[Session_Number]}" ]];then
 			 startx /usr/bin/${X_Sessions[Session_Number]}
