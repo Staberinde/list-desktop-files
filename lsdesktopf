@@ -1063,11 +1063,15 @@ case "$1" in
 	tips )
 		help_tips
 		;;
+	ses )
+		help_Sessions
+		;;
 	all )
 	help_def
 	help_var
 	help_sec
 	help_mimetypes
+	help_Sessions
 	help_usage
 	help_config
 	help_debug
