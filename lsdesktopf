@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.4-2
+# Version 1.0.4-3
 #
 # License: GPL3
 #
@@ -736,15 +736,46 @@ esac
 
 ShowOrStartXsession(){
 for FileName in /usr/share/xsessions/*;do
-	X_Sessions+=("$(grep ^'Exec=' $FileName| cut -d= -f2-)")
-	X_Names+=("$(grep ^'Name=' $FileName| cut -d= -f2-)")
+	X_Sessions+=("$(grep ^'Exec=' $FileName| cut -d= -f2-)");
+	X_Names+=("$(grep ^'Name=' $FileName| cut -d= -f2-)"' ');
+	X_Comment+=("$(grep ^'Comment=' $FileName| cut -d= -f2-)"' ');
+	X_DesktopNames+=("$(grep ^'DesktopNames=' $FileName| cut -d= -f2-)"' ');
 done
 CC=0;
 
-for ReadSessions in "${X_Sessions[@]}";do
+case $ToShowPart in
+	n | name )
+ for ReadSessions in "${X_Names[@]}";do
 	echo $CC $ReadSessions
 	 ((CC++))
  done
+	;;
+	c | comment )
+ for ReadSessions in "${X_Comment[@]}";do
+	echo $CC $ReadSessions
+	 ((CC++))
+ done
+	;;
+	dn | desktopname )
+ for ReadSessions in "${X_DesktopNames[@]}";do
+	echo $CC $ReadSessions
+	 ((CC++))
+ done
+	;;
+	a | all )
+	echo 'Number Name # Comment # Exec';
+ for ReadSessions in "${X_Sessions[@]}";do
+	echo $CC ${X_Names[CC]} '#' ${X_Comment[CC]} '#' $ReadSessions;
+	 ((CC++))
+ done
+	;;
+	*)
+ for ReadSessions in "${X_Sessions[@]}";do
+	echo $CC $ReadSessions
+	 ((CC++))
+ done
+	;;
+esac
 
 if [[ "$StartIt" == "1"  ]];then
 echo 'Enter a session number:';
@@ -1022,6 +1053,19 @@ help_Sessions(){
 	echo '
 --sxs	
  list numbered content of Exec in .desktop files located at /usr/share/xsessions/
+ additional options:
+	n
+	name
+  	 show content of "Name="
+	c
+	comment
+	 show content of "Comment="
+	dn
+	desktopname
+	 show content of "DesktopName="
+	a
+	all
+	 show content by pattern "Number Name # Comment # Exec"
 --rxs
  as above but also asking to choose number of a session to start.'
 }
@@ -1714,10 +1758,12 @@ done | awk -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for
 	;;
 --sxs | --show-x-sessions )	
 	StartIt=0;
+	ToShowPart="$2";
 	ShowOrStartXsession "$@"
 	;;
 --rxs | --run-x-session )
 	StartIt=1;
+	ToShowPart="$2";
 	ShowOrStartXsession "$@"
 	;;
 	* ) 
