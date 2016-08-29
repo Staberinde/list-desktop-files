@@ -28,11 +28,8 @@ LocalArray="$HOME/.ldf/sorted.test"
 if [[ ! -z "$DESKTOP_FILES"   ]];then
 OLD_IFS="$IFS";
 IFS=';';
-tmp_DSK=("$(echo $DESKTOP_FILES)")
-#echo ${#tmp_DSK[@]}
-DefDskPath=($tmp_DSK);
-echo ${#DefDskPath[@]}
-exit 0;
+tmp_DSK=($DESKTOP_FILES)
+DefDskPath=($DESKTOP_FILES);
 IFS="$OLD_IFS";
 else
 DefDskPath+=("/etc/dynamic/launchers/scanner")
@@ -177,9 +174,24 @@ if [[  ! -f "$LocalArray" ]];then
 ### ADskPath contains list of "decoded" path with command "file"
 ### command "file" can handle wildcards such as * that is useful when it is multiple or new path with versions number is available
 ### command "grep" is used to separate available from not existing path
+#for FromDDP in "${DefDskPath[@]}";do
+#if [[ ! -z "$FromDDP"  ]];then  
+#	echo "$FromDDP"
+#fi
+#done;
+#exit 0
 ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
-	file "$FromDDP";
-done |sort -u | grep -v \)$ | grep ^/ |rev|cut -d: -f2- |rev))
+#echo '/usr/share/applications'
+if [[ ! -z "$(echo $FromDDP| grep -v "^\ ")" ]];then
+       	file "$FromDDP" 
+fi
+done |\
+	sort -u |\
+       	grep -v -e \)$ -e ^$ |\
+       	grep ^/ |\
+	rev|\
+	cut -d: -f2- |\
+	rev))
 ####################
 	fi
 else
@@ -188,7 +200,14 @@ fi
 if [[ "${#ADskPath[@]}" == 0 ]]; then
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
-	done < "$FilePath"|xargs file|sort -u | grep -v \)$ |grep ^/ |rev|cut -d: -f2-|rev))
+	done < "$FilePath"|\
+		xargs file|\
+		sort -u |\
+	       	grep -v \)$ |\
+		grep ^/ |\
+		rev|\
+		cut -d: -f2-|\
+		rev));
 ### $BDskPath is used to add path that depends on such variables as $HOME and $XDG related
  BDskPath+=("$HOME/.local/share/applications")
  BDskPath+=("$HOME/.config/autostart")
@@ -1010,7 +1029,7 @@ echo 'Search a value of the variables. Supporting grep syntax
  --show-uniq-only |--suo
  	using default path
 
---list-categories | --lc
+ --list-categories | --lc
 	Show all categories found in "/usr/share/applications/" and "$HOME/.local/share/applications/" 
 
 Not supporting grep syntax, using awk
@@ -1024,7 +1043,7 @@ help_sec(){
 echo 'Search section names in *.desktop files
 
 	search for uniq section names
---sys-section-name 	| --ssn
+ --sys-section-name 	| --ssn
  	using system path /usr /etc /opt
  --default-section-name | --dsn
  	using default path'
@@ -1052,8 +1071,12 @@ echo 'Configuration
 
  --find-path | --fp (path)
  	find path that contain *.desktop files, default starting path is /
+	as the third option can be used any symbol 
+	 that will be added in the end of each directory
  --formated-path-output | --fpo
  	same as --fp but showing already formated path (replaced numbers,spaces with *)  
+	as the third option can be used any symbol 
+	 that will be added in the end of each directory
 
  --format-path-file | --fpf [filename]
  	replace all spaces and numbers with *'
@@ -1220,6 +1243,15 @@ help_Sessions(){
  as above but also asking to choose number of a session to start.'
 }
 
+help_env(){
+echo 'Environment
+NO_COLORS 	- if value is YES then no colors will be used
+DESKTOP_FILES 	- must contain path to folders with 
+		  desktop files separated with ";"
+		  overriding default preset path'
+
+}
+
 case "$1" in
 --help )
 	if [[ -z "$2" ]];then
@@ -1234,7 +1266,8 @@ case "$1" in
  info	-	show short info about *.desktop specified Exec
  tips	-	show some tips about commands used in this script
  mime	-	list available mimetypes
- ses	-	list or run sessions'
+ ses	-	list or run sessions
+ env	-	enviroment variables'
 	else
 		case "$2" in	
 	mime )
@@ -1267,12 +1300,16 @@ case "$1" in
 	ses )
 		help_Sessions
 		;;
+	env )
+		help_env
+		;;
 	all )
 	help_def
 	help_var
 	help_sec
 	help_mimetypes
 	help_Sessions
+	help_env
 	help_usage
 	help_config
 	help_debug
@@ -1571,7 +1608,7 @@ printf "@ Total translations: "length(UniqLang)": ";
  		fi
 	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null |\
 	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
-	       	sort -u
+	       	sort -u 
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
@@ -1579,7 +1616,7 @@ printf "@ Total translations: "length(UniqLang)": ";
 	else
 		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null |\
 		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' |\
-			sort -u
+			sort -u 
 	fi
 	;;
 --all-sys-path | --asc)
