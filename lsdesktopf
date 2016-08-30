@@ -1136,7 +1136,7 @@ echo 'Usage examples
 	Use --find-path or --fp 
 	--fp 
 	--fp /usr /etc
-	export DESKTOP_FILES=$(lsdesktopf --fp / ";")"'
+	export DESKTOP_FILES="$(lsdesktopf --fp / ";")"'
 	}
 help_tips(){
 	echo 'The script is based around commands: "grep", "awk", "find" 
