@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.5-0
+# Version 1.0.5-1
 #
 # License: GPL3
 #
@@ -26,9 +26,10 @@ LocalArray="$HOME/.ldf/sorted.test"
 
 ### The DefDskPath variable contains list of default folders
 if [[ ! -z "$DESKTOP_FILES"   ]];then
+DEP_MAX="-maxdepth";
+DEP_LV="1";
 OLD_IFS="$IFS";
 IFS=';';
-tmp_DSK=($DESKTOP_FILES)
 DefDskPath=($DESKTOP_FILES);
 IFS="$OLD_IFS";
 else
@@ -575,9 +576,9 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 	else
 		printf "#\e[1;36m %s ${fdPath} \e[0m \n";	
 	fi;
-  if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+  if [ ! -z "$One" ] && [[ -d "${fdPath}" || -f "${fdPath}" ]] ;
     then
-     find "${fdPath}" -iname "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v Fil="{}"  -v Seek="$One" -F"=" '//{
+     find "${fdPath}" "$DEP_MAX" "$DEP_LV"  -iname "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v Fil="{}"  -v Seek="$One" -F"=" '//{
 if(index($0,"Categories=") >= 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"Name=")       == 1) inNm=substr($0,index($0,"=")+1);
 if(index($0,"Comment=")    == 1) inComment=substr($0,index($0,"=")+1);
@@ -593,7 +594,7 @@ if(! E)E=inComment;
  Z=CmdLine" # "E" #  "Fil;
 if( index(tolower(Z),tolower(Seek)) && CmdLine  )  print Z;}' "{}" \;
     else
-[[ -d "${fdPath}"  || -f "${fdPath}" ]] && find "${fdPath}" -iname "*.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v Fil="{}"  -F"=" '//{
+[[ -d "${fdPath}" || -f "${fdPath}" ]] && find "${fdPath}" -iname "*.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v Fil="{}"  -F"=" '//{
 if(index($0,"Categories") == 1) Ctgr=substr($0,index($0,"=")+1);
 if(index($0,"Name=")      == 1) inNm=substr($0,index($0,"=")+1);
 if(index($0,"Exec=")      == 1) inExc=substr($0,index($0,"=")+1);
@@ -624,24 +625,24 @@ if [[ "$OffPrint" == "no" ]]; then
 		printf "#\e[1;36m %s ${fdPath} \e[0m \n";
 	fi
 fi
-   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+   if [ ! -z "$One" ] && [[ -d "${fdPath}" || -f "${fdPath}" ]] ;
     then 
 	case $Opts in
 ### "$var" is used to search for variable names with "grep" in *.desktop
 	var )
-		grep -e ^"$Var" "${AddCmd[@]:2}" -H -E -R --include "*\.desktop" "${fdPath}" 
+		grep -e ^"$Var" "${AddCmd[@]:2}" -H -E -R --include "*\.desktop" "${fdPath}"   
 		;;
 ### "ddp" is used to raw dump cotent of all *.desktop found in default path. || grep
 	ddp ) 
-                grep ^ -H -R --include "*\.desktop" "${fdPath}"
+                grep ^ -H -R --include "*\.desktop" "${fdPath}"  
 		;;
 ### "sud" showing uniq variables found in default path. || grep, cut
 	sud )
-		grep '=' -R -h --include "*\.desktop" "${fdPath}"|cut -d= -f 1|grep -v -e "\[" -e ^\# |sort -u
+		grep '=' -R -h --include "*\.desktop" "${fdPath}" |cut -d= -f 1|grep -v -e "\[" -e ^\# |sort -u
 		;;
 ### "no-var" showing all *.desktop except them that contains contains specified string. || grep, find
 	no-var )
-		find "${fdPath}" -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" "${AddCmd[@]:2}" "{}" \;
+		find "${fdPath}" "$DEP_MAX" "$DEP_LV"  -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" "${AddCmd[@]:2}" "{}" \;
 		;;
 ### "sdsn" showing only uniq section names found in default path. || grep, sed 
 	sdsn )
@@ -653,7 +654,7 @@ fi
 			FLang="";
 		fi
 
-		find "${fdPath}" -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
+		find "${fdPath}" "$DEP_MAX" "$DEP_LV"  -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
 		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
 		if(index($1,"["GetLang"]") != 0 ){Item[cnt++]=$0}else { if(index($1,"]") == 0)Item[cnt++]=$0}
 		}END{
@@ -673,7 +674,7 @@ fi
 		}' "{}" \; | grep -v ^"\#"
 		;;
 	more )
-		find "${fdPath}" -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
+		find "${fdPath}" "$DEP_MAX" "$DEP_LV"   -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
 		ToLowerOne=tolower($1);
 		ToLowerFindIt=tolower(FindIt);
 		ToLowerTwo=tolower($2);
@@ -705,7 +706,7 @@ fi
 		}'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
 #	more )
-#		find "${fdPath}" -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
+#		find "${fdPath}" "$DEP_MAX" "$DEP_LV"  -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
 #	 		  if(index($1,"]") == 0    && index($1,"MimeType") == 0 && index($1,"Keywords") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
 #		if(FindIt)if(index($2,FindIt) != 0 && index($1,"MimeType") == 0 && index($1,"Keywords") == 0)YES="1"; };}END{
 #		if(YES == "1" ){print " "FILENAME;        for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]};
@@ -713,7 +714,7 @@ fi
 #		;;
 
 	less )
-		find  "${fdPath}" -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
+		find  "${fdPath}" "$DEP_MAX" "$DEP_LV"  -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
 		ToLowerTwo=tolower($2);
 		ToLowerFindIt=tolower(FindIt);
 			if(Trans)
@@ -817,7 +818,7 @@ fi
 			     }'  "{}"  \;
 		;;
 	iov )
-		find  "${fdPath}" -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Fname="$3" -F= '//{ 
+		find  "${fdPath}" "$DEP_MAX" "$DEP_LV"  -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Fname="$3" -F= '//{ 
 			if(FindIt){
 			SizeArray=split(FindIt,ArrayFindIt,",");
 			if (index($0,"[") == 1 ) 
@@ -891,9 +892,9 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
 		printf "#\e[1;36m %s ${fdPath} \e[0m \n";
 		fi
 	fi
-   if [ ! -z "$One" ] && [[ -d "${fdPath}"  || -f "${fdPath}" ]] ;
+   if [ ! -z "$One" ] && [[ -d "${fdPath}" || -f "${fdPath}" ]] ;
     then 
-[[ "$Opts" == "suo"  ]] &&  grep ^ -R -h --include "*\.desktop" "${fdPath}";
+[[ "$Opts" == "suo"  ]] &&  grep ^ -R -h --include "*\.desktop" "${fdPath}" ;
     fi;
 fi
 done | case $Opts in
