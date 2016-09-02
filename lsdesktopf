@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.5-2
+# Version 1.0.5-3
 #
 # License: GPL3
 #
@@ -28,10 +28,9 @@ LocalArray="$HOME/.ldf/sorted.test"
 if [[ ! -z "$DESKTOP_FILES"   ]];then
 DEP_MAX="-maxdepth";
 DEP_LV="1";
-OLD_IFS="$IFS";
-IFS=';';
-DefDskPath=($DESKTOP_FILES);
-IFS="$OLD_IFS";
+DefDskPath=($(echo "$DESKTOP_FILES" | awk -F';' '{for(I=1;I <= NF-1;I++){TT=$I;gsub(/[0-9]/,"*",TT);gsub(/" "/,"*",TT);print TT} }' |grep -v ^$ ));
+#DefDskPath=($(echo "$DESKTOP_FILES" | awk -F';' '{for(I=1;I <= NF-1;I++)print $I }' |grep -v ^$ ));
+
 else
 DefDskPath+=("/etc/dynamic/launchers/scanner")
 DefDskPath+=("/etc/xdg/autostart")
@@ -181,10 +180,16 @@ if [[  ! -f "$LocalArray" ]];then
 #fi
 #done;
 #exit 0
-ADskPath=($(for FromDDP in "${DefDskPath[@]}";do
-#echo '/usr/share/applications'
-if [[ ! -z "$(echo $FromDDP| grep -v "^\ ")" ]];then
-       	file "$FromDDP" 
+#echo "DEF_DSK_PATH ${#DefDskPath[@]}"
+#echo "DEF_DSK_PATH LIST:::= ${DefDskPath[@]}"
+
+######
+
+ADskPath=($(for FromDDP in "${DefDskPath[@]}";
+	do
+if [[ ! -z "$(echo $FromDDP| grep -v -e "^\ " -e ^$ -e ';')" ]];
+ then
+	file "$FromDDP" 
 fi
 done |\
 	sort -u |\
@@ -193,12 +198,18 @@ done |\
 	rev|\
 	cut -d: -f2- |\
 	rev))
+
 ####################
 	fi
 else
 	FilePath="$LocalArray"
 fi
+
+#echo "ADSK ==  ${#ADskPath[@]}"
+#exit 0
+
 if [[ "${#ADskPath[@]}" == 0 ]]; then
+
 	ADskPath=($(sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' "$FilePath";
 	while read FromFile;do echo "$FromFile"  ; 
 	done < "$FilePath"|\
@@ -220,22 +231,9 @@ if [[ "${#ADskPath[@]}" == 0 ]]; then
  BDskPath+=("$HOME/.local/share/xfce*/helpers")
  BDskPath+=("/home/$USER/.local/share/xfce*/helpers")
  BDskPath+=("$XDG_DATA_HOME/applications")
-#############
-
-
-# BDskPath+=("$HOME/.local/share")
-#	 if [[ -f "$HOME/.config/user-dirs.dirs"  ]];then
-#	 BPath="$(grep XDG_DESKTOP_DIR ./.config/user-dirs.dirs | cut -d= -f2- | sed -e 's/^\"//' -e 's/\"$//' )"
-#	 BDskPath+=("$BPath")
-#	else
-#	 if [[ -f "$XDG_CONFIG_DIRS/user-dirs.dirs"  ]];then 
-#	  BDskPath+=("$(grep XDG_DESKTOP_DIR "$XDG_CONFIG_DIRS/user-dirs.dirs"|cut -d= -f2-|sed -e 's/^\"//' -e 's/\"$//' )") 
-#		[[ ! -z "$DesktopDir" ]] && BDskPath="$DesktopDir"  
-#	 fi
-#	fi
 
 fi
-#ADskPath+="$AddWithVariables";
+
 
 for AddWithVariables in "${BDskPath[@]}"; do
 	if [ -d "$AddWithVariables" ];then
@@ -243,9 +241,6 @@ for AddWithVariables in "${BDskPath[@]}"; do
 
 	fi
 done 
-#echo "${NoEmpty[@]}"
-#echo "${DefDskPath[@]}"
-#exit 1
 ### soring out only uniq path in case if $XDG related and $HOME are pointing on a similar destination. || $InDskPath, $ADskPath, NoEmpty
 NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort -u;));
 
@@ -564,13 +559,13 @@ GAcal=0;
 ### ListDefault listing or searching in default output for content of Name, Exec, Comment. || awk, DskPath, fdPath
 ListDefault(){
 for fdPath in "${DskPath[@]}";do
-if [[ ! -z "$1"   ]];then
+	if [[ ! -z "$1"   ]];then
  if [[ "$One" ==  "--all-sys-path" || "$1" == --asc ]];then
 	 One="$2"
  fi
 fi
 if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
- then
+then
 	if [[ "$DISABLE_COLORS" == "YES" ]];then	
 		printf "# %s ${fdPath} \n";
 	else
@@ -1225,7 +1220,7 @@ echo 'Show list of mimetypes with associated *.desktop files.
 
 help_Sessions(){
 	echo '
---sxs	
+ --sxs	
  list numbered content of Exec in .desktop files located at /usr/share/xsessions/
  additional options:
 	n
@@ -1240,7 +1235,7 @@ help_Sessions(){
 	a
 	all
 	 show content by pattern "Number Name # Comment # Exec"
---rxs
+ --rxs
  as above but also asking to choose number of a session to start.'
 }
 
@@ -1599,6 +1594,43 @@ printf "@ Total translations: "length(UniqLang)": ";
 	else
 		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
 	fi
+	;;
+--find-path-exec | --fpe)
+#	find /usr/share/ -type f -name "*\.desktop" -exec grep -H ^Exec "{}" \; | cut -d":" -f1 | xargs dirname | sort -u
+	if [[ ! -z "$2" ]]; then  
+	for StartCmdLine in "$@"; 
+		do
+		if [[ -d "$StartCmdLine" ]]; then
+  		InPath="$StartCmdLine"
+ 		fi
+		find "$InPath" -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+		{
+		A=$1;
+		NumbArr=split(A,SArr,"/");
+		for(InArr=2; InArr <= NumbArr-1;InArr++ )
+		 printf  "/"SArr[InArr] ;
+		printf "\n"  ;
+		delete SArr ;
+		}' | sort -u | sed "s/$/$3/g"
+	 if [[ "$InPath" == "/" ]];then 
+	  	exit 0
+ 		fi
+	done
+	else
+		find / -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+		{
+		A=$1;
+		NumbArr=split(A,SArr,"/");
+		for(InArr=3; InArr <= NumbArr-1;InArr++ )
+		 printf  "/"SArr[InArr] ;
+		printf "\n"  ;
+		delete SArr ;
+		}' | sort -u | sed "s/$/$3/g"
+#find / -type f -name "*\.desktop"  -exec grep ^Exec "{}" \; 2> /dev/null | awk -F':' '{if($1)print $1}' | sort -u | sed "s/$/$3/g"
+
+                #find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
+	fi
+
 	;;
 --formated-path-output | --fpo )
 	if [[ ! -z "$2" ]]; then  
@@ -2002,7 +2034,6 @@ done | awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;spli
 	;;
 	* ) 
 	ReCreateDskPath "$@"
-
 	ListDefault "$@"
 	;;
 esac
