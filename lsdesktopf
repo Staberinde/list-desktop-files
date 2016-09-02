@@ -1070,6 +1070,10 @@ echo 'Configuration
 	 as the third option can be used any symbol 
 	 that will be added in the end of each directory.
 	 useful for preparation to use directories in an array
+
+ --find-path-exec | --fpe (path)
+	same as --fp but shows only directories that contains variable Exec
+
  --formated-path-output | --fpo
  	same as --fp but showing already formated path (replaced numbers,spaces with *)  
 
