@@ -1655,7 +1655,7 @@ printf "@ Total translations: "length(UniqLang)": ";
 		delete SArr ;
 		}' |\
 	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
-	       	sort -u sed | "s/$/$3/g"
+	       	sort -u | sed  "s/$/$3/g"
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
