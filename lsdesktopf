@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.5-3
+# Version 1.0.5-4
 #
 # License: GPL3
 #
@@ -1070,15 +1070,17 @@ echo 'Configuration
 	 as the third option can be used any symbol 
 	 that will be added in the end of each directory.
 	 useful for preparation to use directories in an array
-
- --find-path-exec | --fpe (path)
-	same as --fp but shows only directories that contains variable Exec
-
+	
  --formated-path-output | --fpo
  	same as --fp but showing already formated path (replaced numbers,spaces with *)  
 
+ --find-path-exec | --fpe (path)
+	same as --fp but shows only directories that contains variable Exec
+ --formated-path-output-exec | --fpoe
+	same as --fpo but shows only directories that contains variable Exec
+
  --format-path-file | --fpf [filename]
- 	replace all spaces and numbers with *'
+ 	replace all spaces and numbers with * 	'
 	}
 help_info(){
 echo 'https://specifications.freedesktop.org/desktop-entry-spec/latest/
@@ -1634,8 +1636,47 @@ printf "@ Total translations: "length(UniqLang)": ";
 
                 #find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
 	fi
+	;;
+--formated-path-output-exec | --fpoe )
+	if [[ ! -z "$2" ]]; then  
+	for StartCmdLine in "$@"; 
+		do
+		if [[ -d "$StartCmdLine" ]]; then
+  		InPath="$StartCmdLine"
+ 		fi
+#	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null |\
+		find "$InPath" -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+		{
+		A=$1;
+		NumbArr=split(A,SArr,"/");
+		for(InArr=2; InArr <= NumbArr-1;InArr++ )
+		 printf  "/"SArr[InArr] ;
+		printf "\n"  ;
+		delete SArr ;
+		}' |\
+	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
+	       	sort -u sed | "s/$/$3/g"
+	 if [[ "$InPath" == "/" ]];then 
+	  	exit 0
+ 		fi
+	done
+	else
+#		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null |\
+		find "$InPath" -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+		{
+		A=$1;
+		NumbArr=split(A,SArr,"/");
+		for(InArr=2; InArr <= NumbArr-1;InArr++ )
+		 printf  "/"SArr[InArr] ;
+		printf "\n"  ;
+		delete SArr ;
+		}' |\
+		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' |\
+			sort -u | sed "s/$/$3/g"
+	fi
 
 	;;
+
 --formated-path-output | --fpo )
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
