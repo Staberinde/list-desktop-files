@@ -23,14 +23,19 @@ AddCmd=($@);
 
 GlobalArray="/opt/share/ldf/sorted.test"
 LocalArray="$HOME/.ldf/sorted.test"
-
+#echo "BBBB " "${DESKTOP_FILES}"
+#exit 0
 ### The DefDskPath variable contains list of default folders
 if [[ ! -z "$DESKTOP_FILES"   ]];then
 DEP_MAX="-maxdepth";
 DEP_LV="1";
-DefDskPath=($(echo "$DESKTOP_FILES" | awk -F';' '{for(I=1;I <= NF-1;I++){TT=$I;gsub(/[0-9]/,"*",TT);gsub(/" "/,"*",TT);print TT} }' |grep -v ^$ ));
-#DefDskPath=($(echo "$DESKTOP_FILES" | awk -F';' '{for(I=1;I <= NF-1;I++)print $I }' |grep -v ^$ ));
+#DefDskPath=($(echo "$DESKTOP_FILES" | awk -F';' '{for(I=1;I <= NF-1;I++){TT=$I;gsub(/[0-9]/,"*",TT);gsub(/" "/,"*",TT);print TT} }' |grep -v ^$ ));
+	if [[ "$DESKTOP_FILES" =~ ';'  ]];then
+		DefDskPath=($(echo "$DESKTOP_FILES" | awk -F';' '{for(I=1;I <= NF-1;I++)print $I }' |grep -v ^$ ));
+	else
 
+		DefDskPath=($DESKTOP_FILES);
+	fi
 else
 DefDskPath+=("/etc/dynamic/launchers/scanner")
 DefDskPath+=("/etc/xdg/autostart")
