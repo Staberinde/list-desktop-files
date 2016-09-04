@@ -1598,7 +1598,8 @@ printf "@ Total translations: "length(UniqLang)": ";
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u | sed "s/$/$3/g"
+
 	fi
 	;;
 --find-path-exec | --fpe)
@@ -1686,7 +1687,7 @@ printf "@ Total translations: "length(UniqLang)": ";
  		fi
 	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null |\
 	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
-	       	sort -u 
+	       	sort -u | sed "s/$/$3/g"
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
@@ -1694,7 +1695,7 @@ printf "@ Total translations: "length(UniqLang)": ";
 	else
 		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null |\
 		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' |\
-			sort -u 
+			sort -u | sed "s/$/$3/g"
 	fi
 	;;
 --all-sys-path | --asc)
