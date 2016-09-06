@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.5-4
+# Version 1.0.5-5
 #
 # License: GPL3
 #
@@ -171,6 +171,114 @@ AddKorora(){
 ### Uncomment below to add directories found in Korora Linux
 #AddKorora
 #####
+
+less_sys(){
+		find  /usr /etc /opt -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
+		ToLowerTwo=tolower($2);
+		ToLowerFindIt=tolower(FindIt);
+			if(Trans)
+			{
+			split(Trans,ArrayTransLang,",");
+			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]=1;
+			}				
+		if(index($1,"]") == 0)
+			{
+			Var[CountV++]=$1;
+			InString[CountS++]=substr($0,index($0,$2));
+			if(FindIt)if(index(ToLowerTwo,ToLowerFindIt) != 0)YES="1"; 
+			};
+		if(index($1,"[") != 0 && index($1,"[") != 1 ){
+			split($1,Lang,"[");			
+			TmpLang=Lang[2];		
+			UniqLang[TmpLang]++;
+			sub("]","",TmpLang);
+			if(Trans)
+			  {
+			  if( NewArrTrans[TmpLang] == 1 )
+			   {   
+			  Var[CountV++]=$1;
+			  InString[CountS++]=substr($0,index($0,$2))
+		  	   }			  				
+			  }						 
+			};
+			if(index($1,"[") == 1){
+			Var[CountV++]=$1;
+			InString[CountS++]=$0}			
+			}END{
+		if(YES == "1" )
+			{
+				if(CLR == "YES")
+				{
+				printf "*  " FILENAME " @ Total translations: "length(UniqLang)": ";
+				}else{
+				printf "* \033[2;32m" FILENAME "\033[0m\n @ Total translations: "length(UniqLang)": ";
+				}
+			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
+			print " ";
+			for (I in InString)if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1 )
+				{	
+						if(index(InString[I]"=",Var[I]"=") != 1 )
+							{
+							print Var[I]"="InString[I]
+							}
+						else
+							{	
+							print Var[I]"="
+							}			
+				}
+				else
+				{
+					if(index(Var[I],"[") == 1) 
+						
+						if(CLR == "YES")
+						{
+						printf Var[I]"\n"
+						}else{
+						printf "\033[2;33m"Var[I]"\033[2;0m\n"
+						}
+				}
+			}
+		if(length(FindIt) == 0)
+			{
+				if(CLR == "YES")
+				{
+				printf "* " FILENAME " \n@ Total translations: "length(UniqLang)": ";
+				}else{
+				printf "* \033[2;32m" FILENAME "\033[0m \n@ Total translations: "length(UniqLang)": ";
+				}
+			if(length(UniqLang) != 0)for(AllLang in UniqLang)
+				{
+					sub("]","",AllLang);printf "%s",AllLang",";
+				}
+				print " ";
+				for (I in InString)
+					if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1  )
+						{
+							if(index(InString[I]"=",Var[I]"=") != 1 )
+								{
+								print Var[I]"="InString[I]
+								}
+							else
+								{	
+								print Var[I]"="
+								}
+						}
+						else
+						{ 
+							if(index(Var[I],"[") == 1)
+								if(CLR == "YES")
+								{
+						       		printf Var[I]"\n"
+								}else{
+						       		printf "\033[2;33m"Var[I]"\033[2;0m \n"
+								}
+						}
+			}
+			     }'  "{}"  \;
+	}
+	
+BaseVarUpdate(){
+
 if [[  ! -f "$LocalArray" ]];then
 	if [[  -f "$GlobalArray" ]];then
 	FilePath="$GlobalArray"
@@ -225,6 +333,8 @@ if [[ "${#ADskPath[@]}" == 0 ]]; then
 		rev|\
 		cut -d: -f2-|\
 		rev));
+
+
 ### $BDskPath is used to add path that depends on such variables as $HOME and $XDG related
  BDskPath+=("$HOME/.local/share/applications")
  BDskPath+=("$HOME/.config/autostart")
@@ -248,6 +358,7 @@ for AddWithVariables in "${BDskPath[@]}"; do
 done 
 ### soring out only uniq path in case if $XDG related and $HOME are pointing on a similar destination. || $InDskPath, $ADskPath, NoEmpty
 NoEmpty=($(for InDskPath in "${ADskPath[@]}";do echo "$InDskPath";done|sort -u;));
+}
 
 ### used to find out path that can be used || scan-sys-path, $DskPath, NoEmpty
 ReCreateDskPath(){
@@ -1327,6 +1438,7 @@ case "$1" in
 	fi
 		;;
 --var )
+	BaseVarUpdate "$@"
 	ReCreateDskPath "$@"
 
 	if [[  ! -z "$2"    ]];then  
@@ -1364,6 +1476,7 @@ case "$1" in
 #		}' "{}" \; | grep -v ^"\#"
 #		;;
 --more | --m )
+	BaseVarUpdate "$@"
 	Opts="more"
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
@@ -1398,6 +1511,8 @@ case "$1" in
 			     }'  "{}"  \;|grep -v ^"#"
 	;;
 --including-only-var  | --iov )
+	BaseVarUpdate "$@"
+
 	if [[ -z "$2" ]];then
 		echo 'Use options!
 		Example: --iov Exec,Type filename'
@@ -1440,97 +1555,19 @@ case "$1" in
 	}' "{}" \;
 	;;	
 --less | --l )
+	BaseVarUpdate "$@"
+
 	Opts="less"
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
 	;;
 --less-sys | --ls )
-	find  /usr /etc /opt -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
-			if(Trans)
-			{
-			split(Trans,ArrayTransLang,",");
-			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]=1;
-			}				
-		if(index($1,"]") == 0)
-			{
-			Var[CountV++]=$1;
-			InString[CountS++]=substr($0,index($0,$2));
-			if(FindIt)if(index($2,FindIt) != 0)YES="1"; 
-			};
-		if(index($1,"[") != 0 && index($1,"[") != 1 ){
-			split($1,Lang,"[");			
-			TmpLang=Lang[2];		
-			UniqLang[TmpLang]++;
-			sub("]","",TmpLang);
-			if(Trans)
-			  {
-			  if( NewArrTrans[TmpLang] == 1 )
-			   {   
-			  Var[CountV++]=$1;
-			  InString[CountS++]=substr($0,index($0,$2))
-		  	   }			  				
-			  }						 
-			};
-			if(index($1,"[") == 1){
-			Var[CountV++]=$1;
-			InString[CountS++]=$0}			
-			}END{
-		if(YES == "1" )
-			{	if(CLR == "YES")
-				{
-				printf "* "FILENAME"\n";
-				printf "@ Total translations: "length(UniqLang)": ";
-				}else{
-				printf "*\033[2;32m "FILENAME"\033[2;0m \n";
-				printf "@ Total translations: "length(UniqLang)": ";
-				}
-			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
-			print " ";
-			for (I in InString)
-				if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1 )
-				{
-					print Var[I]"="InString[I];
-				}
-				else
-				{
-					if(index(Var[I],"[") == 1)
-						if(CLR == "YES")
-						{
-						printf  Var[I]"\n";
-						}else{
-						printf "\033[2;33m" Var[I]"\033[0m\n";
-						}
-				}						
-			}
-		if(length(FindIt) == 0)
-			{
-			if(CLR == "YES")
-			{
-			printf "*  "FILENAME"\n";
-			}else{
-			printf "* \033[2;32m "FILENAME"\033[2;0m \n";
-			}
-printf "@ Total translations: "length(UniqLang)": ";
-			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}
-				print " ";
-				for (I in InString)if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1 )
-				{
-					print Var[I]"="InString[I];
-				}
-				else
-				{
-				if(index(Var[I],"[") == 1)
-					if(CLR == "YES")
-					{
-					printf Var[I]"\n"
-					}else{
-					printf "\033[2;33m"Var[I]"\033[0m \n"
-					}
-			}
-			}		
-	}'  "{}"  \;
+	BaseVarUpdate "$@";
+	less_sys "$@"
 	;;
 --no-var | --nv )
+	BaseVarUpdate "$@"
+
 	ReCreateDskPath "$@"
 
 	if [[  ! -z "$2"    ]];then  
@@ -1543,6 +1580,8 @@ printf "@ Total translations: "length(UniqLang)": ";
  	fi	 	
  	;;
 --var-sys | --vs)
+	BaseVarUpdate "$@"
+
 #	ReCreateDskPath
 	if [[  ! -z "$2"    ]];then  
 	Var="$2"
@@ -1557,6 +1596,7 @@ printf "@ Total translations: "length(UniqLang)": ";
  	fi	
 	;;
 --no-var-sys | --nvs )
+
 	if [[ ! -z "$2" ]];then
 		find /usr /etc /opt -type f -name "*\.desktop" -exec grep -i -H -L "$2" \;
 	else
@@ -1574,13 +1614,15 @@ printf "@ Total translations: "length(UniqLang)": ";
 #  	ReCreateDskPath "$@"
 #     	SearchContentOfVariable
 #	;;
---show-uniq-def | --sud )
+--show-uniq-def | --sud )	BaseVarUpdate "$@"
+
 	OffPrint="no"
 	Opts="sud"
  	ReCreateDskPath "$@"
       	SearchContentOfVariable "$@"
 	;;
---show-uniq-only | --suo )
+--show-uniq-only | --suo )	BaseVarUpdate "$@"
+
 	OffPrint="yes"
 	Opts=suo
 	ReCreateDskPath "$@"
@@ -1590,7 +1632,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 		Opts="sys-uniq"
 		SearchContentOfVariable "$@"
 	;;
---find-path | --fp )
+--find-path | --fp )	BaseVarUpdate "$@"
+
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
@@ -1607,7 +1650,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 
 	fi
 	;;
---find-path-exec | --fpe)
+--find-path-exec | --fpe)	BaseVarUpdate "$@"
+
 #	find /usr/share/ -type f -name "*\.desktop" -exec grep -H ^Exec "{}" \; | cut -d":" -f1 | xargs dirname | sort -u
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
@@ -1643,7 +1687,8 @@ printf "@ Total translations: "length(UniqLang)": ";
                 #find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
 	fi
 	;;
---formated-path-output-exec | --fpoe )
+--formated-path-output-exec | --fpoe )	BaseVarUpdate "$@"
+
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
@@ -1683,7 +1728,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 
 	;;
 
---formated-path-output | --fpo )
+--formated-path-output | --fpo )	BaseVarUpdate "$@"
+
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
@@ -1703,7 +1749,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 			sort -u | sed "s/$/$3/g"
 	fi
 	;;
---all-sys-path | --asc)
+--all-sys-path | --asc)	BaseVarUpdate "$@"
+
 	Opts="scan-sys-path"
 	ReCreateDskPath "$@"
 	ListDefault "$@"
@@ -1733,7 +1780,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 #	fi
 #	;;
 
---format-path-file | --fpf )
+--format-path-file | --fpf )	BaseVarUpdate "$@"
+
 	if [[ ! -z "$2" ]];then 
 	 if [[ -f "$2" ]];then
 	  if [[ $(grep -c -v ^/  "$2" ) != "0" ]];then
@@ -1747,7 +1795,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 	 fi 
 	fi
 	;;
---create-global-list | --cgl)
+--create-global-list | --cgl)	BaseVarUpdate "$@"
+
 	if [[ "$UID" != 0 ]];then  
 		echo 'You must start it as user root'
 		exit 1
@@ -1771,7 +1820,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 		echo 'Does not exist /opt/share/ldf/sorted.test'
 	fi
 	;;
---show-default-directories | --sdd)
+--show-default-directories | --sdd)	BaseVarUpdate "$@"
+
 	for SDD in "${DefDskPath[@]}"; do
 		echo "$SDD"
 	done
@@ -1797,7 +1847,8 @@ printf "@ Total translations: "length(UniqLang)": ";
 --sys-section-name | --ssn)
 	grep -e ^"\[" -h -R --include "*\.desktop"  /usr /etc /opt | sort -u
 	;;
---default-section-name | --dsn)
+--default-section-name | --dsn)	BaseVarUpdate "$@"
+
 	OffPrint="no"
 	Opts='sdsn'
 	ReCreateDskPath "$@"
@@ -1805,6 +1856,7 @@ printf "@ Total translations: "length(UniqLang)": ";
 	SearchContentOfVariable
 	;;	
 --generate-mimeapps.list | --gen-mimeapps | --gm )
+	BaseVarUpdate "$@"
 
 if [[  -z "$XDG_CONFIG_HOME" ]];	then
 PName="$HOME/.local/share/applications"
@@ -2059,7 +2111,8 @@ find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISA
 		done
 	fi
 		;;
---list-categories | --lc )
+--list-categories | --lc )	BaseVarUpdate "$@"
+
 #	grep ^Categories -h -R "/usr/share/applications/" "$HOME/.local/share/applications/" | awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for(I in YY)HH[YY[I]];for(QQ in HH)print QQ}'
 #		#\ awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A){gsub(";","\n",E);printf E}}' | sort -u
 List_Dirs=("/usr/share/applications/")
@@ -2083,7 +2136,118 @@ done | awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;spli
 	ToShowPart="$2";
 	ShowOrStartXsession "$@"
 	;;
+--in-file | --if )
+	if [[ ! -z "$2" && -e "$2" && -f "$2" ]];
+	then 
+		awk  -v CLR="$DISABLE_COLORS" -v FindIt="$3" -v Trans="$4" -F= '/^create/;{ 
+		ToLowerTwo=tolower($2);
+		ToLowerFindIt=tolower(FindIt);
+			if(Trans)
+			{
+			split(Trans,ArrayTransLang,",");
+			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]=1;
+			}				
+		if(index($1,"]") == 0)
+			{
+			Var[CountV++]=$1;
+			InString[CountS++]=substr($0,index($0,$2));
+			if(FindIt)if(index(ToLowerTwo,ToLowerFindIt) != 0)YES="1"; 
+			};
+		if(index($1,"[") != 0 && index($1,"[") != 1 ){
+			split($1,Lang,"[");			
+			TmpLang=Lang[2];		
+			UniqLang[TmpLang]++;
+			sub("]","",TmpLang);
+			if(Trans)
+			  {
+			  if( NewArrTrans[TmpLang] == 1 )
+			   {   
+			  Var[CountV++]=$1;
+			  InString[CountS++]=substr($0,index($0,$2))
+		  	   }			  				
+			  }						 
+			};
+			if(index($1,"[") == 1){
+			Var[CountV++]=$1;
+			InString[CountS++]=$0}			
+			}END{
+		if(YES == "1" )
+			{
+				if(CLR == "YES")
+				{
+				printf "*  " FILENAME " @ Total translations: "length(UniqLang)": ";
+				}else{
+				printf "* \033[2;32m" FILENAME "\033[0m\n @ Total translations: "length(UniqLang)": ";
+				}
+			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
+			print " ";
+			for (I in InString)if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1 )
+				{	
+						if(index(InString[I]"=",Var[I]"=") != 1 )
+							{
+							print Var[I]"="InString[I]
+							}
+						else
+							{	
+							print Var[I]"="
+							}			
+				}
+				else
+				{
+					if(index(Var[I],"[") == 1) 
+						
+						if(CLR == "YES")
+						{
+						printf Var[I]"\n"
+						}else{
+						printf "\033[2;33m"Var[I]"\033[2;0m\n"
+						}
+				}
+			}
+		if(length(FindIt) == 0)
+			{
+				if(CLR == "YES")
+				{
+				printf "* " FILENAME " \n@ Total translations: "length(UniqLang)": ";
+				}else{
+				printf "* \033[2;32m" FILENAME "\033[0m \n@ Total translations: "length(UniqLang)": ";
+				}
+			if(length(UniqLang) != 0)for(AllLang in UniqLang)
+				{
+					sub("]","",AllLang);printf "%s",AllLang",";
+				}
+				print " ";
+				for (I in InString)
+					if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1  )
+						{
+							if(index(InString[I]"=",Var[I]"=") != 1 )
+								{
+								print Var[I]"="InString[I]
+								}
+							else
+								{	
+								print Var[I]"="
+								}
+						}
+						else
+						{ 
+							if(index(Var[I],"[") == 1)
+								if(CLR == "YES")
+								{
+						       		printf Var[I]"\n"
+								}else{
+						       		printf "\033[2;33m"Var[I]"\033[2;0m \n"
+								}
+						}
+			}
+			     }'  "$2"
+	 else
+		echo 'Use valid path to the .desktop file'
+	 fi
+	 
+	;;
 	* ) 
+	BaseVarUpdate "$@"
 	ReCreateDskPath "$@"
 	ListDefault "$@"
 	;;
