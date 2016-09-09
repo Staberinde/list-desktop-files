@@ -758,7 +758,7 @@ fi
 ### "sude"  show uniq variables with examples
   	sude )
 	[[ -z "$DESKTOP_FILES" ]] &&  grep '=' -R -h --include "*\.desktop" "${fdPath}" | awk -F= '//{if(index($1,"]") == 0 && index($1,"#") == 0)if(length($2) != 0)GetVars[$1]=substr($0,index($0,$2));}END{for(II in GetVars)print II "="GetVars[II] }' | sort
-	[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f -iname "*\.desktop" -exec |  grep '=' | awk -F= '//{if(index($1,"]") == 0 && index($1,"#") == 0)if(length($2) != 0)GetVars[$1]=substr($0,index($0,$2));}END{for(II in GetVars)print II "="GetVars[II] }' | sort
+	[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f -iname "*\.desktop" -exec grep '=' "{}" \;| awk -F= '//{if(index($1,"]") == 0 && index($1,"#") == 0)if(length($2) != 0)GetVars[$1]=substr($0,index($0,$2));}END{for(II in GetVars)print II "="GetVars[II] }' | sort
 
 		;;
 ### "no-var" showing all *.desktop except them that contains contains specified string. || grep, find
