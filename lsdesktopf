@@ -1205,19 +1205,17 @@ echo 'Configuration
  --remove-global-config
  	removing /opt/share/ldf/sorted.test
 
- --find-path | --fp (path)
- 	find path that contain *.desktop files, default starting path is /
-	 as the third option can be used any symbol 
-	 that will be added in the end of each directory.
-	 useful for preparation to use directories in an array
-	
- --formated-path-output | --fpo
- 	same as --fp but showing already formated path (replaced numbers,spaces with *)  
+     Find path to directories with .desktop files, default is "/"
 
- --find-path-exec | --fpe (path)
-	same as --fp but shows only directories that contains variable Exec
- --formated-path-output-exec | --fpoe
-	same as --fpo but shows only directories that contains variable Exec
+ --find-path | --fp [path1] [path2]
+ 	all path with *.desktop files	
+ --formated-path-output | --fpo  [path1] [path2]
+ 	replacing numbers and spaces with *
+
+ --find-path-exec | --fpe [path1] [path2]
+	shows only directories that contains variable Exec
+ --formated-path-output-exec | --fpoe [path1] [path2]
+	shows only directories that contains variable Exec
 
  --format-path-file | --fpf [filename]
  	replace all spaces and numbers with * 	'
@@ -2421,7 +2419,7 @@ TargetEnvironment
 Terminal
 TryExec
 Type
-Version'
+	Version'
 	;;
 	* ) 
 	BaseVarUpdate "$@"
