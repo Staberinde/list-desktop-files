@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.6-0
+# Version 1.0.6-1
 #
 # License: GPL3
 #
@@ -1684,8 +1684,8 @@ case "$1" in
 		Opts="sys-uniq"
 		SearchContentOfVariable "$@"
 	;;
---find-path | --fp )	BaseVarUpdate "$@"
-
+--find-path | --fp )
+	BaseVarUpdate "$@"
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
@@ -1702,8 +1702,8 @@ case "$1" in
 
 	fi
 	;;
---find-path-exec | --fpe)	BaseVarUpdate "$@"
-
+--find-path-exec | --fpe)
+	BaseVarUpdate "$@"
 #	find /usr/share/ -type f -name "*\.desktop" -exec grep -H ^Exec "{}" \; | cut -d":" -f1 | xargs dirname | sort -u
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
@@ -1739,8 +1739,8 @@ case "$1" in
                 #find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
 	fi
 	;;
---formated-path-output-exec | --fpoe )	BaseVarUpdate "$@"
-
+--formated-path-output-exec | --fpoe )
+	BaseVarUpdate "$@"
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
@@ -1780,8 +1780,8 @@ case "$1" in
 
 	;;
 
---formated-path-output | --fpo )	BaseVarUpdate "$@"
-
+--formated-path-output | --fpo )
+	BaseVarUpdate "$@"
 	if [[ ! -z "$2" ]]; then  
 	for StartCmdLine in "$@"; 
 		do
@@ -1801,8 +1801,8 @@ case "$1" in
 			sort -u | sed "s/$/$3/g"
 	fi
 	;;
---all-sys-path | --asc)	BaseVarUpdate "$@"
-
+--all-sys-path | --asc)
+	BaseVarUpdate "$@"
 	Opts="scan-sys-path"
 	ReCreateDskPath "$@"
 	ListDefault "$@"
@@ -1832,8 +1832,8 @@ case "$1" in
 #	fi
 #	;;
 
---format-path-file | --fpf )	BaseVarUpdate "$@"
-
+--format-path-file | --fpf )
+	BaseVarUpdate "$@"
 	if [[ ! -z "$2" ]];then 
 	 if [[ -f "$2" ]];then
 	  if [[ $(grep -c -v ^/  "$2" ) != "0" ]];then
@@ -1847,8 +1847,8 @@ case "$1" in
 	 fi 
 	fi
 	;;
---create-global-list | --cgl)	BaseVarUpdate "$@"
-
+--create-global-list | --cgl)
+	BaseVarUpdate "$@"
 	if [[ "$UID" != 0 ]];then  
 		echo 'You must start it as user root'
 		exit 1
@@ -1872,8 +1872,8 @@ case "$1" in
 		echo 'Does not exist /opt/share/ldf/sorted.test'
 	fi
 	;;
---show-default-directories | --sdd)	BaseVarUpdate "$@"
-
+--show-default-directories | --sdd)
+	BaseVarUpdate "$@"
 	for SDD in "${DefDskPath[@]}"; do
 		echo "$SDD"
 	done
@@ -1899,8 +1899,8 @@ case "$1" in
 --sys-section-name | --ssn)
 	grep -e ^"\[" -h -R --include "*\.desktop"  /usr /etc /opt | sort -u
 	;;
---default-section-name | --dsn)	BaseVarUpdate "$@"
-
+--default-section-name | --dsn)
+	BaseVarUpdate "$@"
 	OffPrint="no"
 	Opts='dsn'
 	ReCreateDskPath "$@"
@@ -2163,8 +2163,8 @@ find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISA
 		done
 	fi
 		;;
---list-categories | --lc )	BaseVarUpdate "$@"
-
+--list-categories | --lc )
+	BaseVarUpdate "$@"
 #	grep ^Categories -h -R "/usr/share/applications/" "$HOME/.local/share/applications/" | awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;split(ZZ,YY,";");asort(YY);for(I in YY)HH[YY[I]];for(QQ in HH)print QQ}'
 #		#\ awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A){gsub(";","\n",E);printf E}}' | sort -u
 List_Dirs=("/usr/share/applications/")
