@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.6-1
+# Version 1.0.6-2
 #
 # License: GPL3
 #
@@ -1687,30 +1687,29 @@ case "$1" in
 --find-path | --fp )
 	BaseVarUpdate "$@"
 	if [[ ! -z "$2" ]]; then  
-	for StartCmdLine in "$@"; 
-		do
-		if [[ -d "$StartCmdLine" ]]; then
-  		InPath="$StartCmdLine"
- 		fi
-	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null | sort -u | sed "s/$/$3/g"
+	for (( Ipath=2; Ipath <= ${#@};Ipath++ )) ;do
+	GetPathList="${@:Ipath:1}"
+	if [[ -d "$GetPathList" ]]; then
+		InPath="$GetPathList"
+	fi
+	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null | sort -u 
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u | sed "s/$/$3/g"
+		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u 
 
 	fi
 	;;
 --find-path-exec | --fpe)
 	BaseVarUpdate "$@"
-#	find /usr/share/ -type f -name "*\.desktop" -exec grep -H ^Exec "{}" \; | cut -d":" -f1 | xargs dirname | sort -u
 	if [[ ! -z "$2" ]]; then  
-	for StartCmdLine in "$@"; 
-		do
-		if [[ -d "$StartCmdLine" ]]; then
-  		InPath="$StartCmdLine"
- 		fi
+	for (( Ipath=2; Ipath <= ${#@};Ipath++ )) ;do
+	GetPathList="${@:Ipath:1}"
+	if [[ -d "$GetPathList" ]]; then
+		InPath="$GetPathList"
+	fi
 		find "$InPath" -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
 		{
 		A=$1;
@@ -1719,7 +1718,7 @@ case "$1" in
 		 printf  "/"SArr[InArr] ;
 		printf "\n"  ;
 		delete SArr ;
-		}' | sort -u | sed "s/$/$3/g"
+		}' | sort -u
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
@@ -1733,21 +1732,17 @@ case "$1" in
 		 printf  "/"SArr[InArr] ;
 		printf "\n"  ;
 		delete SArr ;
-		}' | sort -u | sed "s/$/$3/g"
-#find / -type f -name "*\.desktop"  -exec grep ^Exec "{}" \; 2> /dev/null | awk -F':' '{if($1)print $1}' | sort -u | sed "s/$/$3/g"
-
-                #find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null | sort -u
+		}' | sort -u 
 	fi
 	;;
 --formated-path-output-exec | --fpoe )
 	BaseVarUpdate "$@"
-	if [[ ! -z "$2" ]]; then  
-	for StartCmdLine in "$@"; 
-		do
-		if [[ -d "$StartCmdLine" ]]; then
-  		InPath="$StartCmdLine"
- 		fi
-#	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null |\
+	if [[ "${#@}" -ge 2 ]]; then  
+	for (( Ipath=2; Ipath <= ${#@};Ipath++ )) ;do
+	GetPathList="${@:Ipath:1}"
+	if [[ -d "$GetPathList" ]]; then
+		InPath="$GetPathList"
+	fi
 		find "$InPath" -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
 		{
 		A=$1;
@@ -1758,13 +1753,9 @@ case "$1" in
 		delete SArr ;
 		}' |\
 	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
-	       	sort -u | sed  "s/$/$3/g"
-	 if [[ "$InPath" == "/" ]];then 
-	  	exit 0
- 		fi
+	       	sort -u 
 	done
 	else
-#		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null |\
 		find "$InPath" -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
 		{
 		A=$1;
@@ -1775,7 +1766,7 @@ case "$1" in
 		delete SArr ;
 		}' |\
 		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' |\
-			sort -u | sed "s/$/$3/g"
+			sort -u 
 	fi
 
 	;;
@@ -1783,14 +1774,15 @@ case "$1" in
 --formated-path-output | --fpo )
 	BaseVarUpdate "$@"
 	if [[ ! -z "$2" ]]; then  
-	for StartCmdLine in "$@"; 
-		do
-		if [[ -d "$StartCmdLine" ]]; then
-  		InPath="$StartCmdLine"
- 		fi
+	for (( Ipath=2; Ipath <= ${#@};Ipath++ )) ;do
+	GetPathList="${@:Ipath:1}"
+	if [[ -d "$GetPathList" ]]; then
+		InPath="$GetPathList"
+	fi
 	find "$InPath" -type f -name "*\.desktop"  -exec dirname "{}" \; 2> /dev/null |\
 	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
-	       	sort -u | sed "s/$/$3/g"
+	       	sort -u 
+	       	#| sed "s/$/$3/g"
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
@@ -1798,7 +1790,8 @@ case "$1" in
 	else
 		find / -type f -name "*\.desktop" -exec dirname "{}" \; 2> /dev/null |\
 		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' |\
-			sort -u | sed "s/$/$3/g"
+			sort -u 
+			#| sed "s/$/$3/g"
 	fi
 	;;
 --all-sys-path | --asc)
@@ -2402,33 +2395,33 @@ done | awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;spli
 	;;
 --cbf | --create-base-file )
 	echo 'Actions
-	Categories
-	Comment
-	DBusActivatable
-	DocPath
-	Encoding
-	Exec
-	FilePattern
-	GenericName
-	Hidden
-	Icon
-	InitialPreference
-	Keywords
-	MimeType
-	Name
-	NoDisplay
-	NotShowIn
-	OnlyShowIn
-	Path
-	Patterns
-	ServiceTypes
-	StartupNotify
-	StartupWMClass
-	TargetEnvironment
-	Terminal
-	TryExec
-	Type
-	Version'
+Categories
+Comment
+DBusActivatable
+DocPath
+Encoding
+Exec
+FilePattern
+GenericName
+Hidden
+Icon
+InitialPreference
+Keywords
+MimeType
+Name
+NoDisplay
+NotShowIn
+OnlyShowIn
+Path
+Patterns
+ServiceTypes
+StartupNotify
+StartupWMClass
+TargetEnvironment
+Terminal
+TryExec
+Type
+Version'
 	;;
 	* ) 
 	BaseVarUpdate "$@"
