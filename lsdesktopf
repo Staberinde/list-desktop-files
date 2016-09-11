@@ -1277,7 +1277,7 @@ echo ' --list-categories | --lc
 
  --show-more-category | --smc [text]
  	output is similar to option --more but searching text only in categories
- --show-categories-exec | --smc [text] (sf)
+ --show-categories-exec | --sce [text] (sf)
 	searching only in categories.
        	showing result by one line per exec found in a single file. 
 	use "sf" as the last option to show filename'
