@@ -1214,9 +1214,9 @@ help_def(){
  	using system path
  
 	Same as option --more but is less userfiendly by outputing much more information
- --less | --l (text) (translation)
+ --list | --l (text) (translation)
  	using default path
- --less-sys | --ls (text) (translation)
+ --list-sys | --ls (text) (translation)
  	using system path /usr /etc /opt'
 	}
 help_debug(){
@@ -1343,9 +1343,9 @@ echo 'Usage examples
 	 lsdesktopf game
 	 lsdesktopf --more 
 	 lsdesktopf --more kde
-	 lsdesktopf --less
-	 lsdesktopf --less gnome 
-	 lsdesktopf --less gtk zh_CN,zh_TW
+	 lsdesktopf --list
+	 lsdesktopf --list gnome 
+	 lsdesktopf --list gtk zh_CN,zh_TW
 
  Use --var option (supporting grep syntax):
 	--var-sys has same syntax as --var
@@ -1493,7 +1493,7 @@ DESKTOP_FILES 	- must contain path to folders with
 
 help_sinfile(){
 echo '--in-file | --if [text] [language]
-		output is similar to option "--less" 
+		output is similar to option "--list" 
 		by default showing base content of a .desktop with a list of available translations
 		searching for the "text" in both - variable name and content
 		 showing only lines where the text was found but ignoring translated
@@ -1705,14 +1705,14 @@ case "$1" in
 		}
 	}' "{}" \;
 	;;	
---less | --l )
+--list | --less | --l )
 	BaseVarUpdate "$@"
 
 	Opts="less"
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
 	;;
---less-sys | --ls )
+--list-sys | --less-sys | --ls )
 	BaseVarUpdate "$@";
 	less_sys "$@"
 	;;
