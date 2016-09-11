@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 1.0.6-2
+# Version 1.0.7-0
 #
 # License: GPL3
 #
@@ -827,7 +827,95 @@ fi
 			}
 		}'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
-#	more )
+	smc )
+		find "${fdPath}" $DEP_MAX $DEP_LV   -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
+		ToLowerOne=tolower($1);
+		ToLowerFindIt=tolower(FindIt);
+		ToLowerTwo=tolower($2);
+		if(index($1,"]") == 0 )
+		if( index(ToLowerOne,"exec") != 0 || index(ToLowerOne,"name") != 0  || index(ToLowerOne,"comment") != 0  || index(ToLowerOne,"categories") != 0  || index(ToLowerOne,"command") != 0 || index(ToLowerOne,"module") != 0 || index(ToLowerOne,"x-xfce-binaries") != 0 )	{Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
+		if(FindIt)if( index($1,"Categories") != 0 )if(index(ToLowerTwo,ToLowerFindIt) != 0 )YES="1"; };
+		}END{
+		if(YES == "1" )
+		{
+			if(CLR == "YES")
+			{
+			printf "* "FILENAME"\n";
+			}else{
+			printf "* \033[2;32m"FILENAME"\033[2;0m \n";
+			};
+	        for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]
+		};
+		if(length(FindIt) == 0)
+			{
+				if(CLR == "YES")
+				{
+				printf "*  "FILENAME" \n";
+				}else{
+				printf "* \033[2;32m "FILENAME"\033[2;0m \n";
+				};
+	
+			for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]
+			}
+		}'  "{}"  \;|grep -v -e ^"#" -e ^$
+		;;
+	sce )
+		find "${fdPath}" $DEP_MAX $DEP_LV   -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v SFName=$3 -v FindIt="$2" -v CLR=$DISABLE_COLORS -F= '/^create/;{ 
+		ToLowerOne=tolower($1);
+		ToLowerFindIt=tolower(FindIt);
+		ToLowerTwo=tolower($2);
+		if(index($1,"]") == 0 && index($1,"#") != 1 )
+			{
+			if( index(ToLowerOne,"exec") != 0 ||  index(ToLowerOne,"module") != 0 || index(ToLowerOne,"x-xfce-binaries") != 0 || index(ToLowerOne,"categories") != 0 )
+			{
+				if(index(ToLowerOne,"categories") != 0)
+				{
+				GetCtg=substr($0,index($0,$2));
+				}
+				else
+				{
+				Var[CountV++]=$1;
+				InString[CountS++]=substr($0,index($0,$2));
+				}
+			if(FindIt)if( index($1,"Categories") != 0 )
+				if(index(ToLowerTwo,ToLowerFindIt) != 0 )YES="1"; 
+
+			}
+			
+		};
+			
+		}END{
+		if(SFName == "sf" || SFName == "filename"){FName=" # "FILENAME}else{FName=""};
+			if(YES == "1" )
+			{
+		        for(I in InString)if(length(Var[I]) != 0)
+				{
+					if(CLR == "YES")
+					{
+					printf "%s", InString[I]" # "GetCtg FName"\n";
+					}else
+					{
+					printf "%s", InString[I]" # \033[34m"GetCtg"\033[0m"FName"\n";
+					}
+				};
+			}
+		if(length(FindIt) == 0)
+			{			
+			for(I in InString)if(length(Var[I]) != 0)
+				if(index(ToLowerOne,"categories") != 0)
+				{
+					if(CLR == "YES")
+					{
+					printf "%s", InString[I]" # "GetCtg FName"\n";
+					}else
+					{
+					printf "%s", InString[I]" # \033[34m"GetCtg"\033[0m"FName"\n";
+					}
+				}
+			}
+		}'  "{}"  \;|grep -v -e ^"#" -e ^$
+		;;
+	#	more )
 #		find "${fdPath}" $DEP_MAX $DEP_LV  -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
 #	 		  if(index($1,"]") == 0    && index($1,"MimeType") == 0 && index($1,"Keywords") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
 #		if(FindIt)if(index($2,FindIt) != 0 && index($1,"MimeType") == 0 && index($1,"Keywords") == 0)YES="1"; };}END{
@@ -1165,8 +1253,6 @@ echo 'Search a value of the variables. Supporting grep syntax
  --show-uniq-only-example |--suoe
  	using default path
 
- --list-categories | --lc
-	Show all categories found in "/usr/share/applications/" and "$HOME/.local/share/applications/" 
 
 Not supporting grep syntax, using awk
 	show content of choosen variables only if all them are present in the file. To show path to file use "sf" as last option.
@@ -1185,6 +1271,19 @@ echo 'Search section names in *.desktop files
  	using default path'
 
 	}
+help_ctg(){
+echo ' --list-categories | --lc
+	Show all categories found in "/usr/share/applications/" and "$HOME/.local/share/applications/" 
+
+ --show-more-category | --smc [text]
+ 	output is similar to option --more but searching text only in categories
+ --show-categories-exec | --smc [text] (sf)
+	searching only in categories.
+       	showing result by one line per exec found in a single file. 
+	use "sf" as the last option to show filename'
+ 	
+
+}
 help_config(){
 echo 'Configuration
  --create-global-list | --cgl
@@ -1417,7 +1516,8 @@ case "$1" in
  mime	-	list available mimetypes
  ses	-	list or run sessions
  env	-	enviroment variables
- sinf	-	show options for viewing single file'
+ sinf	-	show options for viewing single file
+ ctg	-	list availabe or search only in categories'
 	else
 		case "$2" in
 	sinf )
@@ -1443,6 +1543,9 @@ case "$1" in
 		 ;;
 	info ) 
 		help_info	
+		;;
+	ctg )
+		help_ctg
 		;;
 	usage ) 
 		help_usage
@@ -1514,6 +1617,18 @@ case "$1" in
 --more | --m )
 	BaseVarUpdate "$@"
 	Opts="more"
+	ReCreateDskPath "$@"
+        SearchContentOfVariable "$@"
+	;;
+--show-more-category | --smc )
+	BaseVarUpdate "$@"
+	Opts="smc"
+	ReCreateDskPath "$@"
+        SearchContentOfVariable "$@"
+	;;
+--show-category-exec | --sce )
+	BaseVarUpdate "$@"
+	Opts="sce"
 	ReCreateDskPath "$@"
         SearchContentOfVariable "$@"
 	;;
