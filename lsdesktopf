@@ -2466,7 +2466,7 @@ Version'
 			}else{
 			printf "%s", VName " #\033[1;33m "VIcon"\033[0m # "VComment" # \033[1;30m"FILENAME"\033[0m\n"
 			}
-	}' "{}" \;
+	}' "{}" \; 2> /dev/null
 ;;
 	* ) 
 	BaseVarUpdate "$@"
