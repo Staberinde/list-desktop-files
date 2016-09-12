@@ -1220,8 +1220,11 @@ help_def(){
  	list content of variables by pattern: Name # Icon # Comment # FILENAME'
 	}
 help_debug(){
-	echo '--show-me | --sm (options)
-		show or search content in this script'		
+	echo '--show-me | --sm (options)		
+		without options will show content of script.
+		will search for text string and will show line numbers where it was found
+		other options:
+		 beta - showing options that are not currently in help description'
 	}
 help_var(){
 echo 'Search a value of the variables. Supporting grep syntax
@@ -1995,11 +1998,18 @@ case "$1" in
 	fi
 	;;
 --show-me | --sm)
-	if [[  -z $2 ]];then
+	if [[ -z $2 ]];then
 		cat "$0"
 		echo '# my path: '" $0"
 	else
+		case "$2" in
+			beta )
+		grep "^\-\-" "$0" | grep -v -e "IGNORE" -e ^"# "
+			;;
+			* )
 		grep -n "$2" "$0" | grep -v -e "IGNORE" -e ^"# "
+			;;
+		esac
 	fi
 	;;
 --sys-section-name | --ssn)
@@ -2293,116 +2303,6 @@ done | awk  -v CLR="$DISABLE_COLORS" -F= '//{A[$2]=1}END{for(E in A)ZZ=ZZ E;spli
 	StartIt=1;
 	ToShowPart="$2";
 	ShowOrStartXsession "$@"
-	;;
---sif | --search-in-file )
-	if [[ ! -z "$2" && -e "$2" && -f "$2" ]];
-	then 
-		awk  -v CLR="$DISABLE_COLORS" -v FindIt="$3" -v Trans="$4" -F= '/^create/;{ 
-		ToLowerTwo=tolower($2);
-		ToLowerFindIt=tolower(FindIt);
-			if(Trans)
-			{
-			split(Trans,ArrayTransLang,",");
-			for(ReLangArray in ArrayTransLang )NewArrTrans[ArrayTransLang[ReLangArray]]=1;
-			}				
-		if(index($1,"]") == 0)
-			{
-			Var[CountV++]=$1;
-			InString[CountS++]=substr($0,index($0,$2));
-			if(FindIt)if(index(ToLowerTwo,ToLowerFindIt) != 0)YES="1"; 
-			};
-		if(index($1,"[") != 0 && index($1,"[") != 1 ){
-			split($1,Lang,"[");			
-			TmpLang=Lang[2];		
-			UniqLang[TmpLang]++;
-			sub("]","",TmpLang);
-			if(Trans)
-			  {
-			  if( NewArrTrans[TmpLang] == 1 )
-			   {   
-			  Var[CountV++]=$1;
-			  InString[CountS++]=substr($0,index($0,$2))
-		  	   }			  				
-			  }						 
-			};
-			if(index($1,"[") == 1){
-			Var[CountV++]=$1;
-			InString[CountS++]=$0}			
-			}END{
-		if(YES == "1" )
-			{
-				if(CLR == "YES")
-				{
-				printf "*  " FILENAME " @ Total translations: "length(UniqLang)": ";
-				}else{
-				printf "* \033[2;32m" FILENAME "\033[0m\n @ Total translations: "length(UniqLang)": ";
-				}
-			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
-			print " ";
-			for (I in InString)if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1 )
-				{	
-						if(index(InString[I]"=",Var[I]"=") != 1 )
-							{
-							print Var[I]"="InString[I]
-							}
-						else
-							{	
-							print Var[I]"="
-							}			
-				}
-				else
-				{
-					if(index(Var[I],"[") == 1) 
-						
-						if(CLR == "YES")
-						{
-						printf Var[I]"\n"
-						}else{
-						printf "\033[2;33m"Var[I]"\033[2;0m\n"
-						}
-				}
-			}
-		if(length(FindIt) == 0)
-			{
-				if(CLR == "YES")
-				{
-				printf "* " FILENAME " \n@ Total translations: "length(UniqLang)": ";
-				}else{
-				printf "* \033[2;32m" FILENAME "\033[0m \n@ Total translations: "length(UniqLang)": ";
-				}
-			if(length(UniqLang) != 0)for(AllLang in UniqLang)
-				{
-					sub("]","",AllLang);printf "%s",AllLang",";
-				}
-				print " ";
-				for (I in InString)
-					if(index(Var[I],"[") != 1 && length(Var[I]) != 0 && index(Var[I],"#") != 1  )
-						{
-							if(index(InString[I]"=",Var[I]"=") != 1 )
-								{
-								print Var[I]"="InString[I]
-								}
-							else
-								{	
-								print Var[I]"="
-								}
-						}
-						else
-						{ 
-							if(index(Var[I],"[") == 1)
-								if(CLR == "YES")
-								{
-						       		printf Var[I]"\n"
-								}else{
-						       		printf "\033[2;33m"Var[I]"\033[2;0m \n"
-								}
-						}
-			}
-			     }'  "$2"
-	 else
-		echo 'Use valid path to the .desktop file'
-	 fi
-	 
 	;;
 --in-file | --if )
 	if [[ ! -z "$2" && -e "$2" && -f "$2" ]];
