@@ -2551,6 +2551,17 @@ TryExec
 Type
 Version'
 	;;
+--description | -d )
+find /usr/ -type f -name "*\.desktop" -o -name "*\.directory" -exec awk  -F= '{
+	if($1 == "Name")VName=substr($0,index($0,$2));
+	if($1 == "Icon")VIcon=substr($0,index($0,$2));
+	if($1 == "Icon")VIcon=substr($0,index($0,$2));
+	if($1 == "Comment")VComment=substr($0,index($0,$2))
+}END{
+	FName=FILENAME;
+	gsub(/[^*]*\//,"",FName);
+	print VName " # "VIcon" #  "VComment" #  "FName}' "{}" \;
+;;
 	* ) 
 	BaseVarUpdate "$@"
 	ReCreateDskPath "$@"
