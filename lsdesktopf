@@ -209,9 +209,9 @@ less_sys(){
 			{
 				if(CLR == "YES")
 				{
-				printf "*  " FILENAME " @ Total translations: "length(UniqLang)": ";
+				printf "*  " FILENAME "@ Total translations: "length(UniqLang)": ";
 				}else{
-				printf "* \033[2;32m" FILENAME "\033[0m\n @ Total translations: "length(UniqLang)": ";
+				printf "* \033[2;32m" FILENAME "\033[0m\n@ Total translations: "length(UniqLang)": ";
 				}
 			if(length(UniqLang) != 0)for(AllLang in UniqLang){sub("]","",AllLang);printf "%s",AllLang",";}				
 			print " ";
