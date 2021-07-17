@@ -103,6 +103,16 @@ DefDskPath+=("/usr/share/xfce*/panel/plugins")
 DefDskPath+=("/usr/share/xsessions")
 fi
 ##########################################
+AddNixHomeManager(){
+  DefDskPath+=("$HOME/.nix-profile/share/applications")
+}
+AddNixHomeManager
+##########################################
+AddNixOS(){
+  DefDskPath+=("/run/current-system/sw/share/applications")
+}
+AddNixOS
+##########################################
 AddKorora(){
  DefDskPath+=("/usr/lib64/gnome-settings-daemon-*/gtk-modules")
  DefDskPath+=("/usr/lib64/libreoffice/share/xdg")
