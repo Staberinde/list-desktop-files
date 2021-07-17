@@ -183,7 +183,7 @@ AddKorora(){
 #####
 
 less_sys(){
-	find  /usr /etc /opt -type f \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
+	find  /usr /etc /opt -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
 		ToLowerTwo=tolower($2);
 		ToLowerFindIt=tolower(FindIt);
 			if(Trans)
@@ -385,11 +385,11 @@ DskPath=($(if [[ ! -z $2 ]]; then
  		fi
 	done
 else
-	find / -type f \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; |sort -u
+	find / -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; |sort -u
 fi))
 ;;
 	scan-sys-path )
-		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -name "*\.desktop" -exec dirname "{}" \;|sort -u))
+		DskPath=($(find "/usr/"  "/etc/" "/opt/"  -type f -L -name "*\.desktop" -exec dirname "{}" \;|sort -u))
 		;;
 	*)
 	DskPath=(${NoEmpty[@]})
@@ -402,20 +402,20 @@ IFS="
 "	
 	case $2 in
 			g | glob )
-				List_XML=($(find "/usr/" "/etc/" "$HOME/.local/" "$HOME/.config"  -type f -name "*\.xml"));
+				List_XML=($(find "/usr/" "/etc/" "$HOME/.local/" "$HOME/.config"  -type f -L -name "*\.xml"));
 			;;
 			l | local )
-				List_XML=($(find  "$HOME/.config" "$HOME/.local/" -type f -name "*\.xml"));
+				List_XML=($(find  "$HOME/.config" "$HOME/.local/" -type f -L -name "*\.xml"));
 			;;
 			* )
-				List_XML=($(find "/usr/share/mime/packages/" "/usr/share/mime/application/" "$HOME/.local/share/" -type f -name "*\.xml"));     
+				List_XML=($(find "/usr/share/mime/packages/" "/usr/share/mime/application/" "$HOME/.local/share/" -type f -L -name "*\.xml"));     
 	    		 ;;
 		esac
 
 	case $2 in
 	0 )
 	 for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
+	find "$In_XML_List" -type f -L -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
 		done | awk -v CLR="$DISABLE_COLORS"  -F"\"" '{
 	if(index($0,"mime-type")){
 		if(index($0,"type type=")){
@@ -426,7 +426,7 @@ IFS="
 	;;
 	1 )
 	 for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
+	find "$In_XML_List" -type f -L -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
 		done | awk  -v CLR="$DISABLE_COLORS" -F"\"" '{
 	if(index($0,"mime-type")){
 		if(index($0,"type type=")){
@@ -439,7 +439,7 @@ IFS="
 	;;
 	2 )
 	 for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
+	find "$In_XML_List" -type f -L -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
 		done | awk - -v CLR="$DISABLE_COLORS" F"\"" '{
 	if(index($0,"mime-type")){
 		if(index($0,"type type=")){
@@ -452,7 +452,7 @@ IFS="
 	;;
 	3 )
 	 for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec grep "pattern=" "{}" \;
+	find "$In_XML_List" -type f -L -name "*\.xml" -exec grep "pattern=" "{}" \;
 		done | awk  -v CLR="$DISABLE_COLORS" -F"\"" '{
 			if(index(tolower($0),"pattern="))ContentArray[$2]=1;			
 			}END{
@@ -461,7 +461,7 @@ IFS="
 	;;
 	-gfx)
 	for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec awk  -v CLR="$DISABLE_COLORS" -v ShowItems="$3" '{		
+	find "$In_XML_List" -type f -L -name "*\.xml" -exec awk  -v CLR="$DISABLE_COLORS" -v ShowItems="$3" '{		
 	if(index($0,"<mime-type") != 0)
 		{
 			Astop=1;		
@@ -628,7 +628,7 @@ GAcal=0;
 	;;
 	-gx ) if [[ ! -z "$3" ]];then
 		for In_XML_List in "${List_XML[@]}";do
-	find "$In_XML_List" -type f -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
+	find "$In_XML_List" -type f -L -name "*\.xml" -exec grep -e "mime-type" -e "type=" "{}" \;
 		done | awk  -v CLR="$DISABLE_COLORS" -F"\"" -v FindForType="$3" '{
 	if(index($0,"mime-type")){
 		if(index($0,"type type=")){
@@ -647,7 +647,7 @@ GAcal=0;
 		;;
 	*) 
 	  for In_XML_List in "${List_XML[@]}";do
-		find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISABLE_COLORS" -F"\"" '{YesM=0;
+		find "$In_XML_List" -type f -L -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISABLE_COLORS" -F"\"" '{YesM=0;
 		if(index($0,"mime-type")){if(index($0,"type type=")){ContentArray[Count++]=$2" == ";YesM=1}else{if(index($0," type=")){
 			ContentArray[Count++]=$4" == "}}}				
 		if(index($0,"<comment>")){
@@ -755,28 +755,28 @@ fi
 ### "ddp" is used to raw dump cotent of all *.desktop found in default path. || grep
 	ddp ) 
 [[ -z "$DESKTOP_FILES" ]] && grep ^ -H -R --include "*\.desktop" "${fdPath}"  ;
-[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f -iname "*\.desktop" -exec cat "{}" \;
+[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f -L -iname "*\.desktop" -exec cat "{}" \;
 		;;
 ### "sud" showing unique variables found in default path. || grep, cut
 	sud )
 [[ -z "$DESKTOP_FILES" ]] && grep '=' -R -h --include "*\.desktop" --include "*\.directory" "${fdPath}" | cut -d= -f 1|grep -v -e "\[" -e ^\# |sort -u
 
-[[ ! -z "$DESKTOP_FILES" ]] &&	find "${fdPath}" $DEP_MAX $DEP_LV  -type f \( -name "*.desktop" -o -name "*.directory" \) -exec grep '=' "{}" \; | cut -d= -f 1|grep -v -e "\[" -e ^\# |sort -u
+[[ ! -z "$DESKTOP_FILES" ]] &&	find "${fdPath}" $DEP_MAX $DEP_LV  -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec grep '=' "{}" \; | cut -d= -f 1|grep -v -e "\[" -e ^\# |sort -u
 		;;
 ### "sude"  show unique variables with examples
   	sude )
 	[[ -z "$DESKTOP_FILES" ]] &&  grep '=' -R -h --include "*\.desktop" "${fdPath}" | awk -F= '//{if(index($1,"]") == 0 && index($1,"#") == 0)if(length($2) != 0)GetVars[$1]=substr($0,index($0,$2));}END{for(II in GetVars)print II "="GetVars[II] }' | sort
-	[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f -iname "*\.desktop" -exec grep '=' "{}" \;| awk -F= '//{if(index($1,"]") == 0 && index($1,"#") == 0)if(length($2) != 0)GetVars[$1]=substr($0,index($0,$2));}END{for(II in GetVars)print II "="GetVars[II] }' | sort
+	[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f -L -iname "*\.desktop" -exec grep '=' "{}" \;| awk -F= '//{if(index($1,"]") == 0 && index($1,"#") == 0)if(length($2) != 0)GetVars[$1]=substr($0,index($0,$2));}END{for(II in GetVars)print II "="GetVars[II] }' | sort
 
 		;;
 ### "no-var" showing all *.desktop except them that contains contains specified string. || grep, find
 	no-var )
-		find "${fdPath}" $DEP_MAX $DEP_LV  -type f -iname "*\.desktop" -exec grep -H -L -e "$Var" "${AddCmd[@]:2}" "{}" \;
+		find "${fdPath}" $DEP_MAX $DEP_LV  -type f -L -iname "*\.desktop" -exec grep -H -L -e "$Var" "${AddCmd[@]:2}" "{}" \;
 		;;
 ### "dsn" showing only unique section names found in default path. || grep, sed 
 	dsn )
 [[ -z "$DESKTOP_FILES" ]] && 	grep '\[*\]'$ -R -h --include "*\.desktop" --include "*\.directory" "${fdPath}" | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort -u
-[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f \( -name "*.desktop" -o -name "*.directory" \) -exec grep '\[*\]'$ "{}" \; | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort -u 
+[[ ! -z "$DESKTOP_FILES" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV  -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec grep '\[*\]'$ "{}" \; | sed 's/ * //m' |grep ^'\[' |grep -v -e ^'#' -e '\]=' |sort -u 
 		;;
 	upfd )
 		if [[ ! -z "$2"  ]];then FLang="$2";
@@ -784,7 +784,7 @@ fi
 			FLang="";
 		fi
 
-		find "${fdPath}" $DEP_MAX $DEP_LV  -type f \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
+		find "${fdPath}" $DEP_MAX $DEP_LV  -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
 		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
 		if(index($1,"["GetLang"]") != 0 ){Item[cnt++]=$0}else { if(index($1,"]") == 0)Item[cnt++]=$0}
 		}END{
@@ -804,7 +804,7 @@ fi
 		}' "{}" \; | grep -v ^"\#"
 		;;
 	description ) 
-		find "${fdPath}" -type f \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -F= -v CLR="$DISABLE_COLORS" '{
+		find "${fdPath}" -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -F= -v CLR="$DISABLE_COLORS" '{
 			if($2)if($1 == "Name")VName=substr($0,index($0,$2));
 			if($2)if($1 == "Icon")VIcon=substr($0,index($0,$2));
 			if($2)if($1 == "Comment")VComment=substr($0,index($0,$2))
@@ -822,10 +822,10 @@ fi
 		;;	
 	empty-ctg )
 
-#	find  "${fdPath}" $DEP_MAX $DEP_LV -type f -name "*\.desktop" -exec awk -F= '{if($1 == "Categories")if(length($2) == 0)print FILENAME}' "{}" \;
+#	find  "${fdPath}" $DEP_MAX $DEP_LV -type f -L -name "*\.desktop" -exec awk -F= '{if($1 == "Categories")if(length($2) == 0)print FILENAME}' "{}" \;
 	;;
 	empty-ctg-with-exec | ece )
-	find  "${fdPath}" $DEP_MAX $DEP_LV -type f -name "*\.desktop" -exec awk -F= -v CLR="$DISABLE_COLORS" '
+	find  "${fdPath}" $DEP_MAX $DEP_LV -type f -L -name "*\.desktop" -exec awk -F= -v CLR="$DISABLE_COLORS" '
 		{
 			if($1)
 			{
@@ -857,11 +857,11 @@ fi
 		}' "{}" \;
 	;;
 	exec-with-empty-variables )
-	find  /usr/ -type f -name "*\.desktop" -exec awk -F= '{if($1){if(index($0,"=") != 0 && index($1,"#") == 0 )if(length($2) == 0)GetEmptyVar[ec++]=$1;if($2 && index(tolower($1),"exec"))GetAllExec[aec++]=$2} }END{if(length(GetAllExec) != 0){ print "* "FILENAME;for(ShowExec in GetAllExec )print GetAllExec[ShowExec];for(ShowEV in GetEmptyVar )print GetEmptyVar[ShowEV]"=" }}' "{}" \;
+	find  /usr/ -type f -L -name "*\.desktop" -exec awk -F= '{if($1){if(index($0,"=") != 0 && index($1,"#") == 0 )if(length($2) == 0)GetEmptyVar[ec++]=$1;if($2 && index(tolower($1),"exec"))GetAllExec[aec++]=$2} }END{if(length(GetAllExec) != 0){ print "* "FILENAME;for(ShowExec in GetAllExec )print GetAllExec[ShowExec];for(ShowEV in GetEmptyVar )print GetEmptyVar[ShowEV]"=" }}' "{}" \;
 
 	;;
 	more )
-		find "${fdPath}" $DEP_MAX $DEP_LV   -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
+		find "${fdPath}" $DEP_MAX $DEP_LV   -type f -L -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
 		ToLowerOne=tolower($1);
 		ToLowerFindIt=tolower(FindIt);
 		ToLowerTwo=tolower($2);
@@ -893,7 +893,7 @@ fi
 		}'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
 	smc )
-		find "${fdPath}" $DEP_MAX $DEP_LV   -type f \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
+		find "${fdPath}" $DEP_MAX $DEP_LV   -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
 		ToLowerOne=tolower($1);
 		ToLowerFindIt=tolower(FindIt);
 		ToLowerTwo=tolower($2);
@@ -925,7 +925,7 @@ fi
 		}'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
 	sce )
-		find "${fdPath}" $DEP_MAX $DEP_LV   -type f \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v SFName=$3 -v FindIt="$2" -v CLR=$DISABLE_COLORS -F= '/^create/;{ 
+		find "${fdPath}" $DEP_MAX $DEP_LV   -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v SFName=$3 -v FindIt="$2" -v CLR=$DISABLE_COLORS -F= '/^create/;{ 
 		ToLowerOne=tolower($1);
 		ToLowerFindIt=tolower(FindIt);
 		ToLowerTwo=tolower($2);
@@ -981,7 +981,7 @@ fi
 		}'  "{}"  \;|grep -v -e ^"#" -e ^$
 		;;
 	#	more )
-#		find "${fdPath}" $DEP_MAX $DEP_LV  -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
+#		find "${fdPath}" $DEP_MAX $DEP_LV  -type f -L -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
 #	 		  if(index($1,"]") == 0    && index($1,"MimeType") == 0 && index($1,"Keywords") == 0){Var[CountV++]=$1;InString[CountS++]=substr($0,index($0,$2));
 #		if(FindIt)if(index($2,FindIt) != 0 && index($1,"MimeType") == 0 && index($1,"Keywords") == 0)YES="1"; };}END{
 #		if(YES == "1" ){print " "FILENAME;        for(I in InString)if(length(Var[I]) != 0)print Var[I]"="InString[I]};
@@ -989,7 +989,7 @@ fi
 #		;;
 
 	less )
-		find  "${fdPath}" $DEP_MAX $DEP_LV  -type f \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
+		find  "${fdPath}" $DEP_MAX $DEP_LV  -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Trans="$3" -F= '/^create/;{ 
 		ToLowerTwo=tolower($2);
 		ToLowerFindIt=tolower(FindIt);
 			if(Trans)
@@ -1093,7 +1093,7 @@ fi
 			     }'  "{}"  \;
 		;;
 	iov )
-		find  "${fdPath}" $DEP_MAX $DEP_LV  -type f \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Fname="$3" -F= '//{ 
+		find  "${fdPath}" $DEP_MAX $DEP_LV  -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Fname="$3" -F= '//{ 
 			if(FindIt){
 			SizeArray=split(FindIt,ArrayFindIt,",");
 			if (index($0,"[") == 1 ) 
@@ -1150,7 +1150,7 @@ done
 case  "$Opts" in
 ### "sys-unique" showing unique variable names found in /usr /etc /opt path. || find, cut, grep
 	sys-uniq )
-	find "/usr" "/etc" "/opt"  -type f \( -name "*.desktop" -o -name "*.directory" \) -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort -u
+	find "/usr" "/etc" "/opt"  -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec grep ^ "{}"  \; | cut -d= -f1 | grep -v -e "\[" -e ^\#  | sort -u
 		;;
 ### "var-sys" searching for variable name in system path /usr /etc /opt
 	var-sys )
@@ -1175,7 +1175,7 @@ if [[ -d "${DskPath[Count]}" || -f "${DskPath[Count]}"  ]];
     then 
 #[[ "$Opts" == "suo" || "$Opts" == "suoe" ]] &&  grep ^ -R -h --include "*\.desktop" "${fdPath}" ;
 
-[[ "$Opts" == "suo" || "$Opts" == "suoe" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV -type f -name "*\.desktop" -exec cat "{}" \;
+[[ "$Opts" == "suo" || "$Opts" == "suoe" ]] &&  find "${fdPath}" $DEP_MAX $DEP_LV -type f -L -name "*\.desktop" -exec cat "{}" \;
 
     fi;
 fi
@@ -1473,13 +1473,13 @@ help_tips(){
  	awk -F"AB" "{print NF}"
  	awk "{print split($0,A,"AB") }"
  command "basename" is used to show only the filename but cutting away path to it.
-	find / -type f -exec basename "{}" \;
-	find / -type f | xargs basename
+	find / -type f -L -exec basename "{}" \;
+	find / -type f -L | xargs basename
  command "dirname" is used to show only path to file.
-	find / -type f -exec dirname "{}" \;
-	find / -type f | xargs dirname
+	find / -type f -L -exec dirname "{}" \;
+	find / -type f -L | xargs dirname
  hide error messages from stderr, such as e.g. "permission denied"
- 	find / -type f 2> /dev/null | grep desktop'
+ 	find / -type f -L 2> /dev/null | grep desktop'
 }
 help_mimetypes(){
 echo 'Show list of mimetypes with associated *.desktop files. 
@@ -1680,8 +1680,8 @@ case "$1" in
 #	;;
 #--uniq-per-file-sys | --upfs )
 
-#	find /usr /etc /opt -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="ru" -F"=" '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";if(index($1,"["GetLang"]")){print $0}else{if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
-#		find /usr /etc /opt -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
+#	find /usr /etc /opt -type f -L -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="ru" -F"=" '{if (index($1,"[") == 1)  printf "  "FILENAME"\n" $1"\n";if(index($1,"["GetLang"]")){print $0}else{if(index($1,"]") == 0) print $0}}' "{}" \; | grep -v ^"\#"
+#		find /usr /etc /opt -type f -L -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v GetLang="$FLang" -v ShowAvailableLanguages="$3"  -F= '//{
 #		if(index($1,"[") != 0 && index($1,"[") != 1 ){split($1,Lang,"[")UniqLang[Lang[2]]++};
 #		if(index($1,"["GetLang"]") != 0 ){Item[cnt++]=$0}else { if(index($1,"]") == 0)Item[cnt++]=$0}
 #		}END{
@@ -1713,7 +1713,7 @@ case "$1" in
         SearchContentOfVariable "$@"
 	;;
 --more-sys | --ms )
-	find /usr /etc /opt -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
+	find /usr /etc /opt -type f -L -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2"  -F= '/^create/;{ 
 		if(index($1,"]") == 0)
 			{
 			Var[CountV++]=$1;
@@ -1759,7 +1759,7 @@ case "$1" in
 		Example: --iovs Exec,Type filename'
 		exit 1
 	fi
-	find  /usr /etc /opt -type f -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Fname="$3" -F= '//{ 
+	find  /usr /etc /opt -type f -L -name "*\.desktop" -exec awk  -v CLR="$DISABLE_COLORS" -v FindIt="$2" -v Fname="$3" -F= '//{ 
 		if(FindIt){
 		SizeArray=split(FindIt,ArrayFindIt,",");
 		if (index($0,"[") == 1 ) YesFoundIt[CountFinds++]=$0;
@@ -1829,7 +1829,7 @@ case "$1" in
 --no-var-sys | --nvs )
 
 	if [[ ! -z "$2" ]];then
-		find /usr /etc /opt -type f -name "*\.desktop" -exec grep -i -H -L "$2" \;
+		find /usr /etc /opt -type f -L -name "*\.desktop" -exec grep -i -H -L "$2" \;
 	else
 		echo 'No options are given.'
 	fi
@@ -1885,13 +1885,13 @@ case "$1" in
 	if [[ -d "$GetPathList" ]]; then
 		InPath="$GetPathList"
 	fi
-	find "$InPath" -type f \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null | sort -u 
+	find "$InPath" -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null | sort -u 
 	 if [[ "$InPath" == "/" ]];then 
 	  	exit 0
  		fi
 	done
 	else
-		find / -type f \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null | sort -u 
+		find / -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null | sort -u 
 
 	fi
 	;;
@@ -1903,7 +1903,7 @@ case "$1" in
 	if [[ -d "$GetPathList" ]]; then
 		InPath="$GetPathList"
 	fi
-		find "$InPath" -type f -name "*\.desktop" -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+		find "$InPath" -type f -L -name "*\.desktop" -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
 		{
 		A=$1;
 		NumbArr=split(A,SArr,"/");
@@ -1917,7 +1917,7 @@ case "$1" in
  		fi
 	done
 	else
-		find / -type f -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+		find / -type f -L -name "*\.desktop"  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
 		{
 		A=$1;
 		NumbArr=split(A,SArr,"/");
@@ -1936,7 +1936,7 @@ case "$1" in
 	if [[ -d "$GetPathList" ]]; then
 		InPath="$GetPathList"
 	fi
-	find "$InPath" -type f \( -name "*.desktop" -o -name "*.directory" \)  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+	find "$InPath" -type f -L \( -name "*.desktop" -o -name "*.directory" \)  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
 		{
 		A=$1;
 		NumbArr=split(A,SArr,"/");
@@ -1949,7 +1949,7 @@ case "$1" in
 	       	sort -u 
 	done
 	else
-		find "$InPath" -type f \( -name "*.desktop" -o -name "*.directory" \)  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
+		find "$InPath" -type f -L \( -name "*.desktop" -o -name "*.directory" \)  -exec grep -H ^Exec "{}" \; 2> /dev/null | awk -F: '
 		{
 		A=$1;
 		NumbArr=split(A,SArr,"/");
@@ -1972,7 +1972,7 @@ case "$1" in
 	if [[ -d "$GetPathList" ]]; then
 		InPath="$GetPathList"
 	fi
-	find "$InPath" -type f \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null |\
+	find "$InPath" -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null |\
 	       	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g'  -e 's/\.\*/*/g' -e 's/**\*/*/g' |\
 	       	sort -u 
 	       	#| sed "s/$/$3/g"
@@ -1981,7 +1981,7 @@ case "$1" in
  		fi
 	done
 	else
-		find / -type f \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null |\
+		find / -type f -L \( -name "*.desktop" -o -name "*.directory" \) -exec dirname "{}" \; 2> /dev/null |\
 		      	sed -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/\.\*/*/g' -e 's/\*\**/*/g' |\
 			sort -u 
 			#| sed "s/$/$3/g"
@@ -1995,7 +1995,7 @@ case "$1" in
 	;;
 --create-local-list | --cll)
 	mkdir -p "$(dirname "$LocalArray")"
-	find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$LocalArray"
+	find / -type f -L -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$LocalArray"
 	;;
 #--update-path-file | --upf)
 #	if [[ "$UID" != 0 ]];then  
@@ -2007,7 +2007,7 @@ case "$1" in
 #		else
 #			if [[ -f "$2" ]];then
 #				mkdir -p "$(dirname $GlobalArray)"
-#				find /usr /etc /opt -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u >> "$2";
+#				find /usr /etc /opt -type f -L -name "*\.desktop" -exec dirname "{}" \; | sort -u >> "$2";
 #				sed -i -e 's/[0-9][0-9]*/*/g' -e 's/"//g' -e 's/\/$//g' -e 's/ /*/g' -e 's/[0-9]\.[0-9]*/*/g' -e 's/**\*/*/g' "$2";
 #				uniq -u "$2" /tmp/uniq-tmp.txt
 #				cp "/tmp/uniq-tmp.txt" "$2"
@@ -2040,7 +2040,7 @@ case "$1" in
 		exit 1
 	else
 		mkdir -p "$(dirname $GlobalArray)"
-		find / -type f -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$GlobalArray"
+		find / -type f -L -name "*\.desktop" -exec dirname "{}" \; | sort -u > "$GlobalArray"
 	fi
 	;;
 
@@ -2116,7 +2116,7 @@ fi
 IFS="
 "
 MimePathArray+=("$(
-find "/usr/local/share/applications" "/usr/share/applications" "$PName" -type f -name "*\.desktop" -exec dirname "{}" \; | 
+find "/usr/local/share/applications" "/usr/share/applications" "$PName" -type f -L -name "*\.desktop" -exec dirname "{}" \; | 
 sort -u |
 sed "s/$/\/\*.desktop/" )")
 
@@ -2126,17 +2126,17 @@ IFS="
 "
 		case $3 in
 			g | glob )
-				List_XML=($(find "/usr/" "/etc/" "$HOME/.local/" "$HOME/.config"  -type f -name "*\.xml"));
+				List_XML=($(find "/usr/" "/etc/" "$HOME/.local/" "$HOME/.config"  -type f -L -name "*\.xml"));
 			;;
 			l | local )
-				List_XML=($(find  "$HOME/.config" "$HOME/.local/" -type f -name "*\.xml"));
+				List_XML=($(find  "$HOME/.config" "$HOME/.local/" -type f -L -name "*\.xml"));
 			;;
 			* )
-				List_XML=($(find "/usr/share/mime/packages/" "/usr/share/mime/application/" "$HOME/.local/share/" -type f -name "*\.xml"));     
+				List_XML=($(find "/usr/share/mime/packages/" "/usr/share/mime/application/" "$HOME/.local/share/" -type f -L -name "*\.xml"));     
 	    		 ;;
 		esac
  for In_XML_List in "${List_XML[@]}";do
-find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISABLE_COLORS" -F"\"" '{YesM=0;
+find "$In_XML_List" -type f -L -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISABLE_COLORS" -F"\"" '{YesM=0;
 	if(index($0,"mime-type")){if(index($0,"type type=")){ContentArray[Count++]=$2" == ";YesM=1}else{if(index($0," type=")){
 		ContentArray[Count++]=$4" == "}}}		
 		
@@ -2308,7 +2308,7 @@ find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISA
 	List_Dirs+=("/usr/share/mime-info/")
 	if [[ -z "$2"  ]];then
 		for In_List in "${List_Dirs[@]}";do
-[[ -d "${In_List}" ]]	&& find "${In_List}" -type f  \( -name "*mimeapps.list" -o -name "defaults.list"  -o -name "*.keys" -o -name "*.xml" -o -name "*.mime"  \) -print0 | \
+[[ -d "${In_List}" ]]	&& find "${In_List}" -type f -L  \( -name "*mimeapps.list" -o -name "defaults.list"  -o -name "*.keys" -o -name "*.xml" -o -name "*.mime"  \) -print0 | \
 				xargs -0 awk  -v CLR="$DISABLE_COLORS" -v GetType="$2"  '{GetListName=length(FILENAME)-4;
 			if(index(FILENAME,".list") == GetListName ){
 				GetContentList[CountItems++]=$0;YesFN=FILENAME
@@ -2343,7 +2343,7 @@ find "$In_XML_List" -type f -name "*\.xml" -print0 | xargs -0 awk  -v CLR="$DISA
 
 		for In_List in "${List_Dirs[@]}";do
 
-		[[ -d  "${In_List}"  ]]	&&	find "${In_List}" -type f  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  -v CLR="$DISABLE_COLORS"  '{ 
+		[[ -d  "${In_List}"  ]]	&&	find "${In_List}" -type f -L  \( -name "*mimeapps.list" -o -name "defaults.list" \) -exec awk  -v CLR="$DISABLE_COLORS"  '{ 
 		       	CollectMIMEContent[count++]=$0 
 			}END{
 				if(CLR == "YES")
